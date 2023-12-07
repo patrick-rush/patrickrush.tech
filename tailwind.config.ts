@@ -6,7 +6,8 @@ export default {
   theme: {
     extend: {
       fontFamily: {
-        cutive: ['"Cutive Mono"', ...defaultTheme.fontFamily.sans]
+        // cutive: ['"Cutive Mono"', ...defaultTheme.fontFamily.sans]
+        sans: ['Inter var', ...defaultTheme.fontFamily.sans],
       }
     },
   },

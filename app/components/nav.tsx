@@ -2,8 +2,8 @@ import { Link, NavLink } from '@remix-run/react';
 // import CodeIcon from '@mui/icons-material/Code';
 
 export default function Nav() {
-  const activeClassName = "bg-theme-nav-clickable-active text-theme-nav-clickable-text-active hover:text-theme-nav-clickable-text-hover px-3 py-2 rounded-md text-sm font-cutive";
-  const inactiveClassName = "text-theme-nav-clickable-text hover:bg-theme-nav-clickable-hover hover:text-theme-nav-clickable-text px-3 py-2 rounded-md text-sm font-cutive";
+  const activeClassName = "bg-theme-nav-clickable-active text-theme-nav-clickable-text-active hover:text-theme-nav-clickable-text-hover px-3 py-2 rounded-md text-sm font-sans";
+  const inactiveClassName = "text-theme-nav-clickable-text hover:bg-theme-nav-clickable-hover hover:text-theme-nav-clickable-text px-3 py-2 rounded-md text-sm font-sans";
   return (
     <nav className="bg-theme-primary-dark">
         <div className="max-w-8xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -14,7 +14,7 @@ export default function Nav() {
                   {/* <svg className="w-6 h-6 mr-2 text-theme-clickable stroke-[1.5px]" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                     <path strokeLinecap="round" strokeLinejoin="round" d="M3.75 6.75h16.5M3.75 12H12m-8.25 5.25h16.5" />
                   </svg> */}
-                  <span className="font-cutive text-theme-clickable">Patrick Rush</span>
+                  <span className="font-sans text-theme-clickable">Patrick Rush</span>
                 </div>
               </Link>
               <div className="hidden md:block">
