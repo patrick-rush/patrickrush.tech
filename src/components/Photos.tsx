@@ -9,7 +9,6 @@ import clsx from 'clsx'
 export const Photos = async () => {
     const imageDirectory = path.join(process.cwd(), '/public/images/');
     const imageFilenames = await fs.readdir(imageDirectory)
-    console.log(imageFilenames)
 
     return (
         <Gallery images={imageFilenames} />
@@ -36,7 +35,7 @@ const Gallery = ({ images }: { images: Array<string>; }) => {
                     >
                     <Image
                         src={`/images/${image}`}
-                        alt={image.split('-').join(' ').slice(0, -5)}
+                        alt={image.split(".")[0].split('-').join(' ')}
                         fill
                         sizes="(min-width: 640px) 18rem, 11rem"
                         className="absolute inset-0 h-full w-full object-cover"

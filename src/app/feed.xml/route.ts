@@ -4,6 +4,7 @@ import { Feed } from 'feed'
 
 export async function GET(req: Request) {
   let siteUrl = process.env.NEXT_PUBLIC_SITE_URL
+  const EMAIL_ADDRESS = process.env.NEXT_PUBLIC_EMAIL_ADDRESS
 
   if (!siteUrl) {
     throw Error('Missing NEXT_PUBLIC_SITE_URL environment variable')
@@ -11,12 +12,12 @@ export async function GET(req: Request) {
 
   let author = {
     name: 'Patrick Rush',
-    email: 'EMAIL_ADDRESS',
+    email: EMAIL_ADDRESS,
   }
 
   let feed = new Feed({
     title: author.name,
-    description: 'Your blog description',
+    description: 'Patrick Rush - Professional Portfolio',
     author,
     id: siteUrl,
     link: siteUrl,

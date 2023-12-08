@@ -3,6 +3,7 @@ import { Button } from '@/components/Button'
 import { Card } from '@/components/Card'
 import { Container } from '@/components/Container'
 import { Photos } from '@/components/Photos'
+import { Contact } from '@/components/Contact'
 import {
   GitHubIcon,
   InstagramIcon,
@@ -13,28 +14,28 @@ import logoPlanetaria from '@/images/logos/planetaria.svg'
 import { type ArticleWithSlug, getAllArticles } from '@/lib/articles'
 import { formatDate } from '@/lib/formatDate'
 
-function MailIcon(props: React.ComponentPropsWithoutRef<'svg'>) {
-  return (
-    <svg
-      viewBox="0 0 24 24"
-      fill="none"
-      strokeWidth="1.5"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      aria-hidden="true"
-      {...props}
-    >
-      <path
-        d="M2.75 7.75a3 3 0 0 1 3-3h12.5a3 3 0 0 1 3 3v8.5a3 3 0 0 1-3 3H5.75a3 3 0 0 1-3-3v-8.5Z"
-        className="fill-zinc-100 stroke-zinc-400 dark:fill-zinc-100/10 dark:stroke-zinc-500"
-      />
-      <path
-        d="m4 6 6.024 5.479a2.915 2.915 0 0 0 3.952 0L20 6"
-        className="stroke-zinc-400 dark:stroke-zinc-500"
-      />
-    </svg>
-  )
-}
+// function MailIcon(props: React.ComponentPropsWithoutRef<'svg'>) {
+//   return (
+//     <svg
+//       viewBox="0 0 24 24"
+//       fill="none"
+//       strokeWidth="1.5"
+//       strokeLinecap="round"
+//       strokeLinejoin="round"
+//       aria-hidden="true"
+//       {...props}
+//     >
+//       <path
+//         d="M2.75 7.75a3 3 0 0 1 3-3h12.5a3 3 0 0 1 3 3v8.5a3 3 0 0 1-3 3H5.75a3 3 0 0 1-3-3v-8.5Z"
+//         className="fill-zinc-100 stroke-zinc-400 dark:fill-zinc-100/10 dark:stroke-zinc-500"
+//       />
+//       <path
+//         d="m4 6 6.024 5.479a2.915 2.915 0 0 0 3.952 0L20 6"
+//         className="stroke-zinc-400 dark:stroke-zinc-500"
+//       />
+//     </svg>
+//   )
+// }
 
 function BriefcaseIcon(props: React.ComponentPropsWithoutRef<'svg'>) {
   return (
@@ -100,53 +101,10 @@ function SocialLink({
   )
 }
 
-function Contact() {
-  return (
-    <form
-      action="/thank-you"
-      className="rounded-2xl border border-zinc-100 p-6 dark:border-zinc-700/40"
-    >
-      <h2 className="flex text-sm font-semibold text-zinc-900 dark:text-zinc-100">
-        <MailIcon className="h-6 w-6 flex-none" />
-        <span className="ml-3">Get in touch</span>
-      </h2>
-      <div className="mt-6 flex">
-        <input
-          type="text"
-          placeholder="Your name"
-          aria-label="Your name"
-          required
-          className="min-w-0 flex-auto appearance-none rounded-md border border-zinc-900/10 bg-white px-3 py-[calc(theme(spacing.2)-1px)] shadow-md shadow-zinc-800/5 placeholder:text-zinc-400 focus:border-teal-500 focus:outline-none focus:ring-4 focus:ring-teal-500/10 dark:border-zinc-700 dark:bg-zinc-700/[0.15] dark:text-zinc-200 dark:placeholder:text-zinc-500 dark:focus:border-teal-400 dark:focus:ring-teal-400/10 sm:text-sm"
-        />
-      </div>
-      <div className="mt-6 flex">
-        <textarea
-          placeholder="Your message"
-          aria-label="Your message"
-          required
-          className="min-w-0 flex-auto appearance-none rounded-md border border-zinc-900/10 bg-white px-3 py-[calc(theme(spacing.2)-1px)] shadow-md shadow-zinc-800/5 placeholder:text-zinc-400 focus:border-teal-500 focus:outline-none focus:ring-4 focus:ring-teal-500/10 dark:border-zinc-700 dark:bg-zinc-700/[0.15] dark:text-zinc-200 dark:placeholder:text-zinc-500 dark:focus:border-teal-400 dark:focus:ring-teal-400/10 sm:text-sm"
-        />
-      </div>
-      <div className="mt-6 flex">
-        <input
-          type="email"
-          placeholder="Your email address"
-          aria-label="Your email address"
-          required
-          className="min-w-0 flex-auto appearance-none rounded-md border border-zinc-900/10 bg-white px-3 py-[calc(theme(spacing.2)-1px)] shadow-md shadow-zinc-800/5 placeholder:text-zinc-400 focus:border-teal-500 focus:outline-none focus:ring-4 focus:ring-teal-500/10 dark:border-zinc-700 dark:bg-zinc-700/[0.15] dark:text-zinc-200 dark:placeholder:text-zinc-500 dark:focus:border-teal-400 dark:focus:ring-teal-400/10 sm:text-sm"
-        />
-        <Button type="submit" className="ml-4 flex-none">
-          Send
-        </Button>
-      </div>
-    </form>
-  )
-}
-
 interface Role {
   company: string
   title: string
-  logo: ImageProps['src']
+  // logo: ImageProps['src']
   start: string | { label: string; dateTime: string }
   end: string | { label: string; dateTime: string }
 }
@@ -193,7 +151,7 @@ function Resume() {
     {
       company: 'Uplynx',
       title: 'Principle Engineer/Co-Founder',
-      logo: logoPlanetaria,
+      // logo: logoPlanetaria,
       start: '2022',
       end: {
         label: 'Present',
@@ -203,7 +161,7 @@ function Resume() {
     {
       company: 'Jackson Symphony',
       title: 'Cellist',
-      logo: logoPlanetaria,
+      // logo: logoPlanetaria,
       start: '2015',
       end: {
         label: 'Present',
@@ -213,7 +171,7 @@ function Resume() {
     {
       company: 'Paymerang',
       title: 'Software Engineer III',
-      logo: logoPlanetaria,
+      // logo: logoPlanetaria,
       start: '2021',
       end: '2023'
     },
@@ -306,7 +264,6 @@ export default async function Home() {
           {/* <div className="space-y-10 lg:pl-16 xl:pl-24"> */}
           <div className="space-y-10">
             <Contact />
-            
           </div>
         {/* </div> */}
       </Container>
