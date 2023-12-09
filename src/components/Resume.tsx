@@ -210,10 +210,34 @@ interface Role {
         end: new Date().getFullYear().toString()
       },
       {
+        name: 'AWS/Serverless',
+        level: 'Advanced',
+        start: '2021',
+        end: new Date().getFullYear().toString()
+      },
+      {
+        name: 'React',
+        level: 'Advanced',
+        start: '2020',
+        end: new Date().getFullYear().toString()
+      },
+      {
+        name: 'SQL',
+        level: 'Advanced Beginner',
+        start: '2020',
+        end: new Date().getFullYear().toString()
+      },
+      {
         name: 'Ruby/Rails',
         level: 'Intermediate',
         start: '2020',
         end: '2021'
+      },
+      {
+        name: 'HTML/CSS',
+        level: 'Intermediate',
+        start: '2020',
+        end: new Date().getFullYear().toString()
       },
     ]
   
