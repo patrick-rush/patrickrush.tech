@@ -177,17 +177,17 @@ interface Role {
         start: '2021',
         end: '2023'
       },
-      // {
-      //   company: "Blanchard's Coffee",
-      //   title: 'Web Sales Fulfillment Lead',
-      //   logo: logoStarbucks,
-      //   start: '2017',
-      //   end: '2021'
-      // },
+      {
+        company: "Blanchard's Coffee",
+        title: 'Web Sales Fulfillment Lead',
+        // logo: logoStarbucks,
+        start: '2017',
+        end: '2021'
+      },
     ]
   
     return (
-      <ol className="mt-6 space-y-4">
+      <ol className="mt-6 space-y-4 max-h-44 overflow-scroll">
         {workHistory.map((role, roleIndex) => (
           <Role key={roleIndex} role={role} />
         ))}
@@ -210,15 +210,39 @@ interface Role {
         end: new Date().getFullYear().toString()
       },
       {
+        name: 'AWS/Serverless',
+        level: 'Advanced',
+        start: '2021',
+        end: new Date().getFullYear().toString()
+      },
+      {
+        name: 'React',
+        level: 'Advanced',
+        start: '2020',
+        end: new Date().getFullYear().toString()
+      },
+      {
+        name: 'SQL',
+        level: 'Advanced Beginner',
+        start: '2020',
+        end: new Date().getFullYear().toString()
+      },
+      {
         name: 'Ruby/Rails',
         level: 'Intermediate',
         start: '2020',
         end: '2021'
       },
+      {
+        name: 'HTML/CSS',
+        level: 'Intermediate',
+        start: '2020',
+        end: new Date().getFullYear().toString()
+      },
     ]
   
     return (
-      <ol className="mt-6 space-y-4">
+      <ol className="mt-6 space-y-4 max-h-44 overflow-scroll">
         {skills.map((skill, skillIndex) => (
           <Skill key={skillIndex} skill={skill} />
         ))}
@@ -248,9 +272,9 @@ interface Role {
     ]
   
     return (
-      <div className="rounded-2xl border border-zinc-100 p-6 dark:border-zinc-700/40">
+      <div className="rounded-2xl border border-zinc-100 p-6 dark:border-zinc-700/40 flex flex-col">
         <h2 className="flex justify-between text-sm font-semibold text-zinc-900 dark:text-zinc-100">
-            <div className="flex">
+            <div className="flex items-center">
                 <BriefcaseIcon className="h-6 w-6 flex-none" />
                 <span className="ml-3">{sections[activeElement].title}</span>
             </div>
@@ -258,7 +282,9 @@ interface Role {
                 <ArrowIcon className="h-6 w-6 flex-none cursor-pointer" onClick={() => setActiveElement((activeElement + 1)%sections.length)}/>
             </div>
         </h2>
-        {sections[activeElement].component}
+        <div className="flex-grow">
+          {sections[activeElement].component}
+        </div>
         <Button href={RESUME_URL} variant="secondary" className="group mt-6 w-full">
           Download Resume
           <ArrowDownIcon className="h-4 w-4 stroke-zinc-400 transition group-active:stroke-zinc-600 dark:group-hover:stroke-zinc-50 dark:group-active:stroke-zinc-50" />
