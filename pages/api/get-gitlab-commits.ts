@@ -18,12 +18,14 @@ export default async function handler(
         })
         const responseJson = await response.json()
         console.log("GitLab Response:", responseJson)
+        return res.status(200).json({
+            message: "Success",
+            body: responseJson
+        });
     } catch (err) {
         console.log("Error reaching GitLab:", err)
         return res.status(500).json({ message: err });
     }
-
-    return res.status(200).json({ message: "Success" });
 }
 
 const getPastDate = (subtrahend: number): string => {
