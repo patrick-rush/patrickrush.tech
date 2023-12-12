@@ -25,7 +25,7 @@ export default {
     },
     extend: {
       gridTemplateColumns: {
-        '52': 'repeat(52, minmax(0, 16px))',
+        '52': 'repeat(52, minmax(0, 15.5px))',
       }
     },
     // colors: {

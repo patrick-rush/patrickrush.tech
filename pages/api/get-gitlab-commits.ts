@@ -6,21 +6,46 @@ export default async function handler(
 ) {
 
     const GITLAB_PAT = process.env.GITLAB_PAT || '';
-    const url = 'https://gitlab.com/api/v4/projects/41808127/repository/commits?all=true&author=' + encodeURIComponent('Patrick Rush') + '&since=' + getPastDate(1)
-    console.log(url)
+
     try {
-        const response = await fetch(url, {
-            method: 'GET',
-            headers: {
-                'PRIVATE-TOKEN': GITLAB_PAT,
-                'Content-Type': 'application/json',
+        const accumulator: any[] = []
+        const fetchData = async (page: number = 1) => {
+
+            const url = buildUrl({
+                contributor: 'Patrick Rush',
+                monthsBack: 12,
+                page: page
+            })
+
+            const response = await fetch(url, {
+                method: 'GET',
+                headers: {
+                    'PRIVATE-TOKEN': GITLAB_PAT,
+                    'Content-Type': 'application/json',
+                }
+            })
+
+            const headers = response.headers
+            const nextPage = headers.get("x-next-page")
+
+            const responseJson = await response.json()
+            accumulator.push(...responseJson)
+
+            if (nextPage) await fetchData(+nextPage)
+        }
+
+        await fetchData()
+        
+        const processedData = accumulator.map(commit => {
+            return {
+                date: commit["committed_date"],
+                source: "GitLab"
             }
         })
-        const responseJson = await response.json()
-        console.log("GitLab Response:", responseJson)
+
         return res.status(200).json({
             message: "Success",
-            body: responseJson
+            body: processedData
         });
     } catch (err) {
         console.log("Error reaching GitLab:", err)
@@ -32,4 +57,20 @@ const getPastDate = (subtrahend: number): string => {
     let date = new Date()
     date.setMonth(date.getMonth() - subtrahend)
     return date.toISOString()
+}
+
+const buildUrl = ({ 
+    contributor,
+    monthsBack,
+    perPage = 100,
+    page = 0
+}:{
+    contributor: string,
+    monthsBack: number,
+    perPage?: number,
+    page?: number
+}) => {
+    let url = 'https://gitlab.com/api/v4/projects/41808127/repository/commits?all=true&author=' + encodeURIComponent(contributor) + '&since=' + getPastDate(monthsBack) + `&per_page=${perPage}`
+    if (page) url += `&page=${page}`
+    return url
 }
