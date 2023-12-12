@@ -13,7 +13,7 @@ import {
 import logoPlanetaria from '@/images/logos/planetaria.svg'
 import { type ArticleWithSlug, getAllArticles } from '@/lib/articles'
 import { formatDate } from '@/lib/formatDate'
-import GitHubContributionGraph from '@/components/CommitGrid'
+import { CommitGrid } from '@/components/CommitGrid'
 
 
 function Article({ article }: { article: ArticleWithSlug }) {
@@ -105,7 +105,7 @@ export default async function Home() {
           {/* <div className="space-y-10 lg:pl-16 xl:pl-24"> */}
           <div className="space-y-10">
             <Contact />
-            <GitHubContributionGraph />
+            <CommitGrid />
           </div>
         {/* </div> */}
       </Container>

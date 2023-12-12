@@ -1,4 +1,6 @@
 "use client"
+import { useState, useEffect, useMemo, useCallback, Suspense } from 'react'
+import type { Dispatch, SetStateAction} from 'react'
 
 interface Month {
   name: string;
@@ -28,112 +30,107 @@ function CodeIcon(props: React.ComponentPropsWithoutRef<'svg'>) {
         />
       </svg>
     )
-  }
+}
 
-  const generateMonths = (): Month[] => {
+function generateMonths(): Month[] {
     const months: Month[] = [];
-  
+
     const monthNames = [
-      'January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'
+        'January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'
     ];
 
     const currentMonth = new Date().getMonth();
     const orderedMonths = [...monthNames.slice(currentMonth + 1), ...monthNames.slice(0, currentMonth + 1)]
-  
+
     for (let i = 0; i < 12; i++) {
-      const monthName = orderedMonths[i];
-      const monthAbbr = monthName.slice(0, 3);
-      const currentYear = new Date().getFullYear();
-      const daysInMonth = new Date(currentYear, i + 1, 0).getDate();
-  
-      months.push({ name: monthName, abbr: monthAbbr, days: daysInMonth });
+        const monthName = orderedMonths[i];
+        const monthAbbr = monthName.slice(0, 3);
+        const currentYear = new Date().getFullYear();
+        const daysInMonth = new Date(currentYear, i + 1, 0).getDate();
+
+        months.push({ name: monthName, abbr: monthAbbr, days: daysInMonth });
     }
-  
+
     return months;
-  };
+};
 
-import React, { useEffect, useState } from 'react';
-
-function daysIntoYear(date: Date | string){
-    if (typeof date === 'string') date = new Date(date)
-    return (Date.UTC(date.getFullYear(), date.getMonth(), date.getDate()) - Date.UTC(date.getFullYear(), 0, 0)) / 24 / 60 / 60 / 1000;
-}
-
-const gitHubData = [
-    {
-        "date": "2023-10-16T00:11:22.000+00:00",
-        "level": 1,
-        "source": "GitHub"
-      },
-      {
-        "date": "2023-11-15T03:44:57.000+00:00",
-        "level": 1,
-        "source": "GitHub"
-      },
-]
-
-const GitHubContributionGraph = () => {
+export const CommitGrid = () => {
     "use client"
     const [active, setActive] = useState<'all' | 'github' | 'gitlab'>('all')
-    const months: Month[] = generateMonths()
-    const [gitLabData, setGitLabData] = useState<Contribution[]>([])
+    const [gitHubLoading, setGitHubLoading] = useState<boolean>(true)
+    const [gitLabLoading, setGitLabLoading] = useState<boolean>(true)
+    const months: Month[] = useMemo(() => generateMonths(), []); // Memoize months array
 
-    let allContributions: {
-        [key: number]: Contribution[] | undefined
-    } = {}
-    let gitHubContributions: {
-        [key: number]: Contribution[] | undefined
-    } = {}
-    let gitLabContributions: {
-        [key: number]: Contribution[] | undefined
-    } = {}
+    const fetchData = useCallback(async (apiEndpoint: string, setData: Dispatch<SetStateAction<Contribution[]>>) => {
+        try {
+            const response = await fetch(apiEndpoint, {
+                method: 'GET',
+                headers: {
+                    'content-type': 'application/json'
+                }
+            })
+
+            if (response.status === 200) {
+                const responseJson = await response.json()
+                setData(responseJson.body)
+            } else {
+                const res = await response.text()
+                console.log(res)
+            }
+        } catch (err) {
+            console.log("Error", err)
+        }
+    }, []);
+
+    const [gitLabData, setGitLabData] = useState<Contribution[]>([]);
+    const [gitHubData, setGitHubData] = useState<Contribution[]>([]);
 
     useEffect(() => {
-        (async () => {
-            try {
-                const response = await fetch('/api/get-gitlab-commits', {
-                    method: 'GET',
-                    headers: {
-                        'content-type': 'application/json'
-                    }
-                })
-          
-                if (response.status === 200) {
-                  console.log("response", response)
-                  const responseJson = await response.json()
-                  setGitLabData(responseJson.body)
-                } else {
-                  const res = await response.text()
-                  console.log(res)
-                }
-            } catch (err) {
-                console.log("Error", err)
-            }      
-        })()
-    }, [])
+        fetchData('/api/get-gitlab-commits', setGitLabData).then(() => {
+            setGitLabLoading(false)
+        });
+    }, [fetchData]);
 
-    /* Process GitHub data */
-    gitHubData.forEach(entry => {
-        const dayOfYear = daysIntoYear(entry.date)
+    useEffect(() => {
+        fetchData('/api/get-github-commits', setGitHubData).then(() => {
+            setGitHubLoading(false)
+        });
+    }, [fetchData]);
 
-        if (allContributions[dayOfYear]) allContributions[dayOfYear]?.push(entry)
-        else allContributions[dayOfYear] = [entry]
-    
-        if (gitHubContributions[dayOfYear]) gitHubContributions[dayOfYear]?.push(entry)
-        else gitHubContributions[dayOfYear] = [entry]
-    })
+    const daysIntoYear = useCallback((date: Date | string) => {
+        if (typeof date === 'string') date = new Date(date)
+        return (Date.UTC(date.getFullYear(), date.getMonth(), date.getDate()) - Date.UTC(date.getFullYear(), 0, 0)) / 24 / 60 / 60 / 1000;
+    }, []);
 
-    /* Process GitLab data */
-    gitLabData.forEach(entry => {
-        const dayOfYear = daysIntoYear(entry.date)
+    const gitHubContributions = useMemo(() => {
+        const contributions: { [key: number]: Contribution[] | undefined } = {};
+        gitHubData.forEach(entry => {
+            const dayOfYear = daysIntoYear(entry.date);
+            if (contributions[dayOfYear]) contributions[dayOfYear]?.push(entry);
+            else contributions[dayOfYear] = [entry];
+        });
+        return contributions;
+    }, [gitHubData, daysIntoYear]);
 
-        if (allContributions[dayOfYear]) allContributions[dayOfYear]?.push(entry)
-        else allContributions[dayOfYear] = [entry]
-    
-        if (gitLabContributions[dayOfYear]) gitLabContributions[dayOfYear]?.push(entry)
-        else gitLabContributions[dayOfYear] = [entry]
-    })
+    const gitLabContributions = useMemo(() => {
+        const contributions: { [key: number]: Contribution[] | undefined } = {};
+        gitLabData.forEach(entry => {
+            const dayOfYear = daysIntoYear(entry.date);
+            if (contributions[dayOfYear]) contributions[dayOfYear]?.push(entry);
+            else contributions[dayOfYear] = [entry];
+        });
+        return contributions;
+    }, [gitLabData, daysIntoYear]);
 
+    const allContributions = useMemo(() => {
+        const contributions: { [key: number]: Contribution[] | undefined } = {};
+        [...gitHubData, ...gitLabData].forEach(entry => {
+            const dayOfYear = daysIntoYear(entry.date);
+            if (contributions[dayOfYear]) contributions[dayOfYear]?.push(entry);
+            else contributions[dayOfYear] = [entry];
+        });
+        return contributions;
+    }, [gitHubData, gitLabData, daysIntoYear]);
     return (
         <div className="rounded-2xl border border-zinc-100 p-6 dark:border-zinc-700/40">
             <h2 className="flex justify-between text-sm font-semibold text-zinc-900 dark:text-zinc-100">
@@ -149,7 +146,7 @@ const GitHubContributionGraph = () => {
                 </div>
             </h2>
             <div className="flex justify-center ">
-                <div className="grid gap-[3px] overflow-hidden">
+                <div className="grid gap-[3px] overflow-x-hidden">
                     {/* Month Header Row */}
                     <div className="grid-cols-12 w-[962px] grid gap-[3px]">
                         {months.map((month, index) => (
@@ -176,10 +173,12 @@ const GitHubContributionGraph = () => {
                                     break
                             }
                             const contributionsPerLocation = activeContributions[location]
+                            const loading = gitLabLoading || gitHubLoading
+                            const loadingStyles = 'animate-pulse bg-zinc-100 dark:bg-zinc-800'
                             const blankStyles = 'bg-zinc-100 dark:bg-zinc-800'
                             const filledStyles = 'bg-teal-500 dark:bg-teal-400'
                             return (
-                                <div key={colIndex} id={"grid-square-" + location} className={`p-2 text-center rounded-sm ${contributionsPerLocation?.length ? filledStyles : blankStyles}`}>
+                                <div key={colIndex} id={"grid-square-" + location} className={`p-2 text-center rounded-sm ${loading ? loadingStyles : contributionsPerLocation?.length ? filledStyles : blankStyles}`}>
                                 </div>
                             )})}
                         </div>
@@ -189,5 +188,3 @@ const GitHubContributionGraph = () => {
         </div>
     );
 };
-
-export default GitHubContributionGraph;
