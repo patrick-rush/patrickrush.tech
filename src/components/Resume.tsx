@@ -253,7 +253,7 @@ interface Role {
   export const Resume = () => {
     "use client"
     const [activeElement, setActiveElement] = useState(0)
-    const RESUME_URL = process.env.RESUME_URL || ""
+    const RESUME_URL = process.env.NEXT_PUBLIC_RESUME_URL || "/not-found"
   
     interface ResumeSection {
       title: string
