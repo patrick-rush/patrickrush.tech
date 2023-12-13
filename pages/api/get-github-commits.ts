@@ -23,7 +23,7 @@ export default async function handler(
             headers: {
                 'X-GitHub-Api-Version': '2022-11-28'
             },
-            per_page: 1,
+            per_page: 100,
             since: refDate,
             type: 'all',
         })
@@ -36,7 +36,7 @@ export default async function handler(
                     'X-GitHub-Api-Version': '2022-11-28'
                 },
                 per_page: 100,
-                author: 'patrick-rush',
+                committer: 'patrick-rush',
                 since: refDate,
             })
 
