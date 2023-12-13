@@ -55,7 +55,7 @@ interface Role {
         >
             <path
                 d="M4.5 12h15m0 0l-6.75-6.75M19.5 12l-6.75 6.75"
-                className="fill-zinc-100 stroke-zinc-400 dark:fill-zinc-100/10 dark:stroke-zinc-500"
+                className="fill-zinc-100 stroke-zinc-400 dark:fill-zinc-100/10 dark:stroke-zinc-500 transition group-hover:fill-teal-500 group-hover:dark:fill-teal-400 group-hover:stroke-teal-500 group-hover:dark:stroke-teal-400"
             />
         </svg>
     )
@@ -279,7 +279,7 @@ interface Role {
                 <span className="ml-3">{sections[activeElement].title}</span>
             </div>
             <div className="">
-                <ArrowIcon className="h-6 w-6 flex-none cursor-pointer" onClick={() => setActiveElement((activeElement + 1)%sections.length)}/>
+                <ArrowIcon className="h-6 w-6 flex-none cursor-pointer group" onClick={() => setActiveElement((activeElement + 1)%sections.length)}/>
             </div>
         </h2>
         <div className="flex-grow">
