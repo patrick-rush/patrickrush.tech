@@ -6,6 +6,8 @@ interface Month {
   name: string;
   abbr: string;
   days: number;
+  year: number;
+  firstDay: number;
 }
 
 interface Contribution {
@@ -42,13 +44,21 @@ function generateMonths(): Month[] {
     const currentMonth = new Date().getMonth();
     const orderedMonths = [...monthNames.slice(currentMonth + 1), ...monthNames.slice(0, currentMonth + 1)]
 
+    const getPastDate = (subtrahend: number): Date => {
+        let date = new Date()
+        date.setMonth(date.getMonth() - subtrahend)
+        return date
+    }
+
     for (let i = 0; i < 12; i++) {
         const monthName = orderedMonths[i];
         const monthAbbr = monthName.slice(0, 3);
-        const currentYear = new Date().getFullYear();
-        const daysInMonth = new Date(currentYear, i + 1, 0).getDate();
+        const monthIndex = monthNames.findIndex(entry => entry === monthName)
+        const yearOfMonth = getPastDate(11 - i).getFullYear()
+        const daysInMonth = new Date(yearOfMonth, monthIndex, 0).getDate();
+        const firstDayOfMonth = new Date(yearOfMonth, monthIndex, 1).getDay()
 
-        months.push({ name: monthName, abbr: monthAbbr, days: daysInMonth });
+        months.push({ name: monthName, abbr: monthAbbr, days: daysInMonth, year: yearOfMonth, firstDay: firstDayOfMonth });
     }
 
     return months;
@@ -131,6 +141,7 @@ export const CommitGrid = () => {
         });
         return contributions;
     }, [gitHubData, gitLabData, daysIntoYear]);
+
     return (
         <div className="rounded-2xl border border-zinc-100 p-6 dark:border-zinc-700/40">
             <h2 className="flex justify-between text-sm font-semibold text-zinc-900 dark:text-zinc-100">
@@ -146,7 +157,7 @@ export const CommitGrid = () => {
                 </div>
             </h2>
             <div className="flex justify-center ">
-                <div className="grid gap-[3px] overflow-x-hidden">
+                <div className="grid gap-[3px] overflow-hidden">
                     {/* Month Header Row */}
                     <div className="grid-cols-12 w-[962px] grid gap-[3px]">
                         {months.map((month, index) => (
@@ -159,7 +170,9 @@ export const CommitGrid = () => {
                     {Array.from({ length: 7 }).map((_, rowIndex) => (
                         <div key={rowIndex} className="grid-cols-52 grid gap-[3px]">
                         {Array.from({ length: 52 }).map((_, colIndex) => {
-                            const location = (colIndex * 7) + (rowIndex + 1)
+
+                            const location = ((colIndex * 7) + (rowIndex + 1)) - months[0].firstDay
+                            
                             let activeContributions
                             switch (active) {
                                 case 'github':
@@ -172,15 +185,22 @@ export const CommitGrid = () => {
                                     activeContributions = allContributions
                                     break
                             }
+
                             const contributionsPerLocation = activeContributions[location]
+                            const numberOfCommits = contributionsPerLocation?.length || 0
+                            const isHidden = location < 0 || location > daysIntoYear(new Date())
                             const loading = gitLabLoading || gitHubLoading
+
                             const loadingStyles = 'animate-pulse bg-zinc-100 dark:bg-zinc-800'
                             const blankStyles = 'bg-zinc-100 dark:bg-zinc-800'
                             const filledStyles = 'bg-teal-500 dark:bg-teal-400'
+                            const hiddenStyles = 'bg-transparent'
+                            
                             return (
-                                <div key={colIndex} id={"grid-square-" + location} className={`p-2 text-center rounded-sm ${loading ? loadingStyles : contributionsPerLocation?.length ? filledStyles : blankStyles}`}>
+                                <div title={`Commits: ${numberOfCommits}`} key={colIndex} id={"grid-square-" + location} className={`p-2 text-center rounded-sm ${loading ? loadingStyles : isHidden ? hiddenStyles : numberOfCommits ? filledStyles : blankStyles}`}>
                                 </div>
                             )})}
+
                         </div>
                     ))}
                 </div>
