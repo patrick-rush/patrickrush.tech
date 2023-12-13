@@ -1,7 +1,6 @@
 import Link from 'next/link'
 
 import { ContainerInner, ContainerOuter } from '@/components/Container'
-import { Test } from './Test'
 
 function NavLink({
   href,
@@ -38,7 +37,6 @@ export function Footer() {
                 reserved.
               </p>
             </div>
-            <Test />
           </ContainerInner>
         </div>
       </ContainerOuter>
