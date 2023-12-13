@@ -156,53 +156,55 @@ export const CommitGrid = () => {
                     <span onClick={() => setActive('gitlab')} className={`cursor-pointer ${active === 'gitlab' ? "text-teal-500 dark:text-teal-400" : "text-zinc-800 transition hover:text-teal-500 dark:text-zinc-200 dark:hover:text-teal-500"}`}>GitLab</span>
                 </div>
             </h2>
-            <div className="flex justify-center direction-rtl">
+            <div dir="rtl" className="flex justify-center">
                 <div className="grid gap-[3px] overflow-x-scroll overflow-y-hidden md:overflow-hidden">
-                    {/* Month Header Row */}
-                    <div className="grid-cols-12 w-[962px] grid gap-[3px]">
-                        {months.map((month, index) => (
-                            <div key={index} className="p-2 text-center text-zinc-600 dark:text-zinc-400 font-medium text-xs">
-                                {month.abbr}
+                    <span dir="ltr" className="grid gap-[3px]">
+                        {/* Month Header Row */}
+                        <div className="grid-cols-12 w-[962px] grid gap-[3px]">
+                            {months.map((month, index) => (
+                                <div key={index} className="p-2 text-center text-zinc-600 dark:text-zinc-400 font-medium text-xs">
+                                    {month.abbr}
+                                </div>
+                            ))}
+                        </div>
+                        {/* Grid Rows */}
+                        {Array.from({ length: 7 }).map((_, rowIndex) => (
+                            <div key={rowIndex} className="grid-cols-52 grid gap-[3px]">
+                            {Array.from({ length: 52 }).map((_, colIndex) => {
+
+                                const location = ((colIndex * 7) + (rowIndex + 1)) - months[0].firstDay
+                                
+                                let activeContributions
+                                switch (active) {
+                                    case 'github':
+                                        activeContributions = gitHubContributions
+                                        break
+                                    case 'gitlab':
+                                        activeContributions = gitLabContributions
+                                        break
+                                    default:
+                                        activeContributions = allContributions
+                                        break
+                                }
+
+                                const contributionsPerLocation = activeContributions[location]
+                                const numberOfCommits = contributionsPerLocation?.length || 0
+                                const isHidden = location < 0 || location > daysIntoYear(new Date())
+                                const loading = gitLabLoading || gitHubLoading
+
+                                const loadingStyles = 'animate-pulse bg-zinc-100 dark:bg-zinc-800'
+                                const blankStyles = 'bg-zinc-100 dark:bg-zinc-800'
+                                const filledStyles = 'bg-teal-500 dark:bg-teal-400'
+                                const hiddenStyles = 'bg-transparent'
+                                
+                                return (
+                                    <div title={`Commits: ${numberOfCommits}`} key={colIndex} id={"grid-square-" + location} className={`p-2 text-center rounded-sm ${loading ? loadingStyles : isHidden ? hiddenStyles : numberOfCommits ? filledStyles : blankStyles}`}>
+                                    </div>
+                                )})}
+
                             </div>
                         ))}
-                    </div>
-                    {/* Grid Rows */}
-                    {Array.from({ length: 7 }).map((_, rowIndex) => (
-                        <div key={rowIndex} className="grid-cols-52 grid gap-[3px]">
-                        {Array.from({ length: 52 }).map((_, colIndex) => {
-
-                            const location = ((colIndex * 7) + (rowIndex + 1)) - months[0].firstDay
-                            
-                            let activeContributions
-                            switch (active) {
-                                case 'github':
-                                    activeContributions = gitHubContributions
-                                    break
-                                case 'gitlab':
-                                    activeContributions = gitLabContributions
-                                    break
-                                default:
-                                    activeContributions = allContributions
-                                    break
-                            }
-
-                            const contributionsPerLocation = activeContributions[location]
-                            const numberOfCommits = contributionsPerLocation?.length || 0
-                            const isHidden = location < 0 || location > daysIntoYear(new Date())
-                            const loading = gitLabLoading || gitHubLoading
-
-                            const loadingStyles = 'animate-pulse bg-zinc-100 dark:bg-zinc-800'
-                            const blankStyles = 'bg-zinc-100 dark:bg-zinc-800'
-                            const filledStyles = 'bg-teal-500 dark:bg-teal-400'
-                            const hiddenStyles = 'bg-transparent'
-                            
-                            return (
-                                <div title={`Commits: ${numberOfCommits}`} key={colIndex} id={"grid-square-" + location} className={`p-2 text-center rounded-sm ${loading ? loadingStyles : isHidden ? hiddenStyles : numberOfCommits ? filledStyles : blankStyles}`}>
-                                </div>
-                            )})}
-
-                        </div>
-                    ))}
+                    </span>
                 </div>
             </div>
         </div>
