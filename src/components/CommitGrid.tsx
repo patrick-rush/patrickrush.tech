@@ -1,5 +1,5 @@
 "use client"
-import { useState, useEffect, useMemo, useCallback, Suspense } from 'react'
+import { useState, useEffect, useMemo, useCallback } from 'react'
 import type { Dispatch, SetStateAction} from 'react'
 
 interface Month {
@@ -142,6 +142,22 @@ export const CommitGrid = () => {
         return contributions;
     }, [gitHubData, gitLabData, daysIntoYear]);
 
+    let activeContributions: {
+        [key: number]: Contribution[] | undefined;
+    }
+    
+    switch (active) {
+        case 'github':
+            activeContributions = gitHubContributions
+            break
+        case 'gitlab':
+            activeContributions = gitLabContributions
+            break
+        default:
+            activeContributions = allContributions
+            break
+    }
+
     return (
         <div className="rounded-2xl border border-zinc-100 p-6 dark:border-zinc-700/40">
             <h2 className="flex justify-between text-sm font-semibold text-zinc-900 dark:text-zinc-100">
@@ -150,8 +166,7 @@ export const CommitGrid = () => {
                     <span className="ml-3">Commits</span>
                 </div>
                 <div className="flex justify-between space-x-3">
-                    <span onClick={() => setActive('all')}
-                    className={`cursor-pointer ${active === 'all' ? "text-teal-500 dark:text-teal-400" : "text-zinc-800 transition hover:text-teal-500 dark:text-zinc-200 dark:hover:text-teal-500"}`}>All</span>
+                    <span onClick={() => setActive('all')} className={`cursor-pointer ${active === 'all' ? "text-teal-500 dark:text-teal-400" : "text-zinc-800 transition hover:text-teal-500 dark:text-zinc-200 dark:hover:text-teal-500"}`}>All</span>
                     <span onClick={() => setActive('github')} className={`cursor-pointer ${active === 'github' ? "text-teal-500 dark:text-teal-400" : "text-zinc-800 transition hover:text-teal-500 dark:text-zinc-200 dark:hover:text-teal-500"}`}>GitHub</span>
                     <span onClick={() => setActive('gitlab')} className={`cursor-pointer ${active === 'gitlab' ? "text-teal-500 dark:text-teal-400" : "text-zinc-800 transition hover:text-teal-500 dark:text-zinc-200 dark:hover:text-teal-500"}`}>GitLab</span>
                 </div>
@@ -173,19 +188,6 @@ export const CommitGrid = () => {
                             {Array.from({ length: 52 }).map((_, colIndex) => {
 
                                 const location = ((colIndex * 7) + (rowIndex + 1)) - months[0].firstDay
-                                
-                                let activeContributions
-                                switch (active) {
-                                    case 'github':
-                                        activeContributions = gitHubContributions
-                                        break
-                                    case 'gitlab':
-                                        activeContributions = gitLabContributions
-                                        break
-                                    default:
-                                        activeContributions = allContributions
-                                        break
-                                }
 
                                 const contributionsPerLocation = activeContributions[location]
                                 const numberOfCommits = contributionsPerLocation?.length || 0

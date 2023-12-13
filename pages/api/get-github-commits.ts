@@ -1,6 +1,23 @@
 import { Octokit } from 'octokit';
 import type { NextApiRequest, NextApiResponse } from "next";
 
+// supplementalCommits represents commits not available via the GitHub API due to repo restrictions
+// validity can be determined by visiting http://github.com/patrick-rush
+const supplementalCommits = [
+  {
+    date: "2023-02-14T12:00:00Z",
+    source: "GitHub"
+  },
+  {
+    date: "2023-10-27T12:00:00Z",
+    source: "GitHub"
+  },
+  {
+    date: "2023-11-03T12:00:00Z",
+    source: "GitHub"
+  },
+]
+
 export default async function handler(
     req: NextApiRequest,
     res: NextApiResponse
@@ -57,6 +74,8 @@ export default async function handler(
         }
 
         const commits = await fetchAllCommits()
+
+        if (supplementalCommits) commits.push(...supplementalCommits)
     
         return res.status(200).json({
             message: "Success",
