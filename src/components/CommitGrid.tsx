@@ -156,8 +156,8 @@ export const CommitGrid = () => {
                     <span onClick={() => setActive('gitlab')} className={`cursor-pointer ${active === 'gitlab' ? "text-teal-500 dark:text-teal-400" : "text-zinc-800 transition hover:text-teal-500 dark:text-zinc-200 dark:hover:text-teal-500"}`}>GitLab</span>
                 </div>
             </h2>
-            <div className="flex justify-center ">
-                <div className="grid gap-[3px] overflow-hidden">
+            <div className="flex justify-center direction-rtl">
+                <div className="grid gap-[3px] overflow-x-scroll overflow-y-hidden md:overflow-hidden">
                     {/* Month Header Row */}
                     <div className="grid-cols-12 w-[962px] grid gap-[3px]">
                         {months.map((month, index) => (
