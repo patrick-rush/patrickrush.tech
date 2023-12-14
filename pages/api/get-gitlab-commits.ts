@@ -1,4 +1,5 @@
 import type { NextApiRequest, NextApiResponse } from "next";
+import DateUtils from '@/lib/DateUtils'
 
 export default async function handler(
     req: NextApiRequest,
@@ -53,12 +54,6 @@ export default async function handler(
     }
 }
 
-const getPastDate = (subtrahend: number): string => {
-    let date = new Date()
-    date.setMonth(date.getMonth() - subtrahend)
-    return date.toISOString()
-}
-
 const buildUrl = ({ 
     contributor,
     monthsBack,
@@ -70,7 +65,7 @@ const buildUrl = ({
     perPage?: number,
     page?: number
 }) => {
-    let url = 'https://gitlab.com/api/v4/projects/41808127/repository/commits?all=true&author=' + encodeURIComponent(contributor) + '&since=' + getPastDate(monthsBack) + `&per_page=${perPage}`
+    let url = 'https://gitlab.com/api/v4/projects/41808127/repository/commits?all=true&author=' + encodeURIComponent(contributor) + '&since=' + DateUtils.getPastDateString(monthsBack) + `&per_page=${perPage}`
     if (page) url += `&page=${page}`
     return url
 }

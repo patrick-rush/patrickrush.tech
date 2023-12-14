@@ -1,6 +1,7 @@
 "use client"
 import { useState, useEffect, useMemo, useCallback } from 'react'
 import type { Dispatch, SetStateAction } from 'react'
+import DateUtils from '@/lib/DateUtils'
 
 interface Month {
   name: string;
@@ -36,49 +37,14 @@ function CodeIcon(props: React.ComponentPropsWithoutRef<'svg'>) {
     )
 }
 
-function daysIntoYear(date: Date | string) {
-    if (typeof date === 'string') date = new Date(date)
-    return (Date.UTC(date.getFullYear(), date.getMonth(), date.getDate()) - Date.UTC(date.getFullYear(), 0, 0)) / 24 / 60 / 60 / 1000
-}
-
-function generateMonths(): Month[] {
-    const months: Month[] = []
-
-    const monthNames = [
-        'January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'
-    ]
-
-    const currentMonth = new Date().getMonth()
-    const orderedMonths = [...monthNames.slice(currentMonth + 1), ...monthNames.slice(0, currentMonth + 1)]
-
-    const getPastDate = (subtrahend: number): Date => {
-        let date = new Date()
-        date.setMonth(date.getMonth() - subtrahend)
-        return date
-    }
-
-    for (let i = 0; i < 12; i++) {
-        const monthName = orderedMonths[i]
-        const monthAbbr = monthName.slice(0, 3)
-        const monthIndex = monthNames.findIndex(entry => entry === monthName)
-        const yearOfMonth = getPastDate(11 - i).getFullYear()
-        const daysInMonth = new Date(yearOfMonth, monthIndex, 0).getDate()
-        const dateOfFirstDayOfMonth = new Date(yearOfMonth, monthIndex, 1)
-        const dayOfFirstDayOfMonth = dateOfFirstDayOfMonth.getDay()
-        const numberOfFirstDayOfMonth = daysIntoYear(dateOfFirstDayOfMonth)
-
-        months.push({ name: monthName, abbr: monthAbbr, index: monthIndex, days: daysInMonth, year: yearOfMonth, firstDay: dayOfFirstDayOfMonth, daysIntoYear: numberOfFirstDayOfMonth });
-    }
-
-    return months
-}
-
 export const CommitGrid = () => {
     "use client"
     const [active, setActive] = useState<'all' | 'github' | 'gitlab'>('all')
     const [gitHubLoading, setGitHubLoading] = useState<boolean>(true)
     const [gitLabLoading, setGitLabLoading] = useState<boolean>(true)
-    const months: Month[] = useMemo(() => generateMonths(), []) // Memoize months array
+    const [gitHubError, setGitHubError] = useState<boolean>(false)
+    const [gitLabError, setGitLabError] = useState<boolean>(false)
+    const months: Month[] = useMemo(() => DateUtils.generateMonths(), []) // Memoize months array
     const isLeapYear = months.find(month => month.name === "March")!.days === 29
 
     const fetchData = useCallback(async (apiEndpoint: string, setData: Dispatch<SetStateAction<Contribution[]>>) => {
@@ -96,9 +62,11 @@ export const CommitGrid = () => {
             } else {
                 const res = await response.text()
                 console.log(res)
+                throw Error("An error occurred while fetching commit data.")
             }
         } catch (err) {
             console.log("Error", err)
+            throw err
         }
     }, [])
 
@@ -108,16 +76,27 @@ export const CommitGrid = () => {
     useEffect(() => {
         fetchData('/api/get-gitlab-commits', setGitLabData).then(() => {
             setGitLabLoading(false)
+        }).catch((err) => {
+            setGitLabError(true)
+            setGitLabLoading(false)
+            console.log('Error:', err)
         })
     }, [fetchData])
 
     useEffect(() => {
         fetchData('/api/get-github-commits', setGitHubData).then(() => {
             setGitHubLoading(false)
+        }).catch((err) => {
+            setGitHubError(true)
+            setGitHubLoading(false)
+            console.log('Error:', err)
         })
     }, [fetchData])
 
-    const memoizedDaysIntoYear = useCallback(daysIntoYear, [])
+    const daysIntoYear = useCallback((date: Date | string) => {
+        if (typeof date === 'string') date = new Date(date)
+        return (Date.UTC(date.getFullYear(), date.getMonth(), date.getDate()) - Date.UTC(date.getFullYear(), 0, 0)) / 24 / 60 / 60 / 1000
+    }, [])
 
     const dateFromDayOfYear = useCallback((dayOfYear: number, year?: number) => {
         const baseDate = new Date(year ?? new Date().getFullYear(), 0, 1)
@@ -133,12 +112,12 @@ export const CommitGrid = () => {
     const calculateContributions = useCallback((data: Contribution[]) => {
         const contributions: { [key: number]: Contribution[] | undefined } = {}
         data.forEach((entry) => {
-            const dayOfYear = memoizedDaysIntoYear(entry.date)
+            const dayOfYear = daysIntoYear(entry.date)
             if (contributions[dayOfYear]) contributions[dayOfYear]?.push(entry)
             else contributions[dayOfYear] = [entry]
         })
         return contributions
-    }, [memoizedDaysIntoYear])
+    }, [daysIntoYear])
         
     const gitHubContributions = useMemo(() => {
         return calculateContributions(gitHubData)
@@ -173,6 +152,36 @@ export const CommitGrid = () => {
     const filledStyles = 'bg-teal-500 dark:bg-teal-400'
     const hiddenStyles = 'bg-transparent'
 
+    interface NavigationItemProps {
+        onClick: () => void;
+        active: boolean;
+        error: boolean;
+        label: string;
+    }
+    
+    const renderNavigationItem = ({
+        onClick,
+        active,
+        error,
+        label,
+    }: NavigationItemProps) => (
+        <span
+            title={error ? 'Error loading data' : ''}
+            onClick={onClick}
+            className={`cursor-pointer ${
+            active
+                ? error
+                ? 'text-red-500 dark:text-red-400'
+                : 'text-teal-500 dark:text-teal-400'
+                : error
+                ? 'text-zinc-800 transition hover:text-red-500 dark:text-zinc-200 dark:hover:text-red-500'
+                : 'text-zinc-800 transition hover:text-teal-500 dark:text-zinc-200 dark:hover:text-teal-500'
+            }`}
+        >
+            {label}
+        </span>
+    );
+
     const daysInGivenYear = isLeapYear ? 366 : 365
     const firstMonth = months[0]
     const currentMonth = months[11]
@@ -185,9 +194,24 @@ export const CommitGrid = () => {
                     <span className="ml-3">Commits</span>
                 </div>
                 <div className="flex justify-between space-x-3">
-                    <span onClick={() => setActive('all')} className={`cursor-pointer ${active === 'all' ? "text-teal-500 dark:text-teal-400" : "text-zinc-800 transition hover:text-teal-500 dark:text-zinc-200 dark:hover:text-teal-500"}`}>All</span>
-                    <span onClick={() => setActive('github')} className={`cursor-pointer ${active === 'github' ? "text-teal-500 dark:text-teal-400" : "text-zinc-800 transition hover:text-teal-500 dark:text-zinc-200 dark:hover:text-teal-500"}`}>GitHub</span>
-                    <span onClick={() => setActive('gitlab')} className={`cursor-pointer ${active === 'gitlab' ? "text-teal-500 dark:text-teal-400" : "text-zinc-800 transition hover:text-teal-500 dark:text-zinc-200 dark:hover:text-teal-500"}`}>GitLab</span>
+                    {renderNavigationItem({
+                        onClick: () => setActive('all'),
+                        active: active === 'all',
+                        error: gitHubError && gitLabError,
+                        label: 'All',
+                    })}
+                    {renderNavigationItem({
+                        onClick: () => setActive('github'),
+                        active: active === 'github',
+                        error: gitHubError,
+                        label: 'GitHub',
+                    })}
+                    {renderNavigationItem({
+                        onClick: () => setActive('gitlab'),
+                        active: active === 'gitlab',
+                        error: gitLabError,
+                        label: 'GitLab',
+                    })}                
                 </div>
             </h2>
             <div dir="rtl" className="flex justify-center">
@@ -215,7 +239,7 @@ export const CommitGrid = () => {
                                         const numberOfCommits = contributionsPerLocation?.length || 0
                                         const dateOfLocation = dateFromDayOfYear(location)
                                         const isHidden = 
-                                            (memoizedDaysIntoYear(new Date()) < location
+                                            (daysIntoYear(new Date()) < location
                                                 && location < currentMonth.daysIntoYear + currentMonth.days)
                                             || colIndex === 0
                                                 && dateOfLocation.month !== firstMonth.index
@@ -224,8 +248,11 @@ export const CommitGrid = () => {
                                         const loading = gitLabLoading || gitHubLoading
 
                                         return (
-                                            <div title={isHidden ? '' : `Commits: ${numberOfCommits}`} key={colIndex} id={"grid-square-" + location} className={`p-2 text-center rounded-sm ${loading ? loadingStyles : isHidden ? hiddenStyles : numberOfCommits ? filledStyles : blankStyles}`}>
-                                            </div>
+                                            <div
+                                                title={isHidden ? '' : `Commits: ${numberOfCommits}`}
+                                                key={location} id={"grid-square-" + location}
+                                                className={`p-2 text-center rounded-sm ${loading ? loadingStyles : isHidden ? hiddenStyles : numberOfCommits ? filledStyles : blankStyles}`}
+                                            ></div>
                                         )
                                     })}
                                 </div>
