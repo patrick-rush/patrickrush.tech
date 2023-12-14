@@ -1,0 +1,106 @@
+import { ArticleLayout } from '@/components/ArticleLayout'
+import Image from 'next/image'
+// import obsidianLogo from './obsidian-logo-no-background.png'
+import obsidianLogo from './obsidian-logo.png'
+import dataviewTable from './dataview-table.png'
+import devtools from './devtools.png'
+import templaterLogo from './templater-logo.svg'
+import metadataImage from './metadata.png'
+
+export const article = {
+  author: 'Patrick Rush',
+  date: '2023-12-18', // update to actual date
+  title: 'Obsidian Magic',
+  description:
+    'Transforming Your Development Process Through Effective Note-Taking',
+}
+
+export const metadata = {
+  title: article.title,
+  description: article.description,
+}
+
+export default (props) => <ArticleLayout article={article} {...props} />
+
+There are many reasons why people can, should, and do take notes during the development process. Whether you're a seasoned developer or just starting out, notes play a crucial role in knowledge retention, problem-solving, documentation, project management, and gaining a historical perspective on your growth.
+
+<div className="flex justify-center">
+    <a href="https://obsidian.md/"><Image height="325" src={obsidianLogo} alt="The Obsidian logo, a stylized deep purple shard of obsidian glass on a black background." /></a>
+</div>
+
+What is Obsidian, you may ask? Obsidian is a versatile, free to use, Markdown driven, knowledge management application, designed for creating, organizing, and connecting notes. Some of the core features of Obsidian are bi-directional linking, a customizable interface, plugin support, and local data storage. Let's explore how Obsidian, a versatile knowledge management application, can be a game-changer in achieving these goals.
+
+### 1. Knowledge Retention: Teaching Yourself with Obsidian
+
+As an education enthusiast, I've always believed in the power of teaching to solidify knowledge. Obsidian takes this concept to the next level with features like bidirectional links and unlinked mentions. By converting your notes into a searchable and queryable format, Obsidian enhances knowledge recall. It's not just about writing down information; it's about creating a self-teaching tool that keeps your learning journey at your fingertips.
+
+### 2. Problem Solving: Leave a Trail for Future Success
+
+Solving complex problems is not just about finding answers; it's about how you found them. Obsidian allows you to keep a detailed record of your problem-solving journey, creating a valuable breadcrumb trail for future challenges. Whether you're in app support or feature development, documenting your steps ensures a quicker resolution next time and could even lay the foundation for some process automation.
+
+### 3. Documentation: Markdown Magic with Obsidian
+
+Documentation may not be everyone's favorite task, but it's undeniably essential. I often say that _some_ documentation is infinitely better than _no_ documentation. Obsidian's compatibility with Markdown makes note-taking a breeze. Copying and pasting notes directly into documentation, with consistent formatting, saves time and ensures that your valuable insights are easily transferable to others. Get good at this, and you will become a hero to your peers.
+
+### 4. Project Management: Revolutionizing Workflows with Obsidian
+
+For many, project management is a daily struggle of juggling multiple tasks. Obsidian has been a game-changer in my workflow, automating the process of organizing daily tasks. By creating a daily note template that compiles all open tickets and provides a checklist, Obsidian streamlines project management, saving precious time that would be otherwise spent on manual organization. In the days before I began using Obsidian, organizing the day's work sometimes took up the first 30 minutes of the day. Now, I've been able to automate that entire process down to a single click of the mouse.
+
+### 5. Historical Perspective: Reflecting on Growth with Obsidian
+
+Looking back on your journey is essential for personal and professional growth. Obsidian acts as a time capsule, allowing you to revisit past challenges and see how far you've come. Whether it's boosting your confidence or providing insights for performance reviews, having a documented record of your work is invaluable.
+
+---
+
+## Unlocking the Full Potential with Obsidian Plugins
+
+Now that we've explored the core benefits of using Obsidian, let's delve into some plugins and features that can elevate your note-taking experience:
+
+### Calendar/Periodic Notes: Streamlining Daily Note Creation
+
+Using a combination of Calendar and Periodic Notes, I create a daily note template that ensures I start each day with an organized plan.
+
+### Templates/Templater: Enhancing Note Creation with Templates
+
+Obsidian's core template feature combined with the Templater plugin allows for programmatically creating notes with dynamic content, making note creation efficient and standardized. Templater defines a templating language that gives you the power of variables and functions using the syntax shown in the Templater logo below. It also introduces the power of JavaScript to your notes.
+
+<div className="flex justify-center">
+    <a href="https://github.com/SilentVoid13/Templater"><Image height="75" src={templaterLogo} alt="Templater logo made up of angle brackets and percent symbols surrounding the word 'Templater'." /></a>
+</div>
+
+
+### Metadata: Maximizing Plugin Compatibility
+
+While Obsidian's metadata is a core feature, using it strategically enhances plugin functionality. By incorporating metadata into note templates, you can create a structured and searchable knowledge repository.
+
+<Image src={metadataImage} alt="A screnshot of the metadata or properties portion of an Obsidian note with areas for types, tags, and aliases." />
+
+### Dataview: SQL-Like Queries for Notes
+
+Dataview, a community plugin, empowers you to run queries against your notes, providing insights into your work. From tracking current projects to aggregating checklists, Dataview opens up a world of possibilities. Here is a look at a Dataview query that I use to create a table of all of the open work ahead of me for the day. In this example, `link`, `start`, `finish`, `board`, and `state` are all metadata on the notes that are returned, and they become column headers for a table.
+
+```sql
+TABLE link, start, finish, board, state
+FROM "tickets"
+WHERE start <= date(<% tp.date.now("YYYY-MM-DD", 0, tp.file.title, "YYYY-MM-DD") %>) AND finish >= date(<% tp.date.now("YYYY-MM-DD", 0, tp.file.title, "YYYY-MM-DD") %>) OR !finish
+WHERE assigned-to = [[Patrick Rush]]
+SORT start ASC
+```
+
+The above query would result in something like this:
+
+<Image src={dataviewTable} alt="A table showing several ongoing and completed tasks." />
+
+### DevTools: Chrome DevTools in a Desktop Application
+
+Obsidian comes with a developer console out of the box that is identical to Chrome's DevTools. The very same keyboard shortcut that you use in Chrome can be used in Obsidian to open the DevTools console where you can start debugging. I find this especially comes in handy when learning your way around Templater and Dataview.
+
+<Image src={devtools} alt="Obsidian's DevTools console." />
+
+### Linter: Ensuring Consistent and Clean Formatting
+
+Maintaining consistent note formatting is made easy with the Linter plugin. By setting up linting options, you can ensure your notes are not only beautiful but also optimized for future searches and queries.
+
+---
+
+In conclusion, Obsidian is more than just a note-taking application; it's a productivity powerhouse that can transform the way you work. By incorporating Obsidian into your workflow and exploring these plugins, you can enhance your note-taking experience and unlock a new level of efficiency and organization in your development journey. Happy note-taking!
