@@ -166,9 +166,9 @@ export const CommitGrid = () => {
                     <span className="ml-3">Commits</span>
                 </div>
                 <div className="flex justify-between space-x-3">
-                    <span onClick={() => setActive('all')} className={`cursor-pointer ${active === 'all' ? "text-teal-500 dark:text-teal-400" : "text-zinc-800 transition hover:text-teal-500 dark:text-zinc-200 dark:hover:text-teal-500"}`}>All</span>
-                    <span onClick={() => setActive('github')} className={`cursor-pointer ${active === 'github' ? "text-teal-500 dark:text-teal-400" : "text-zinc-800 transition hover:text-teal-500 dark:text-zinc-200 dark:hover:text-teal-500"}`}>GitHub</span>
-                    <span onClick={() => setActive('gitlab')} className={`cursor-pointer ${active === 'gitlab' ? "text-teal-500 dark:text-teal-400" : "text-zinc-800 transition hover:text-teal-500 dark:text-zinc-200 dark:hover:text-teal-500"}`}>GitLab</span>
+                    <span onClick={() => setActive('all')} className={`cursor-pointer ${active === 'all' ? "text-cyan-500 dark:text-cyan-400" : "text-zinc-800 transition hover:text-cyan-500 dark:text-zinc-200 dark:hover:text-cyan-500"}`}>All</span>
+                    <span onClick={() => setActive('github')} className={`cursor-pointer ${active === 'github' ? "text-cyan-500 dark:text-cyan-400" : "text-zinc-800 transition hover:text-cyan-500 dark:text-zinc-200 dark:hover:text-cyan-500"}`}>GitHub</span>
+                    <span onClick={() => setActive('gitlab')} className={`cursor-pointer ${active === 'gitlab' ? "text-cyan-500 dark:text-cyan-400" : "text-zinc-800 transition hover:text-cyan-500 dark:text-zinc-200 dark:hover:text-cyan-500"}`}>GitLab</span>
                 </div>
             </h2>
             <div dir="rtl" className="flex justify-center">
@@ -196,7 +196,7 @@ export const CommitGrid = () => {
 
                                 const loadingStyles = 'animate-pulse bg-zinc-100 dark:bg-zinc-800'
                                 const blankStyles = 'bg-zinc-100 dark:bg-zinc-800'
-                                const filledStyles = 'bg-teal-500 dark:bg-teal-400'
+                                const filledStyles = 'bg-cyan-500 dark:bg-cyan-400'
                                 const hiddenStyles = 'bg-transparent'
                                 
                                 return (

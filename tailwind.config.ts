@@ -28,12 +28,6 @@ export default {
         '52': 'repeat(52, minmax(0, 15.5px))',
       }
     },
-    // colors: {
-    //   teal: {
-    //     500: '#14b8a6',
-    //     600: '#0d9488'
-    //   }
-    // },
     typography: typographyStyles,
   },
 } satisfies Config
