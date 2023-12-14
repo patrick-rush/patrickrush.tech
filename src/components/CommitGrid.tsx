@@ -1,6 +1,6 @@
 "use client"
 import { useState, useEffect, useMemo, useCallback } from 'react'
-import type { Dispatch, SetStateAction} from 'react'
+import type { Dispatch, SetStateAction } from 'react'
 
 interface Month {
   name: string;
@@ -224,7 +224,7 @@ export const CommitGrid = () => {
                                         const loading = gitLabLoading || gitHubLoading
 
                                         return (
-                                            <div title={`Commits: ${numberOfCommits}`} key={colIndex} id={"grid-square-" + location} className={`p-2 text-center rounded-sm ${loading ? loadingStyles : isHidden ? hiddenStyles : numberOfCommits ? filledStyles : blankStyles}`}>
+                                            <div title={isHidden ? '' : `Commits: ${numberOfCommits}`} key={colIndex} id={"grid-square-" + location} className={`p-2 text-center rounded-sm ${loading ? loadingStyles : isHidden ? hiddenStyles : numberOfCommits ? filledStyles : blankStyles}`}>
                                             </div>
                                         )
                                     })}
