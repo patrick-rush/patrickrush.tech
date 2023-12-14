@@ -8,6 +8,7 @@ import { Container } from '@/components/Container'
 import { Prose } from '@/components/Prose'
 import { type ArticleWithSlug } from '@/lib/articles'
 import { formatDate } from '@/lib/formatDate'
+import { CommitGrid } from '@/components/CommitGrid'
 
 function ArrowLeftIcon(props: React.ComponentPropsWithoutRef<'svg'>) {
   return (
@@ -25,9 +26,11 @@ function ArrowLeftIcon(props: React.ComponentPropsWithoutRef<'svg'>) {
 export function ArticleLayout({
   article,
   children,
+  tag,
 }: {
   article: ArticleWithSlug
   children: React.ReactNode
+  tag?: JSX.Element
 }) {
   let router = useRouter()
   let { previousPathname } = useContext(AppContext)
@@ -65,6 +68,7 @@ export function ArticleLayout({
           </article>
         </div>
       </div>
+      {tag}
     </Container>
   )
 }
