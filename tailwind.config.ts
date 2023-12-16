@@ -26,7 +26,16 @@ export default {
     extend: {
       gridTemplateColumns: {
         '52': 'repeat(52, minmax(0, 15.5px))',
-      }
+      },
+      keyframes: {
+        flip: {
+          '0%, 100%': { transform: 'rotateY(0deg)' },
+          '50%': { transform: 'rotateY(180deg)' },
+        },
+      },
+      animation: {
+        'flip-slow': 'flip .5s ease-in-out',
+      },
     },
     // colors: {
     //   teal: {
