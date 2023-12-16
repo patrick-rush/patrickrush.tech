@@ -11,6 +11,7 @@ import {
   TwitterIcon,
 } from '@/components/SocialIcons'
 import portraitImage from '@/images/portrait.jpeg'
+import { PlayingCard } from '@/components/PlayingCard'
 
 function SocialLink({
   className,
