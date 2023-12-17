@@ -25,6 +25,20 @@ interface Card {
     rank: Rank;
 }
 
+interface CommonPlayCardProps {
+    card: Card;
+}
+type ConditionalPlayCardProps = | {
+    source: 'river';
+    pileIndex: number;
+    foundationIndex?: number | null;
+} | {
+    source: 'waste' | 'nert';
+    pileIndex?: never;
+    foundationIndex?: never;
+}
+
+type PlayCardProps = CommonPlayCardProps & ConditionalPlayCardProps
 
 const suits: Suit[] = [
     {
@@ -121,12 +135,6 @@ const ranks: Rank[] = [
     },
 ]
 
-// export const metadata: Metadata = {
-//   title: 'Nerts',
-//   description:
-//     "Let's play the greatest game of all time!",
-// }
-
 export default function Nerts() {
     "use client"
     const [nertStack, setNertStack] = useState<Card[]>([])
@@ -150,10 +158,10 @@ export default function Nerts() {
 
     useEffect(() => {
         const shuffledDeck: Card[] = shuffle(deck)
-        setNertStack(shuffledDeck.splice(0, 0))
+        setNertStack(shuffledDeck.splice(0, 13))
         setLake(Array.from({ length: 4 * players.length }, () => []))
         setStream(shuffledDeck)
-        setWaste([])        
+        setWaste([])
         setRiver([
             shuffledDeck.splice(0, 1),
             shuffledDeck.splice(0, 1),
@@ -168,49 +176,65 @@ export default function Nerts() {
         let topOfStream
         if (stream.length >= 3) topOfStream = stream.splice(streamLength - 3)
         else topOfStream = stream.splice(0)
-    console.log(">>> topOfStream", topOfStream)
-    if (topOfStream.length > 0) {
-        const newWaste = [...waste, ...topOfStream]
-        console.log(">>> newWaste", newWaste)
+        if (topOfStream.length > 0) {
+            const newWaste = [...waste, ...topOfStream]
             setWaste(newWaste)
         } else {
             setStream(waste.reverse())
             setWaste([])
         }
     }
+    
+    const playCard = (props: PlayCardProps) => {
+        const { card, source, pileIndex, foundationIndex } = props
+        
+        if (gameOver) return
 
-    interface CommonPlayCardProps {
-        card: Card;
-    }
-    type ConditionalPlayCardProps = | {
-        source: 'river';
-        pileIndex: number;
-        foundationIndex?: number | null;
-    } | {
-        source: 'waste' | 'nert';
-        pileIndex?: never;
-        foundationIndex?: never;
-    }
-
-    type PlayCardProps = CommonPlayCardProps & ConditionalPlayCardProps
-
-    const handleRiverUpdate = ({
-        destination,
-        source,
-        start
-    } : {
-        destination: number;
-        source: string;
-        start?: never;
-    } | {
-        destination: number;
-        source: number;
-        start: number;
-    }) => {
-        const copyOfRiver = [...river]
-        if (typeof source === 'string') {
+        const handleRiverUpdate = ({
+            destination,
+            source,
+            start
+        }: {
+            destination: number;
+            source: string;
+            start?: never;
+        } | {
+            destination: number;
+            source: number;
+            start: number;
+        }) => {
+            const copyOfRiver = [...river]
+            if (typeof source === 'string') {
+                let sourceArray: Card[]
+                switch (source) {
+                    case 'nert':
+                        sourceArray = nertStack
+                        break
+                    case 'waste':
+                        sourceArray = waste
+                        break
+                    default:
+                        cardHandled = true
+                        return
+                }
+                const cardToMove = sourceArray.pop()
+                if (cardToMove) copyOfRiver[destination].push(cardToMove)
+            } else {
+                copyOfRiver[destination].push(...copyOfRiver[source].splice(start!, copyOfRiver[source].length))
+            }
+            setRiver(copyOfRiver)
+        }
+    
+        const handleLakeUpdate = ({
+            destination,
+        }: {
+            destination: number;
+        }) => {
             let sourceArray: Card[]
             switch (source) {
+                case 'river':
+                    sourceArray = river[pileIndex]
+                    break
                 case 'nert':
                     sourceArray = nertStack
                     break
@@ -221,59 +245,28 @@ export default function Nerts() {
                     cardHandled = true
                     return
             }
+            const copyOfLake = [...lake]
             const cardToMove = sourceArray.pop()
-            if (cardToMove) copyOfRiver[destination].push(cardToMove)
-        } else {
-            copyOfRiver[destination].push(...copyOfRiver[source].splice(start!, copyOfRiver[source].length))
+            if (cardToMove) copyOfLake[destination].push(cardToMove)
+            setLake(copyOfLake)
         }
-        setRiver(copyOfRiver)
-    }
-
-    const handleLakeUpdate = ({
-        destination,
-    } : {
-        destination: number;
-    }) => {
-        let sourceArray: Card[]
-        switch (source) {
-            case 'river':
-                sourceArray = river[pileIndex]
-                break
-            case 'nert':
-                sourceArray = nertStack
-                break
-            case 'waste':
-                sourceArray = waste
-                break
-            default:
-                cardHandled = true
-                return
-        }
-        const copyOfLake = [...lake]
-        const cardToMove = sourceArray.pop()
-        if (cardToMove) copyOfLake[destination].push(cardToMove)
-        setLake(copyOfLake)
-    }
-
-    const playCard = (props: PlayCardProps) => {
-        const { card, source, pileIndex, foundationIndex } = props
-
-        if (gameOver) return
 
         let cardHandled = false
         while (!cardHandled) {
 
-            // handle NERTS
+            /* handle NERTS */
             if (source === 'nert' && nertStack.length === 0) {
                 // GAME OVER
+                
                 setGameOver(true)
                 cardHandled = true
                 window.alert("GAME OVER")
                 return
             }
-            // handle aces
+            /* handle aces */
             if (card?.rank.position === 1) {
                 handleLakeUpdate({ destination: lake.findIndex(pile => !pile.length) })
+
                 cardHandled = true
                 break
             }
@@ -281,15 +274,19 @@ export default function Nerts() {
             if (source === 'river') {
                 let start
                 const isFoundationCard = foundationIndex != null
-                // first check lake for compatible spots
+
+                /* check lake */
                 if (!isFoundationCard) {
                     start = river[pileIndex].length - 1
+
                     for (let i = 0; i < lake.length; i++) {
                         const pile = lake[i]
-                        // aces will have already been handled, so we can skip empty piles
+
                         if (pile.length === 0) continue
+
                         const isOneMore = card.rank.position - 1 === pile[pile.length - 1].rank.position
                         const isSameSuit = card.suit.name === pile[0].suit.name
+
                         if (isOneMore && isSameSuit) {
                             handleLakeUpdate({
                                 destination: i,
@@ -298,15 +295,17 @@ export default function Nerts() {
                             break
                         }
                     }
-    
-                }
-                else start = foundationIndex
+                } else start = foundationIndex
+
                 for (let i = 0; i < river.length; i++) {
                     const pile = river[i]
+
                     if (i === pileIndex) continue
                     if (pile.length === 0) continue
+
                     const isOneLess = card.rank.position + 1 === pile[pile.length - 1].rank.position
                     const isOppositeSuit = card.suit.type !== pile[pile.length - 1].suit.type
+
                     if (isOneLess && isOppositeSuit) {
                         handleRiverUpdate({
                             destination: i,
@@ -317,6 +316,7 @@ export default function Nerts() {
                         break
                     }
                 }
+
                 for (let i = 0; i < river.length; i++) {
                     const pile = river[i]
                     if (i === pileIndex) continue
@@ -329,13 +329,13 @@ export default function Nerts() {
                     cardHandled = true
                     break
                 }
+
                 cardHandled = true
                 break
             } else {
-                // first check lake for compatible spots
+                /* try lake */
                 for (let i = 0; i < lake.length; i++) {
                     const pile = lake[i]
-                    // aces will have already been handled, so we can skip empty piles
                     if (pile.length === 0) continue
                     const isOneMore = card.rank.position - 1 === pile[pile.length - 1].rank.position
                     const isSameSuit = card.suit.name === pile[0].suit.name
@@ -347,12 +347,16 @@ export default function Nerts() {
                         return
                     }
                 }
-                // then check river for compatible spots
+
+                /* try river */
                 for (let i = 0; i < river.length; i++) {
                     const pile = river[i]
+
                     if (pile.length === 0) continue
+
                     const isOneLess = card.rank.position + 1 === pile[pile.length - 1].rank.position
                     const isOppositeSuit = card.suit.type !== pile[pile.length - 1].suit.type
+
                     if (isOneLess && isOppositeSuit) {
                         handleRiverUpdate({
                             destination: i,
@@ -362,49 +366,41 @@ export default function Nerts() {
                         return
                     }
                 }
+
                 for (let i = 0; i < river.length; i++) {
                     const pile = river[i]
+
                     if (pile.length !== 0) continue
+
                     handleRiverUpdate({
                         destination: i,
                         source,
                     })
+
                     cardHandled = true
                     return
                 }
                 cardHandled = true
                 break
-
             }
-
         }
-
     }
 
-    useEffect(() => {
-        console.log("after", waste)
-        console.log(">>> stream.length", stream.length)
-    }, [waste, stream])
-
     const calculateOffset = (index: number, totalLength: number) => {
-        // If total length is less than 3, simply multiply the index by 40.
-        // This will give 0 for the first card and 40 for the second.
         if (totalLength < 3) {
             return index * 40;
         }
-    
-        // For total length of 3 or more, use the existing logic.
+
         const distanceFromEnd = totalLength - 1 - index;
         return distanceFromEnd < 3 ? 80 - Math.abs(distanceFromEnd * 40) : 0;
     };
 
+    /* board */
     return (
-        /* board */
         <Container className="flex h-full items-center pt-8 sm:pt-16">
             <div className="rounded-2xl border border-zinc-100 p-8 dark:border-zinc-700/40">
                 {/* lake */}
                 <div id="lake" className="grid grid-cols-4 pb-8 place-items-center ">
-                    {/* Dynamically generated lake piles */}
                     {Array.from({ length: (players.length * 4) }).map((_, index) => {
                         const pile = lake[index]
                         return (
@@ -418,7 +414,7 @@ export default function Nerts() {
                 </div>
                 {/* tableau */}
                 <div id="tableau" className="flex flex-wrap justify-between pb-16">
-
+                    {/* river */}
                     {river.map((_, riverIndex) => (
                         <div key={riverIndex} id={`river-${riverIndex + 1}`}>
                             <div className="" style={{ height: `${192 + 40 * (Math.max(...river.map(pile => pile.length)) - 1)}px` }}>
@@ -442,8 +438,8 @@ export default function Nerts() {
                             </div>
                         </div>
                     ))}
+                    {/* nert stack */}
                     <div id="nert" className="">
-                        {/* Nert pile */}
                         <div
                             className="w-16 h-24 md:w-32 md:h-48 md:ml-16 outline outline-teal-500 dark:outline-teal-400 outline-offset-4 rounded-md dark:outline-zinc-700/40"
                             onClick={() => playCard({
@@ -460,8 +456,9 @@ export default function Nerts() {
                         </div>
                     </div>
                 </div>
-                {/* stream / waste */}
+                {/* stream & waste */}
                 <div id="stream-and-waste" className="flex justify-center ">
+                    {/* stream */}
                     <div id="stream" className="mx-8">
                         <div className="w-16 h-24 md:w-32 md:h-48 outline outline-zinc-100 outline-offset-4 rounded-md dark:outline-zinc-700/40" onClick={wasteCard}>
                             {stream.map((card, index) => (
@@ -469,10 +466,11 @@ export default function Nerts() {
                             ))}
                         </div>
                     </div>
+                    {/* waste */}
                     <div id="waste" className="mx-8">
-                        <div 
+                        <div
                             className="relative w-16 h-24 md:w-32 md:h-48 outline outline-zinc-100 outline-offset-4 rounded-md dark:outline-zinc-700/40"
-                            onClick={() => playCard({ card: waste[waste.length - 1], source: 'waste'})}
+                            onClick={() => playCard({ card: waste[waste.length - 1], source: 'waste' })}
                         >
                             {waste.map((card, index) => {
                                 let offset = calculateOffset(index, waste.length)
