@@ -144,6 +144,11 @@ export default function Nerts() {
     const [players, setPlayers] = useState([{}, {},])
     const [lake, setLake] = useState<Card[][]>(Array.from({ length: 4 * players.length }, () => []))
     const [gameOver, setGameOver] = useState<boolean>(false)
+    const [nertStackPosition, setNertStackPosition] = useState<DOMRect | undefined>()
+    const [riverPositions, setRiverPositions] = useState<Map<number, DOMRect> | undefined>()
+    const [streamPosition, setStreamPosition] = useState<DOMRect | undefined>()
+    const [wastePosition, setWastePosition] = useState<DOMRect | undefined>()
+    const [lakePositions, setLakePositions] = useState<Map<number, DOMRect> | undefined>()
 
     const deck = useMemo(() => suits.flatMap(suit => {
         return ranks.map(rank => {
@@ -168,7 +173,51 @@ export default function Nerts() {
             shuffledDeck.splice(0, 1),
             shuffledDeck.splice(0, 1),
         ])
+        setNertStackPosition(document.getElementById('nert')?.getBoundingClientRect())
+        setStreamPosition(document.getElementById('stream')?.getBoundingClientRect())
+        setWastePosition(document.getElementById('waste')?.getBoundingClientRect())
+        const riverPositions = new Map()
+        for (let i = 1; i <= 4; i++) {
+            riverPositions.set(i, document.getElementById(`river-${i}`)?.getBoundingClientRect())
+        }
+        const lakePositions = new Map()
+        for (let i = 0; i < 4 * players.length; i++) {
+            lakePositions.set(i, document.getElementById(`lake-${i}`)?.getBoundingClientRect())
+        }
+        setLakePositions(lakePositions)
     }, [deck, players.length])
+
+    useEffect(() => {
+        console.log(">>> nertStack", nertStack)
+        console.log(">>> river", river)
+        console.log(">>> stream", stream)
+        console.log(">>> waste", waste)
+        console.log(">>> players", players)
+        console.log(">>> lake", lake)
+        console.log(">>> gameOver", gameOver)
+        console.log(">>> nertStackPosition", nertStackPosition)
+        console.log(">>> riverPositions", riverPositions)
+        console.log(">>> streamPosition", streamPosition)
+        console.log(">>> wastePosition", wastePosition)
+        console.log(">>> lakePositions", lakePositions)
+    }, [
+        nertStack,
+        river,
+        stream,
+        waste,
+        players,
+        lake,
+        gameOver,
+        nertStackPosition,
+        riverPositions,
+        streamPosition,
+        wastePosition,
+        lakePositions
+    ])
+
+    // const moveCard = (newLeft, newTop) => {
+    //     setCardPosition
+    // }
 
     const wasteCard = () => {
         if (gameOver) return
@@ -406,14 +455,21 @@ export default function Nerts() {
                         return (
                             <div id={`lake-${index}`} key={index} className="w-16 h-24 md:w-32 md:h-48 my-4 outline outline-zinc-100 outline-offset-4 rounded-md dark:outline-zinc-700/40">
                                 {pile?.map((card, cardIndex) => (
-                                    <PlayingCard className={`z-[${cardIndex}]`} key={cardIndex} suit={card.suit} rank={card.rank} isShowing={true} />
+                                    <PlayingCard
+                                        className={`z-[${cardIndex}]`}
+                                        key={cardIndex}
+                                        suit={card.suit}
+                                        rank={card.rank}
+                                        isShowing={true}
+                                        cardPosition={lakePositions?.get(index)}
+                                    />
                                 ))}
                             </div>
                         )
                     })}
                 </div>
                 {/* tableau */}
-                <div id="tableau" className="flex flex-wrap justify-between pb-16">
+                <div id="tableau" className="grid grid-cols-4 justify-items-center md:flex justify-between pb-16">
                     {/* river */}
                     {river.map((_, riverIndex) => (
                         <div key={riverIndex} id={`river-${riverIndex + 1}`}>
@@ -431,7 +487,9 @@ export default function Nerts() {
                                                     source: "river",
                                                     pileIndex: riverIndex,
                                                     foundationIndex: ((cardIndex < river[riverIndex].length - 1) ? cardIndex : null)
-                                                })} />
+                                                })}
+                                                cardPosition={riverPositions?.get(riverIndex)}
+                                            />
                                         </div>
                                     ))}
                                 </div>
@@ -439,7 +497,7 @@ export default function Nerts() {
                         </div>
                     ))}
                     {/* nert stack */}
-                    <div id="nert" className="">
+                    <div id="nert" className="col-span-4 md:flex">
                         <div
                             className="w-16 h-24 md:w-32 md:h-48 md:ml-16 outline outline-teal-500 dark:outline-teal-400 outline-offset-4 rounded-md dark:outline-zinc-700/40"
                             onClick={() => playCard({
@@ -451,7 +509,14 @@ export default function Nerts() {
                                 <span className="text-xl md:text-3xl font-bold">NERTS</span>
                             </div>
                             {nertStack.map((card, index) => (
-                                <PlayingCard className={`z-[${index}]`} key={index} suit={card.suit} rank={card.rank} isShowing={true} />
+                                <PlayingCard
+                                    className={`z-[${index}]`}
+                                    key={index}
+                                    suit={card.suit}
+                                    rank={card.rank}
+                                    isShowing={true}
+                                    cardPosition={nertStackPosition}
+                                />
                             ))}
                         </div>
                     </div>
@@ -462,7 +527,14 @@ export default function Nerts() {
                     <div id="stream" className="mx-8">
                         <div className="w-16 h-24 md:w-32 md:h-48 outline outline-zinc-100 outline-offset-4 rounded-md dark:outline-zinc-700/40" onClick={wasteCard}>
                             {stream.map((card, index) => (
-                                <PlayingCard className={`z-[${index}]`} key={index} suit={card.suit} rank={card.rank} isShowing={false} />
+                                <PlayingCard
+                                    className={`z-[${index}]`}
+                                    key={index}
+                                    suit={card.suit}
+                                    rank={card.rank}
+                                    isShowing={false}
+                                    cardPosition={streamPosition}
+                                />
                             ))}
                         </div>
                     </div>
@@ -476,7 +548,13 @@ export default function Nerts() {
                                 let offset = calculateOffset(index, waste.length)
                                 return (
                                     <div key={index} className="absolute" style={{ left: `${offset}px` }}>
-                                        <PlayingCard className={`z-[${index}]`} suit={card.suit} rank={card.rank} isShowing={true} />
+                                        <PlayingCard
+                                            className={`z-[${index}]`}
+                                            suit={card.suit}
+                                            rank={card.rank}
+                                            isShowing={true}
+                                            cardPosition={wastePosition}
+                                        />
                                     </div>
                                 )
                             })}

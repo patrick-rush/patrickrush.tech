@@ -20,80 +20,13 @@ interface Rank {
   position: 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12 | 13
 }
 
-// const suits: Suit[] = [
-//     {
-//       name: 'Hearts',
-//       symbol: '♥',
-//       type: 0,
-//       color: 'red-800'
-//     },
-//     {
-//       name: 'Clubs',
-//       symbol: '♣',
-//       type: 1,
-//       color: 'zinc-950'
-//     },
-//     {
-//       name: 'Diamonds',
-//       symbol: '♦',
-//       type: 0,
-//       color: 'red-800'
-//     },
-//     {
-//       name: 'Spades',
-//       symbol: '♠',
-//       type: 1,
-//       color: 'zinc-950'
-//     },
-//   ]
-  
-
-  
-
-//   const ranks = [
-//     "A",
-//     "2",
-//     "3",
-//     "4",
-//     "5",
-//     "6",
-//     "7",
-//     "8",
-//     "9",
-//     "10",
-//     "J",
-//     "Q",
-//     "K",
-//   ]
-
-    // const deck = suits.map(suit => {
-    //   return ranks.map(rank => {
-    //     return {
-    //         suit,
-    //         rank,
-    //     };
-    //   });
-    // });
-
-    // console.log(">>> deck", deck)
-
-//   const deck = [
-//       {
-//           suit: Suit[1],
-//           rank: Rank[1],
-//       },
-//       {
-//           suit: Suit[3],
-//           rank: Rank[7],
-//       }
-//   ]
-
 export function PlayingCard<T extends React.ElementType>({
     className,
     suit,
     rank,
     isShowing,
     onClick,
+    cardPosition
     // children,
   }: Omit<React.ComponentPropsWithoutRef<T>, 'as' | 'className'> & {
     className?: string
@@ -101,18 +34,9 @@ export function PlayingCard<T extends React.ElementType>({
     rank: Rank;
     isShowing: boolean;
     onClick?: () => void;
+    cardPosition?: DOMRect | undefined;
   }) {
     "use client"
-    // const [isShowing, setIsShowing] = useState(visible)
-    // const [isFlipping, setIsFlipping] = useState(false)
-  
-    const handleClick = () => {
-        if (isShowing) return
-        // setIsShowing(true)
-        // setIsFlipping(true)
-        // setTimeout(() => setIsShowing(!isShowing), 125)
-        // setTimeout(() => setIsFlipping(false), 250)
-    }
 
     const handleStart = () => {
       console.log(">>> handleStart")
@@ -123,7 +47,7 @@ export function PlayingCard<T extends React.ElementType>({
     const handleStop = (e: any) => {
       console.log(">>> handleStop", e)
     } 
-    
+
     return (
 
           // <div className={clsx(className, 'select-none', { 'mirror': isFlipping })} onClick={onClick}>
