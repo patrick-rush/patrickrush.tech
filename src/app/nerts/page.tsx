@@ -1,11 +1,7 @@
 "use client"
-import { type Metadata } from 'next'
-import Link from 'next/link'
-import clsx from 'clsx'
-
 import { Container } from '@/components/Container'
 import { PlayingCard } from '@/components/PlayingCard'
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 
 interface Suit {
     name: 'Hearts' | 'Clubs' | 'Diamonds' | 'Spades';
@@ -149,6 +145,7 @@ export default function Nerts() {
     const [streamPosition, setStreamPosition] = useState<DOMRect | undefined>()
     const [wastePosition, setWastePosition] = useState<DOMRect | undefined>()
     const [lakePositions, setLakePositions] = useState<Map<number, DOMRect> | undefined>()
+    const maxWasteShowing = useRef(0)
 
     const deck = useMemo(() => suits.flatMap(suit => {
         return ranks.map(rank => {
@@ -180,26 +177,28 @@ export default function Nerts() {
         for (let i = 1; i <= 4; i++) {
             riverPositions.set(i, document.getElementById(`river-${i}`)?.getBoundingClientRect())
         }
+        setRiverPositions(riverPositions)
         const lakePositions = new Map()
         for (let i = 0; i < 4 * players.length; i++) {
             lakePositions.set(i, document.getElementById(`lake-${i}`)?.getBoundingClientRect())
         }
         setLakePositions(lakePositions)
+        maxWasteShowing.current = 0
     }, [deck, players.length])
 
     useEffect(() => {
-        console.log(">>> nertStack", nertStack)
-        console.log(">>> river", river)
-        console.log(">>> stream", stream)
-        console.log(">>> waste", waste)
-        console.log(">>> players", players)
-        console.log(">>> lake", lake)
-        console.log(">>> gameOver", gameOver)
-        console.log(">>> nertStackPosition", nertStackPosition)
-        console.log(">>> riverPositions", riverPositions)
-        console.log(">>> streamPosition", streamPosition)
-        console.log(">>> wastePosition", wastePosition)
-        console.log(">>> lakePositions", lakePositions)
+        // console.log(">>> nertStack", nertStack)
+        // console.log(">>> river", river)
+        // console.log(">>> stream", stream)
+        // console.log(">>> waste", waste)
+        // console.log(">>> players", players)
+        // console.log(">>> lake", lake)
+        // console.log(">>> gameOver", gameOver)
+        // console.log(">>> nertStackPosition", nertStackPosition)
+        // console.log(">>> riverPositions", riverPositions)
+        // console.log(">>> streamPosition", streamPosition)
+        // console.log(">>> wastePosition", wastePosition)
+        // console.log(">>> lakePositions", lakePositions)
     }, [
         nertStack,
         river,
@@ -214,26 +213,27 @@ export default function Nerts() {
         wastePosition,
         lakePositions
     ])
-
-    // const moveCard = (newLeft, newTop) => {
-    //     setCardPosition
-    // }
-
-    const wasteCard = () => {
+    
+    const wasteCards = () => {
         if (gameOver) return
+
         const streamLength = stream.length
         let topOfStream
+        
         if (stream.length >= 3) topOfStream = stream.splice(streamLength - 3)
         else topOfStream = stream.splice(0)
+        
         if (topOfStream.length > 0) {
             const newWaste = [...waste, ...topOfStream]
+            maxWasteShowing.current = newWaste.length
             setWaste(newWaste)
         } else {
+            maxWasteShowing.current = 0
             setStream(waste.reverse())
             setWaste([])
         }
     }
-    
+
     const playCard = (props: PlayCardProps) => {
         const { card, source, pileIndex, foundationIndex } = props
         
@@ -435,50 +435,58 @@ export default function Nerts() {
         }
     }
 
-    const calculateOffset = (index: number, totalLength: number) => {
-        if (totalLength < 3) {
-            return index * 40;
+    const calculateOffset = (index: number) => {
+        const refIndex = maxWasteShowing.current - 1
+    
+        if (waste.length < 3) {
+            return index * 40
         }
-
-        const distanceFromEnd = totalLength - 1 - index;
-        return distanceFromEnd < 3 ? 80 - Math.abs(distanceFromEnd * 40) : 0;
-    };
+    
+        return index === refIndex ? 80 : (index + 1 === refIndex ? 40 : 0)
+    }
 
     /* board */
     return (
         <Container className="flex h-full items-center pt-8 sm:pt-16">
             <div className="rounded-2xl border border-zinc-100 p-8 dark:border-zinc-700/40">
                 {/* lake */}
-                <div id="lake" className="grid grid-cols-4 pb-8 place-items-center ">
-                    {Array.from({ length: (players.length * 4) }).map((_, index) => {
-                        const pile = lake[index]
-                        return (
-                            <div id={`lake-${index}`} key={index} className="w-16 h-24 md:w-32 md:h-48 my-4 outline outline-zinc-100 outline-offset-4 rounded-md dark:outline-zinc-700/40">
-                                {pile?.map((card, cardIndex) => (
-                                    <PlayingCard
-                                        className={`z-[${cardIndex}]`}
-                                        key={cardIndex}
-                                        suit={card.suit}
-                                        rank={card.rank}
-                                        isShowing={true}
-                                        cardPosition={lakePositions?.get(index)}
-                                    />
-                                ))}
-                            </div>
-                        )
-                    })}
+                <div id="lake" className="pb-8">
+                    <div className="grid grid-cols-8 place-items-center px-8 md:px-0 outline outline-zinc-100 outline-offset-4 rounded-md dark:outline-zinc-700/40">
+                        {Array.from({ length: (players.length * 4) }).map((_, index) => {
+                            const pile = lake[index]
+                            return (
+                                <div id={`lake-${index}`} key={index} className="w-16 h-24 md:w-24 md:h-36 my-4">
+                                    {pile?.map((card, cardIndex) => {
+                                        const pileLength = pile.length
+                                        let shadow = ''
+                                        if (index > pileLength - 4) shadow = 'shadow-md shadow-zinc-800 rounded-md' 
+                                        return (
+                                            <PlayingCard
+                                                className={`z-[${cardIndex}] ${shadow}`}
+                                                key={cardIndex}
+                                                suit={card.suit}
+                                                rank={card.rank}
+                                                isShowing={true}
+                                                cardPosition={lakePositions?.get(index)}
+                                            />
+                                        )
+                                    })}
+                                </div>
+                            )
+                        })}
+                    </div>
                 </div>
                 {/* tableau */}
                 <div id="tableau" className="grid grid-cols-4 justify-items-center md:flex justify-between pb-16">
                     {/* river */}
                     {river.map((_, riverIndex) => (
                         <div key={riverIndex} id={`river-${riverIndex + 1}`}>
-                            <div className="" style={{ height: `${192 + 40 * (Math.max(...river.map(pile => pile.length)) - 1)}px` }}>
-                                <div className="relative w-16 h-24 md:w-32 md:h-48 outline outline-zinc-100 outline-offset-4 rounded-md dark:outline-zinc-700/40">
+                            <div className="" style={{ height: `${Math.max((192 + 40 * (Math.max(...river.map(pile => pile.length)) - 1), 312))}px` }}>
+                                <div className="relative w-16 h-24 md:w-24 md:h-36 outline outline-zinc-100 outline-offset-4 rounded-md dark:outline-zinc-700/40">
                                     {river[riverIndex].map((card, cardIndex) => (
-                                        <div key={cardIndex} className="absolute" style={{ top: `${40 * cardIndex}px` }} >
+                                        <div key={cardIndex} className="absolute" style={{ top: `${(Math.min(200/river[riverIndex].length, 40)) * cardIndex}px` }} >
                                             <PlayingCard
-                                                className={`z-[${cardIndex}]`}
+                                                className={`z-[${cardIndex}] shadow-md shadow-zinc-800 rounded-md`}
                                                 suit={card.suit}
                                                 rank={card.rank}
                                                 isShowing={true}
@@ -499,25 +507,30 @@ export default function Nerts() {
                     {/* nert stack */}
                     <div id="nert" className="col-span-4 md:flex">
                         <div
-                            className="w-16 h-24 md:w-32 md:h-48 md:ml-16 outline outline-teal-500 dark:outline-teal-400 outline-offset-4 rounded-md dark:outline-zinc-700/40"
+                            className="w-16 h-24 md:w-24 md:h-36 md:ml-16 outline outline-teal-500 dark:outline-teal-400 outline-offset-4 rounded-md dark:outline-zinc-700/40"
                             onClick={() => playCard({
                                 card: nertStack[nertStack.length - 1],
                                 source: "nert"
                             })
                             }>
-                            <div className="absolute w-16 h-24 md:w-32 md:h-48 text-teal-500 dark:text-teal-400 flex justify-center items-center select-none">
-                                <span className="text-xl md:text-3xl font-bold">NERTS</span>
+                            <div className="absolute w-16 h-24 md:w-24 md:h-36 text-teal-500 dark:text-teal-400 flex justify-center items-center select-none">
+                                <span className="text-l md:text-2xl font-bold">NERTS</span>
                             </div>
-                            {nertStack.map((card, index) => (
-                                <PlayingCard
-                                    className={`z-[${index}]`}
-                                    key={index}
-                                    suit={card.suit}
-                                    rank={card.rank}
-                                    isShowing={true}
-                                    cardPosition={nertStackPosition}
-                                />
-                            ))}
+                            {nertStack.map((card, index) => {
+                                const nertLength = nertStack.length
+                                let shadow = ''
+                                if (index > nertLength - 4) shadow = 'shadow-md shadow-zinc-800 rounded-md' 
+                                return (
+                                    <PlayingCard
+                                        className={`z-[${index}] ${shadow}`}
+                                        key={index}
+                                        suit={card.suit}
+                                        rank={card.rank}
+                                        isShowing={true}
+                                        cardPosition={nertStackPosition}
+                                    />
+                                )
+                            })}
                         </div>
                     </div>
                 </div>
@@ -525,31 +538,42 @@ export default function Nerts() {
                 <div id="stream-and-waste" className="flex justify-center ">
                     {/* stream */}
                     <div id="stream" className="mx-8">
-                        <div className="w-16 h-24 md:w-32 md:h-48 outline outline-zinc-100 outline-offset-4 rounded-md dark:outline-zinc-700/40" onClick={wasteCard}>
-                            {stream.map((card, index) => (
-                                <PlayingCard
-                                    className={`z-[${index}]`}
-                                    key={index}
-                                    suit={card.suit}
-                                    rank={card.rank}
-                                    isShowing={false}
-                                    cardPosition={streamPosition}
-                                />
-                            ))}
+                        <div className="w-16 h-24 md:w-24 md:h-36 outline outline-zinc-100 outline-offset-4 rounded-md dark:outline-zinc-700/40" onClick={wasteCards}>
+                            <div className="absolute w-16 h-24 md:w-24 md:h-36 text-zinc-400 dark:text-zinc-500 flex justify-center items-center select-none">
+                                <span className="text-l md:text-2xl font-bold">FLIP</span>
+                            </div>
+                            {stream.map((card, index) => {
+                                const streamLength = stream.length
+                                let shadow = ''
+                                if (index > streamLength - 4) shadow = 'shadow-md shadow-zinc-800 rounded-md' 
+                                return (
+                                    <PlayingCard
+                                        className={`z-[${index}] ${shadow}`}
+                                        key={index}
+                                        suit={card.suit}
+                                        rank={card.rank}
+                                        isShowing={false}
+                                        cardPosition={streamPosition}
+                                    />
+                                )
+                            })}
                         </div>
                     </div>
                     {/* waste */}
                     <div id="waste" className="mx-8">
                         <div
-                            className="relative w-16 h-24 md:w-32 md:h-48 outline outline-zinc-100 outline-offset-4 rounded-md dark:outline-zinc-700/40"
+                            className="relative w-36 h-24 md:w-44 md:h-36 outline outline-zinc-100 outline-offset-4 rounded-md dark:outline-zinc-700/40"
                             onClick={() => playCard({ card: waste[waste.length - 1], source: 'waste' })}
                         >
                             {waste.map((card, index) => {
-                                let offset = calculateOffset(index, waste.length)
+                                let offset = 0
+                                offset = calculateOffset(index)
+                                let shadow = ''
+                                if (index > maxWasteShowing.current - 4 || index === waste.length - 1) shadow = 'shadow-md shadow-zinc-800 rounded-md'
                                 return (
                                     <div key={index} className="absolute" style={{ left: `${offset}px` }}>
                                         <PlayingCard
-                                            className={`z-[${index}]`}
+                                            className={`z-[${index}] ${shadow}`}
                                             suit={card.suit}
                                             rank={card.rank}
                                             isShowing={true}
