@@ -51,8 +51,8 @@ export function PlayingCard<T extends React.ElementType>({
     return (
 
           // <div className={clsx(className, 'select-none', { 'mirror': isFlipping })} onClick={onClick}>
-          <div className={className} onClick={onClick}>
-            <div className="absolute">
+          // <div className={className} >
+            <div className={clsx(className, "absolute")} onClick={onClick}>
               <div
                 // className={clsx('group relative flex flex-col items-start', { 'animate-flip-slow': isFlipping })}
                 className="group relative flex flex-col items-start select-none"
@@ -61,7 +61,8 @@ export function PlayingCard<T extends React.ElementType>({
                 <div hidden className="border-0 border-zinc-950 border-red-800 text-zinc-950 text-red-800"></div>
                 {/* {children} */}
                 {isShowing ? 
-                  <div className={`w-16 h-24 md:w-32 md:h-48 bg-white border-2 border-${suit.color} rounded-md flex flex-col justify-between p-2`}>
+                  // <div className={`w-16 h-24 md:w-24 md:h-36 bg-white border-2 border-${suit.color} rounded-md flex flex-col justify-between p-2`}>
+                  <div className={`w-16 h-24 md:w-24 md:h-36 bg-white rounded-md flex flex-col justify-between p-2`}>
                     <div className="flex justify-between">
                         <div className={`text-${suit.color}`}>
                             <p className="text-lg font-bold">{rank.display}</p>
@@ -83,12 +84,11 @@ export function PlayingCard<T extends React.ElementType>({
                     </div>
                   </div>
                   :
-                  <div className="w-16 h-24 md:w-32 md:h-48 absolute rounded-md">
-                      <Image draggable="false" priority sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw" fill src={cardBack} className="border-2 border-white rounded-md drop-shadow-md" alt="reverse of playing card"/>
+                  <div className="w-16 h-24 md:w-24 md:h-36 absolute rounded-md">
+                      <Image draggable="false" priority sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw" fill src={cardBack} className={clsx(className, "rounded-md")} alt="reverse of playing card"/>
                   </div>
                   }
               </div>
             </div>
-          </div>
     )
   }
