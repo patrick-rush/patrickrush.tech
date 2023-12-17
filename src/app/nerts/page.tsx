@@ -25,6 +25,7 @@ interface Card {
     rank: Rank;
 }
 
+
 const suits: Suit[] = [
     {
         name: 'Hearts',
@@ -129,14 +130,12 @@ const ranks: Rank[] = [
 export default function Nerts() {
     "use client"
     const [nertStack, setNertStack] = useState<Card[]>([])
-    const [riverOne, setRiverOne] = useState<Card[]>([])
-    const [riverTwo, setRiverTwo] = useState<Card[]>([])
-    const [riverThree, setRiverThree] = useState<Card[]>([])
-    const [riverFour, setRiverFour] = useState<Card[]>([])
+    const [river, setRiver] = useState<Card[][]>([[], [], [], []])
     const [stream, setStream] = useState<Card[]>([])
     const [waste, setWaste] = useState<Card[]>([])
-    const [lake, setLake] = useState<Card[][]>([])
-    const [players, setPlayers] = useState([{}, {}])
+    const [players, setPlayers] = useState([{}, {},])
+    const [lake, setLake] = useState<Card[][]>(Array.from({ length: 4 * players.length }, () => []))
+    const [gameOver, setGameOver] = useState<boolean>(false)
 
     const deck = useMemo(() => suits.flatMap(suit => {
         return ranks.map(rank => {
@@ -151,26 +150,28 @@ export default function Nerts() {
 
     useEffect(() => {
         const shuffledDeck: Card[] = shuffle(deck)
-        setNertStack(shuffledDeck.splice(0, 13))
-        setRiverOne(shuffledDeck.splice(0, 1))
-        setRiverTwo(shuffledDeck.splice(0, 1))
-        setRiverThree(shuffledDeck.splice(0, 1))
-        setRiverFour(shuffledDeck.splice(0, 1))
+        setNertStack(shuffledDeck.splice(0, 0))
+        setLake(Array.from({ length: 4 * players.length }, () => []))
         setStream(shuffledDeck)
-        console.log(">>> nertStack", nertStack)
-        console.log(">>> riverOne", riverOne)
-        console.log(">>> riverTwo", riverTwo)
-        console.log(">>> riverThree", riverThree)
-        console.log(">>> riverFour", riverFour)
-        console.log(">>> stream", stream)
-        console.log(">>> waste", waste)
-        console.log(">>> lake", lake)
-    }, [])
+        setWaste([])        
+        setRiver([
+            shuffledDeck.splice(0, 1),
+            shuffledDeck.splice(0, 1),
+            shuffledDeck.splice(0, 1),
+            shuffledDeck.splice(0, 1),
+        ])
+    }, [deck, players.length])
 
     const wasteCard = () => {
-        const topOfStream = stream.pop()
-        if (topOfStream) {
-            const newWaste = [...waste, topOfStream]
+        if (gameOver) return
+        const streamLength = stream.length
+        let topOfStream
+        if (stream.length >= 3) topOfStream = stream.splice(streamLength - 3)
+        else topOfStream = stream.splice(0)
+    console.log(">>> topOfStream", topOfStream)
+    if (topOfStream.length > 0) {
+        const newWaste = [...waste, ...topOfStream]
+        console.log(">>> newWaste", newWaste)
             setWaste(newWaste)
         } else {
             setStream(waste.reverse())
@@ -178,9 +179,224 @@ export default function Nerts() {
         }
     }
 
+    interface CommonPlayCardProps {
+        card: Card;
+    }
+    type ConditionalPlayCardProps = | {
+        source: 'river';
+        pileIndex: number;
+        foundationIndex?: number | null;
+    } | {
+        source: 'waste' | 'nert';
+        pileIndex?: never;
+        foundationIndex?: never;
+    }
+
+    type PlayCardProps = CommonPlayCardProps & ConditionalPlayCardProps
+
+    const handleRiverUpdate = ({
+        destination,
+        source,
+        start
+    } : {
+        destination: number;
+        source: string;
+        start?: never;
+    } | {
+        destination: number;
+        source: number;
+        start: number;
+    }) => {
+        const copyOfRiver = [...river]
+        if (typeof source === 'string') {
+            let sourceArray: Card[]
+            switch (source) {
+                case 'nert':
+                    sourceArray = nertStack
+                    break
+                case 'waste':
+                    sourceArray = waste
+                    break
+                default:
+                    cardHandled = true
+                    return
+            }
+            const cardToMove = sourceArray.pop()
+            if (cardToMove) copyOfRiver[destination].push(cardToMove)
+        } else {
+            copyOfRiver[destination].push(...copyOfRiver[source].splice(start!, copyOfRiver[source].length))
+        }
+        setRiver(copyOfRiver)
+    }
+
+    const handleLakeUpdate = ({
+        destination,
+    } : {
+        destination: number;
+    }) => {
+        let sourceArray: Card[]
+        switch (source) {
+            case 'river':
+                sourceArray = river[pileIndex]
+                break
+            case 'nert':
+                sourceArray = nertStack
+                break
+            case 'waste':
+                sourceArray = waste
+                break
+            default:
+                cardHandled = true
+                return
+        }
+        const copyOfLake = [...lake]
+        const cardToMove = sourceArray.pop()
+        if (cardToMove) copyOfLake[destination].push(cardToMove)
+        setLake(copyOfLake)
+    }
+
+    const playCard = (props: PlayCardProps) => {
+        const { card, source, pileIndex, foundationIndex } = props
+
+        if (gameOver) return
+
+        let cardHandled = false
+        while (!cardHandled) {
+
+            // handle NERTS
+            if (source === 'nert' && nertStack.length === 0) {
+                // GAME OVER
+                setGameOver(true)
+                cardHandled = true
+                window.alert("GAME OVER")
+                return
+            }
+            // handle aces
+            if (card?.rank.position === 1) {
+                handleLakeUpdate({ destination: lake.findIndex(pile => !pile.length) })
+                cardHandled = true
+                break
+            }
+
+            if (source === 'river') {
+                let start
+                const isFoundationCard = foundationIndex != null
+                // first check lake for compatible spots
+                if (!isFoundationCard) {
+                    start = river[pileIndex].length - 1
+                    for (let i = 0; i < lake.length; i++) {
+                        const pile = lake[i]
+                        // aces will have already been handled, so we can skip empty piles
+                        if (pile.length === 0) continue
+                        const isOneMore = card.rank.position - 1 === pile[pile.length - 1].rank.position
+                        const isSameSuit = card.suit.name === pile[0].suit.name
+                        if (isOneMore && isSameSuit) {
+                            handleLakeUpdate({
+                                destination: i,
+                            })
+                            cardHandled = true
+                            break
+                        }
+                    }
+    
+                }
+                else start = foundationIndex
+                for (let i = 0; i < river.length; i++) {
+                    const pile = river[i]
+                    if (i === pileIndex) continue
+                    if (pile.length === 0) continue
+                    const isOneLess = card.rank.position + 1 === pile[pile.length - 1].rank.position
+                    const isOppositeSuit = card.suit.type !== pile[pile.length - 1].suit.type
+                    if (isOneLess && isOppositeSuit) {
+                        handleRiverUpdate({
+                            destination: i,
+                            source: pileIndex,
+                            start
+                        })
+                        cardHandled = true
+                        break
+                    }
+                }
+                for (let i = 0; i < river.length; i++) {
+                    const pile = river[i]
+                    if (i === pileIndex) continue
+                    if (pile.length !== 0) continue
+                    handleRiverUpdate({
+                        destination: i,
+                        source: pileIndex,
+                        start
+                    })
+                    cardHandled = true
+                    break
+                }
+                cardHandled = true
+                break
+            } else {
+                // first check lake for compatible spots
+                for (let i = 0; i < lake.length; i++) {
+                    const pile = lake[i]
+                    // aces will have already been handled, so we can skip empty piles
+                    if (pile.length === 0) continue
+                    const isOneMore = card.rank.position - 1 === pile[pile.length - 1].rank.position
+                    const isSameSuit = card.suit.name === pile[0].suit.name
+                    if (isOneMore && isSameSuit) {
+                        handleLakeUpdate({
+                            destination: i,
+                        })
+                        cardHandled = true
+                        return
+                    }
+                }
+                // then check river for compatible spots
+                for (let i = 0; i < river.length; i++) {
+                    const pile = river[i]
+                    if (pile.length === 0) continue
+                    const isOneLess = card.rank.position + 1 === pile[pile.length - 1].rank.position
+                    const isOppositeSuit = card.suit.type !== pile[pile.length - 1].suit.type
+                    if (isOneLess && isOppositeSuit) {
+                        handleRiverUpdate({
+                            destination: i,
+                            source,
+                        })
+                        cardHandled = true
+                        return
+                    }
+                }
+                for (let i = 0; i < river.length; i++) {
+                    const pile = river[i]
+                    if (pile.length !== 0) continue
+                    handleRiverUpdate({
+                        destination: i,
+                        source,
+                    })
+                    cardHandled = true
+                    return
+                }
+                cardHandled = true
+                break
+
+            }
+
+        }
+
+    }
+
     useEffect(() => {
         console.log("after", waste)
-    }, [waste])
+        console.log(">>> stream.length", stream.length)
+    }, [waste, stream])
+
+    const calculateOffset = (index: number, totalLength: number) => {
+        // If total length is less than 3, simply multiply the index by 40.
+        // This will give 0 for the first card and 40 for the second.
+        if (totalLength < 3) {
+            return index * 40;
+        }
+    
+        // For total length of 3 or more, use the existing logic.
+        const distanceFromEnd = totalLength - 1 - index;
+        return distanceFromEnd < 3 ? 80 - Math.abs(distanceFromEnd * 40) : 0;
+    };
 
     return (
         /* board */
@@ -192,53 +408,54 @@ export default function Nerts() {
                     {Array.from({ length: (players.length * 4) }).map((_, index) => {
                         const pile = lake[index]
                         return (
-                            <div id={`lake-${index}`} key={index} className="w-32 h-48 my-4 outline outline-zinc-100 outline-offset-4 rounded-md dark:outline-zinc-700/40">
+                            <div id={`lake-${index}`} key={index} className="w-16 h-24 md:w-32 md:h-48 my-4 outline outline-zinc-100 outline-offset-4 rounded-md dark:outline-zinc-700/40">
                                 {pile?.map((card, cardIndex) => (
-                                    <PlayingCard className={`z-${cardIndex}`} key={cardIndex} suit={card.suit} rank={card.rank} visible={false} />
+                                    <PlayingCard className={`z-[${cardIndex}]`} key={cardIndex} suit={card.suit} rank={card.rank} isShowing={true} />
                                 ))}
                             </div>
                         )
                     })}
                 </div>
                 {/* tableau */}
-                <div id="tableau" className="flex justify-between pb-32">
-                    <div id="nert" className="">
-                        {/* Nert pile */}
-                        <div id="nert">
-                            <div className="w-32 h-48 mr-16 outline outline-zinc-100 outline-offset-4 rounded-md dark:outline-zinc-700/40">
-                                {nertStack.map((card, index) => (
-                                    <PlayingCard className={`absolute z-${index}`} key={index} suit={card.suit} rank={card.rank} visible={true} />
-                                ))}
+                <div id="tableau" className="flex flex-wrap justify-between pb-16">
+
+                    {river.map((_, riverIndex) => (
+                        <div key={riverIndex} id={`river-${riverIndex + 1}`}>
+                            <div className="" style={{ height: `${192 + 40 * (Math.max(...river.map(pile => pile.length)) - 1)}px` }}>
+                                <div className="relative w-16 h-24 md:w-32 md:h-48 outline outline-zinc-100 outline-offset-4 rounded-md dark:outline-zinc-700/40">
+                                    {river[riverIndex].map((card, cardIndex) => (
+                                        <div key={cardIndex} className="absolute" style={{ top: `${40 * cardIndex}px` }} >
+                                            <PlayingCard
+                                                className={`z-[${cardIndex}]`}
+                                                suit={card.suit}
+                                                rank={card.rank}
+                                                isShowing={true}
+                                                onClick={() => playCard({
+                                                    card,
+                                                    source: "river",
+                                                    pileIndex: riverIndex,
+                                                    foundationIndex: ((cardIndex < river[riverIndex].length - 1) ? cardIndex : null)
+                                                })} />
+                                        </div>
+                                    ))}
+                                </div>
                             </div>
                         </div>
-                    </div>
-                    <div id="river-1">
-                        <div className="w-32 h-48 outline outline-zinc-100 outline-offset-4 rounded-md dark:outline-zinc-700/40">
-                            {riverOne.map((card, index) => (
-                                <PlayingCard className={`z-${index}`} key={index} suit={card.suit} rank={card.rank} visible={true} />
-                            ))}
-                        </div>
-                    </div>
-                    <div id="river-2">
-                        <div className="w-32 h-48 outline outline-zinc-100 outline-offset-4 rounded-md dark:outline-zinc-700/40">
-                            {riverTwo.map((card, index) => (
-                                <PlayingCard className={`z-${index}`} key={index} suit={card.suit} rank={card.rank} visible={true} />
-                            ))}
-                        </div>
-
-                    </div>
-                    <div id="river-3">
-                        <div className="w-32 h-48 outline outline-zinc-100 outline-offset-4 rounded-md dark:outline-zinc-700/40">
-                            {riverThree.map((card, index) => (
-                                <PlayingCard className={`z-${index}`} key={index} suit={card.suit} rank={card.rank} visible={true} />
-                            ))}
-                        </div>
-
-                    </div>
-                    <div id="river-4">
-                        <div className="w-32 h-48 outline outline-zinc-100 outline-offset-4 rounded-md dark:outline-zinc-700/40">
-                            {riverFour.map((card, index) => (
-                                <PlayingCard className={`z-${index}`} key={index} suit={card.suit} rank={card.rank} visible={true} />
+                    ))}
+                    <div id="nert" className="">
+                        {/* Nert pile */}
+                        <div
+                            className="w-16 h-24 md:w-32 md:h-48 md:ml-16 outline outline-teal-500 dark:outline-teal-400 outline-offset-4 rounded-md dark:outline-zinc-700/40"
+                            onClick={() => playCard({
+                                card: nertStack[nertStack.length - 1],
+                                source: "nert"
+                            })
+                            }>
+                            <div className="absolute w-16 h-24 md:w-32 md:h-48 text-teal-500 dark:text-teal-400 flex justify-center items-center select-none">
+                                <span className="text-xl md:text-3xl font-bold">NERTS</span>
+                            </div>
+                            {nertStack.map((card, index) => (
+                                <PlayingCard className={`z-[${index}]`} key={index} suit={card.suit} rank={card.rank} isShowing={true} />
                             ))}
                         </div>
                     </div>
@@ -246,19 +463,25 @@ export default function Nerts() {
                 {/* stream / waste */}
                 <div id="stream-and-waste" className="flex justify-center ">
                     <div id="stream" className="mx-8">
-
-                        <div className="w-32 h-48 outline outline-zinc-100 outline-offset-4 rounded-md dark:outline-zinc-700/40" onClick={wasteCard}>
+                        <div className="w-16 h-24 md:w-32 md:h-48 outline outline-zinc-100 outline-offset-4 rounded-md dark:outline-zinc-700/40" onClick={wasteCard}>
                             {stream.map((card, index) => (
-                                <PlayingCard className={`z-${index}`} key={index} suit={card.suit} rank={card.rank} visible={false} />
+                                <PlayingCard className={`z-[${index}]`} key={index} suit={card.suit} rank={card.rank} isShowing={false} />
                             ))}
                         </div>
-
                     </div>
                     <div id="waste" className="mx-8">
-                        <div className="w-32 h-48 outline outline-zinc-100 outline-offset-4 rounded-md dark:outline-zinc-700/40">
-                            {waste.map((card, index) => (
-                                <PlayingCard className={`absolute z-[${index}]`} key={index} suit={card.suit} rank={card.rank} visible={true} />
-                            ))}
+                        <div 
+                            className="relative w-16 h-24 md:w-32 md:h-48 outline outline-zinc-100 outline-offset-4 rounded-md dark:outline-zinc-700/40"
+                            onClick={() => playCard({ card: waste[waste.length - 1], source: 'waste'})}
+                        >
+                            {waste.map((card, index) => {
+                                let offset = calculateOffset(index, waste.length)
+                                return (
+                                    <div key={index} className="absolute" style={{ left: `${offset}px` }}>
+                                        <PlayingCard className={`z-[${index}]`} suit={card.suit} rank={card.rank} isShowing={true} />
+                                    </div>
+                                )
+                            })}
                         </div>
                     </div>
                 </div>
