@@ -37,12 +37,6 @@ export default {
         'flip-slow': 'flip .5s ease-in-out',
       },
     },
-    // colors: {
-    //   teal: {
-    //     500: '#14b8a6',
-    //     600: '#0d9488'
-    //   }
-    // },
     typography: typographyStyles,
   },
 } satisfies Config
