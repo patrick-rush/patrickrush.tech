@@ -1,12 +1,11 @@
 "use client"
-import { MutableRefObject, RefObject, useEffect, useMemo, useRef, useState } from 'react'
+import { RefObject, useEffect, useMemo, useRef, useState } from 'react'
 import { suits, ranks } from '@/constants/nerts'
 import { Container } from '@/components/Container'
 import { Lake } from '@/components/Lake'
 import { Tableau } from '@/components/Tableau'
 import { WasteAndStream } from '@/components/WasteAndStream'
 import type { Card, PlayCardProps } from '@/types/nerts.d'
-import type { PanInfo } from "framer-motion"
 
 export default function Nerts() {
     "use client"
@@ -52,7 +51,7 @@ export default function Nerts() {
         setStreamPosition(document.getElementById('stream')?.getBoundingClientRect())
         setWastePosition(document.getElementById('waste')?.getBoundingClientRect())
         const riverPositions = new Map()
-        for (let i = 1; i <= 4; i++) {
+        for (let i = 0; i < 4; i++) {
             riverPositions.set(i, document.getElementById(`river-${i}`)?.getBoundingClientRect())
         }
         setRiverPositions(riverPositions)
@@ -63,34 +62,6 @@ export default function Nerts() {
         setLakePositions(lakePositions)
         maxWasteShowing.current = 0
     }, [deck, players.length])
-
-    // useEffect(() => {
-    //     console.log(">>> nertStack", nertStack)
-    //     console.log(">>> river", river)
-    //     console.log(">>> stream", stream)
-    //     console.log(">>> waste", waste)
-    //     console.log(">>> players", players)
-    //     console.log(">>> lake", lake)
-    //     console.log(">>> gameOver", gameOver)
-    //     console.log(">>> nertStackPosition", nertStackPosition)
-    //     console.log(">>> riverPositions", riverPositions)
-    //     console.log(">>> streamPosition", streamPosition)
-    //     console.log(">>> wastePosition", wastePosition)
-    //     console.log(">>> ?", lakePositions)
-    // }, [
-    //     nertStack,
-    //     river,
-    //     stream,
-    //     waste,
-    //     players,
-    //     lake,
-    //     gameOver,
-    //     nertStackPosition,
-    //     riverPositions,
-    //     streamPosition,
-    //     wastePosition,
-    //     lakePositions
-    // ])
 
     const wasteCards = () => {
         if (gameOver) return
@@ -113,7 +84,6 @@ export default function Nerts() {
     }
 
     const playCard = (props: PlayCardProps) => {
-        console.log("she was clicked yall")
         if (gameOver) return
 
         const { card, source, pileIndex, foundationIndex } = props
@@ -259,51 +229,120 @@ export default function Nerts() {
         return false
     }
 
-    const handleDragAndDrop = (event: MouseEvent | TouchEvent | PointerEvent, info: PanInfo, cardRef: RefObject<HTMLDivElement>, originator: string) => {
+    /**
+     * handleDragAndDrop
+     * @param card          the card that is being dragged
+     * @param cardRef       the DOM node representing the card that is being dragged
+     * @param originator    the location the card emanates from; may include a dash followed by
+     *                      a numeric representation of the pile index
+     * @returns             void
+     */
+    const handleDragAndDrop = (card: Card, cardRef: RefObject<HTMLDivElement>, originator: string, foundationIndex?: number) => {
 
-        console.log("at least we got here")
         let [source, i] = originator.split('-')
-        const index = parseInt(i)
-        // figure out if we dropped the element in a target
-            /* 
-                targets are:
-                    rivers
-                    lakes
-            */
-        // if not, do nothing, return card to original position
+        const sourceIndex = +i
+        interface Target {
+            pile: Card[];
+            location: string;
+            index: number;
+        }
+        type HandleUpdateRiverProps = {
+            destination: number;
+            source: string;
+            sourceIndex: number;
+            start?: number;
+        }
 
-        const getSourceArray = (source: string) => {
+        const determineDestination = (ref: HTMLDivElement) => {
+            if (!ref) {
+                console.error("Card reference does not exist.")
+                throw new Error("cardRef has no current value or current value is incompatible")
+            }
+
+            const { bottom, top, right, left } = ref.getBoundingClientRect()
+            let target: Target | null = null
+
+            const findTarget = (mapObject: Map<number, DOMRect>, piles: Card[][], location: string): Target | null => {
+                for (let [key, value] of mapObject) {
+                    if (left < value.right && right > value.left && top < value.bottom && bottom > value.top) {
+                        return {
+                            pile: piles[key],
+                            location: location,
+                            index: key,
+                        }
+                    }
+                }
+                return null
+            }
+
+            const bottomBoundOfLake = lakePositions?.get(1)?.bottom
+
+            if (lakePositions && bottomBoundOfLake && bottomBoundOfLake > bottom) {
+                target = findTarget(lakePositions, lake, 'lake')
+            } 
+
+            if (!target && riverPositions && bottomBoundOfLake && bottomBoundOfLake < bottom) {
+                target = findTarget(riverPositions, river, 'river')
+            }
+            console.log(">>> target", target)
+            return target
+        }
+
+        const checkCompatibility = (card: Card, target: Target) => {
+            const topCard = target.pile[target.pile.length - 1]
+            switch (target.location) {
+                case 'lake':
+                    if (!topCard) {
+                        if (card.rank.position === 1) {
+                            return true 
+                        }
+                        return false
+                    }
+                    const isOneMore = card.rank.position - 1 === topCard.rank.position
+                    const isSameSuit = card.suit.name === topCard.suit.name
+                    return isOneMore && isSameSuit
+                case 'river':
+                    if (!topCard) return true
+                    const isOneLess = card.rank.position + 1 === topCard.rank.position
+                    const isOppositeSuit = card.suit.type !== topCard.suit.type
+                    return isOneLess && isOppositeSuit
+                default:
+                    throw new Error("Target is not a valid dropzone.")
+            }
+        }
+
+        const determineSourceArray = (source: string) => {
             switch (source) {
                 case 'nert': return nertStack
                 case 'waste': return waste
-                case 'river': return river[index!]
+                case 'river': return river[sourceIndex]
                 default: throw new Error(`Invalid source: ${source}`)
             }
         }
 
-        type HandleUpdateRiverProps = {
-            destination: number;
-            source: string;
-            start?: never;
-        } | {
-            destination: number;
-            source: number;
-            start: number;
-        }
-
+        /**
+         * handleUpdateRiver
+         * @param param0    
+         * {
+         *   destination: index of the river pile that the card or stack should be dropped on,
+         *   source: the card array from which to pull the card that is moving,
+         *   start: (optional) the index of the card if it is a foundation card,
+         * } 
+         * @returns 
+         */
         const handleUpdateRiver = ({
             destination,
             source,
+            sourceIndex,
             start
         }: HandleUpdateRiverProps) => {
             const copyOfRiver = [...river]
-            if (typeof source === 'string') {
-                let sourceArray = getSourceArray(source)
-                if (!sourceArray) return false
+            if (start) {
+                copyOfRiver[destination].push(...copyOfRiver[sourceIndex].splice(start, copyOfRiver[sourceIndex].length))
+            } else {
+                let sourceArray = determineSourceArray(source)
                 const cardToMove = sourceArray.pop()
                 if (cardToMove) copyOfRiver[destination].push(cardToMove)
-            } else {
-                copyOfRiver[destination].push(...copyOfRiver[source].splice(start!, copyOfRiver[source].length))
             }
             setRiver(copyOfRiver)
             return true
@@ -311,10 +350,12 @@ export default function Nerts() {
 
         const handleUpdateLake = ({
             destination,
+            source,
         }: {
             destination: number;
+            source: string;
         }) => {
-            let sourceArray = getSourceArray(source)
+            let sourceArray = determineSourceArray(source)
             if (!sourceArray) return false
             const copyOfLake = [...lake]
             const cardToMove = sourceArray.pop()
@@ -323,51 +364,38 @@ export default function Nerts() {
             return true
         }
 
-        if (cardRef?.current) {
-            const { x, y, width, height } = cardRef.current.getBoundingClientRect()
-            let targetFound = false
-            let target
-            let location
-            let index
-            if (lakePositions) {
-                for (let [key, value] of lakePositions) {
-                    if (value && x + width > value.x && y + height > value.y &&  x < value.x + width && y < value.y + width) {
-                        target = lake[key]
-                        targetFound = true
-                        location = 'lake'
-                        index = key
-                        break
-                    }
-                }
-            }
-            if (!targetFound && riverPositions) {
-                for (let [key, value] of riverPositions) {
-                    if (value && x + width > value.x && y + height > value.y &&  x < value.x + width && y < value.y + width) {
-                        target = river[key]
-                        targetFound = true
-                        location = 'river'
-                        index = key
-                        break
-                    }
-                }
-            }
-            if (target && typeof index === 'number') {
-                switch (location) {
-                    case 'lake':
-                        handleUpdateLake({ destination: index })
-                        break
-                    case 'river':
-                        handleUpdateRiver({ destination: index, source })
-                        break
-                }
-            }
-            // if (target && x + width > target.x && y + height > target.y &&  x < target.x + width && y < target.y + width) {
-            //     console.log("we gon drop")
-            // }
+        let destination
+        try {
+            if (cardRef?.current) destination = determineDestination(cardRef.current)
+            if (!destination) return
+        } catch (err) {
+            console.info(err)
+            return
         }
 
-        // loop through coordinates, if info.point falls in the bounds of coordinates, see if card can be dropped there. If not, return to origin
-        // we need to know, 
+        let compatible
+        try {
+            compatible = checkCompatibility(card, destination)
+            if (!compatible) return
+        } catch (err) {
+            console.info(err)
+            return
+        }
+
+        try {
+            switch (destination.location) {
+                case 'lake':
+                    handleUpdateLake({ destination: destination.index, source })
+                    break
+                case 'river':
+                    handleUpdateRiver({ destination: destination.index, source, sourceIndex, start: foundationIndex })
+                    break
+            }
+        } catch (err) {
+            console.info(err)
+            return
+        }
+
     }
 
     /* board */
