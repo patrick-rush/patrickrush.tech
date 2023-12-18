@@ -2,10 +2,9 @@
 import clsx from 'clsx'
 import Image from 'next/image'
 import cardBack from '@/images/photos/ketchikan.jpeg'
-import React, { MutableRefObject, RefObject, useEffect, useRef, useState } from 'react'
+import React, { MutableRefObject, RefObject, useRef, useState } from 'react'
 import type { Suit, Rank } from '@/types/nerts'
 import { motion } from "framer-motion"
-import type { PanInfo } from "framer-motion"
 
 type PlayingCardProps = {
   className?: string
@@ -17,7 +16,7 @@ type PlayingCardProps = {
   draggable?: boolean;
   assignedZIndex?: number;
   onClick?: () => void;
-  onDragEnd?: (event: MouseEvent | TouchEvent | PointerEvent, info: PanInfo, cardRef: RefObject<HTMLDivElement>) => void;
+  onDragEnd?: (cardRef: RefObject<HTMLDivElement>) => void;
 }
 
 export function PlayingCard({
@@ -37,18 +36,24 @@ export function PlayingCard({
   const cardRef = useRef<HTMLDivElement>(null)
   
   const handleDragStart = () => {
+    console.log("drag started")
     setWasDragged(true)
+  }
+
+  const handleDragEnd = () => {
+    onDragEnd?.(cardRef)
+    setWasDragged(false)
   }
 
   return (
     <motion.div
       className={clsx(className, `absolute z-[${assignedZIndex}]`)}
       drag={draggable}
-      dragConstraints={boardRef}
+      // dragConstraints={boardRef}
       dragElastic={1}
       dragSnapToOrigin
       onDragStart={handleDragStart}
-      onDragEnd={(event, info) => onDragEnd?.(event, info, cardRef)}
+      onDragEnd={handleDragEnd}
       onClick={() => wasDragged ? null : onClick?.()}
       ref={cardRef}
     >
