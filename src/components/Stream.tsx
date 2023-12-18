@@ -20,7 +20,8 @@ export function Stream({
                     if (index > streamLength - 4) shadow = 'shadow-md shadow-zinc-800 rounded-md'
                     return (
                         <PlayingCard
-                            className={`z-[${index}] ${shadow}`}
+                            className={shadow}
+                            assignedZIndex={index}
                             key={index}
                             suit={card.suit}
                             rank={card.rank}

@@ -21,7 +21,8 @@ export function Lake({
                                 if (index > pileLength - 4) shadow = 'shadow-md shadow-zinc-800 rounded-md'
                                 return (
                                     <PlayingCard
-                                        className={`z-[${cardIndex}] ${shadow}`}
+                                        className={shadow}
+                                        assignedZIndex={cardIndex}
                                         key={cardIndex}
                                         suit={card.suit}
                                         rank={card.rank}
