@@ -1,4 +1,4 @@
-import type { Card, PlayCardProps } from '@/types/nerts.d'
+import type { Card, PlayCardProps, DragProps } from '@/types/nerts.d'
 import { PlayingCard } from './PlayingCard';
 import type { MutableRefObject, RefObject } from 'react';
 
@@ -13,7 +13,7 @@ export function Waste({
     maxWasteShowing: { current: number }
     playCard: (props: PlayCardProps) => void;
     boardRef: MutableRefObject<null>;
-    onDragEnd: (card: Card, cardRef: RefObject<HTMLDivElement>, originator: string) => void;
+    onDragEnd: (props: DragProps) => void;
 }) {
 
     const calculateOffset = (index: number) => {
@@ -25,7 +25,7 @@ export function Waste({
     }
 
     const handleDragEnd = (card: Card, cardRef: RefObject<HTMLDivElement>) => {
-        onDragEnd?.(card, cardRef, 'waste')
+        onDragEnd?.({card, cardRef, originator: 'waste'})
     }
 
     return (

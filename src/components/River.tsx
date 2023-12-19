@@ -1,8 +1,6 @@
-import type { Card, PlayCardProps } from '@/types/nerts.d'
+import type { Card, PlayCardProps, DragProps } from '@/types/nerts.d'
 import { Column } from './Column';
-import { useState, type MutableRefObject, type RefObject, useRef } from 'react';
-import { LayoutGroup } from 'framer-motion'
-import { motion } from "framer-motion"
+import { useState, type MutableRefObject } from 'react';
 
 export function River({
     river,
@@ -13,7 +11,7 @@ export function River({
     river: Card[][];
     playCard: (props: PlayCardProps) => void;
     boardRef: MutableRefObject<null>;
-    onDragEnd: (card: Card, cardRef: RefObject<HTMLDivElement>, originator: string, foundationIndex?: number | null) => void;
+    onDragEnd: (props: DragProps) => void;
 }) {
     const [wasDragged, setWasDragged] = useState(false)
     
@@ -22,8 +20,8 @@ export function River({
         setWasDragged(true)
     }
     
-    const handleDragEnd = (card: Card, cardRef: RefObject<HTMLDivElement>, riverIndex: number, foundationIndex?: number | null) => {
-        onDragEnd?.(card, cardRef, `river-${riverIndex}`, foundationIndex)
+    const handleDragEnd = (props: DragProps) => {
+        onDragEnd?.(props)
         setWasDragged(false)
     }
 

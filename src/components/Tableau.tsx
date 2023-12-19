@@ -1,4 +1,4 @@
-import type { Card, PlayCardProps } from '@/types/nerts.d'
+import type { Card, PlayCardProps, DragProps } from '@/types/nerts.d'
 import { River } from './River';
 import { NertStack } from './NertStack';
 import type { MutableRefObject, RefObject } from 'react';
@@ -14,11 +14,11 @@ export function Tableau({
     playCard: (props: PlayCardProps) => void;
     nertStack: Card[];
     boardRef: MutableRefObject<null>;
-    onDragEnd: (card: Card, cardRef: RefObject<HTMLDivElement>, originator: string) => void;
+    onDragEnd: (props: DragProps) => void;
 }) {
 
-    const handleDragEnd = (card: Card, cardRef: RefObject<HTMLDivElement>, originator: string) => {
-        onDragEnd?.(card, cardRef, originator)
+    const handleDragEnd = (props: DragProps) => {
+        onDragEnd?.(props)
     }
 
     return (
@@ -26,7 +26,7 @@ export function Tableau({
             {/* river */}
             <River river={river} playCard={playCard} boardRef={boardRef} onDragEnd={handleDragEnd} />
             {/* nert stack */}
-            <NertStack nertStack={nertStack} playCard={playCard} boardRef={boardRef} onDragEnd={(card, cardRef) => handleDragEnd(card, cardRef, "nert")} />
+            <NertStack nertStack={nertStack} playCard={playCard} boardRef={boardRef} onDragEnd={({card, cardRef}) => handleDragEnd({ card, cardRef, originator: "nert"})} />
         </div>
     )
 }

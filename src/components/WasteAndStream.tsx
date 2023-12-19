@@ -1,7 +1,7 @@
-import type { Card, PlayCardProps } from '@/types/nerts.d'
+import type { Card, PlayCardProps, DragProps } from '@/types/nerts.d'
 import { Stream } from './Stream';
 import { Waste } from './Waste';
-import type { MutableRefObject, RefObject } from 'react';
+import type { MutableRefObject } from 'react';
 
 export function WasteAndStream({
     stream,
@@ -18,7 +18,7 @@ export function WasteAndStream({
     boardRef: MutableRefObject<null>;
     playCard: (props: PlayCardProps) => void;
     wasteCards: () => void;
-    onDragEnd: (card: Card, cardRef: RefObject<HTMLDivElement>, originator: string) => void;
+    onDragEnd: (props: DragProps) => void;
 }) {
     return (
         <div id="stream-and-waste" className="flex justify-center ">
