@@ -34,19 +34,15 @@ const PlayingCardComponent: ForwardRefRenderFunction<HTMLDivElement, PlayingCard
     onDragEnd,
   } = props
   const [wasDragged, setWasDragged] = useState(false)
-  // const [zIndex, setZIndex] = useState<number | null>(0)
   const cardRef = useRef<HTMLDivElement>(null)
   
   const handleDragStart = () => {
-    // setZIndex(1000)
-    console.log("drag started")
     onDragStart?.()
     setWasDragged(true)
   }
 
   const handleDragEnd = () => {
     onDragEnd?.(cardRef)
-    // setZIndex(null)
     setWasDragged(false)
   }
 
@@ -78,15 +74,15 @@ const PlayingCardComponent: ForwardRefRenderFunction<HTMLDivElement, PlayingCard
                 <p className="text-lg font-bold">{rank.display}</p>
               </div>
               <div className={`text-${suit.color}`}>
-                <p className="text-lg font-bold">{suit.symbol}</p>
+                <p className="text-lg font-thin">{suit.symbol}</p>
               </div>
             </div>
             <div className="flex-grow flex items-center justify-center">
-              <div className={`text-${suit.color} text-5xl font-bold`}>{suit.symbol}</div>
+              <div className={`text-${suit.color} font-thin ${suit.name === 'Spades' && rank.position === 1 ? 'text-7xl' : 'text-5xl'}`}>{suit.symbol}</div>
             </div>
             <div className="hidden md:flex justify-between">
               <div className={`text-${suit.color} rotate-180`}>
-                <p className="text-lg font-bold">{suit.symbol}</p>
+                <p className="text-lg font-thin">{suit.symbol}</p>
               </div>
               <div className={`text-${suit.color} rotate-180`}>
                 <p className="text-lg font-bold">{rank.display}</p>

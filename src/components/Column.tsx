@@ -1,6 +1,6 @@
 import type { Card, PlayCardProps, DragProps } from '@/types/nerts.d'
 import { PlayingCard } from './PlayingCard'
-import { useRef, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { motion } from "framer-motion"
 interface ColumnProps {
     pile: Card[]
@@ -26,6 +26,14 @@ export const Column = ({ pile,
 }: ColumnProps): JSX.Element => {
     const [zIndex, setZIndex] = useState(parentZIndex || 0)
     const cardRef = useRef<HTMLDivElement>(null)
+    const timeoutRef = useRef<NodeJS.Timeout>()
+
+    useEffect(() => {
+        return () => {
+            if (timeoutRef.current) clearTimeout(timeoutRef.current)
+        }
+    }, [])
+
     if (parentIndex >= pile.length) {
         return <></>
     }
@@ -36,7 +44,12 @@ export const Column = ({ pile,
     }
     
     const handleDragEnd = (props: DragProps) => {
-        setZIndex(parentZIndex || 0)
+        if (timeoutRef.current) clearTimeout(timeoutRef.current)
+
+        timeoutRef.current = setTimeout(() => {
+            setZIndex(parentZIndex || 0)
+        }, 1000)
+
         onDragEnd(props)
     }
 

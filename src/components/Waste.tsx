@@ -1,6 +1,6 @@
 import type { Card, PlayCardProps, DragProps } from '@/types/nerts.d'
 import { PlayingCard } from './PlayingCard';
-import { useState, type MutableRefObject, type RefObject } from 'react';
+import { useState, type RefObject, useRef, useEffect } from 'react';
 
 export function Waste({
     waste,
@@ -14,6 +14,27 @@ export function Waste({
     onDragEnd: (props: DragProps) => void;
 }) {
     const [zIndex, setZIndex] = useState(0)
+    const timeoutRef = useRef<NodeJS.Timeout>()
+
+    useEffect(() => {
+        return () => {
+            if (timeoutRef.current) clearTimeout(timeoutRef.current)
+        }
+    }, [])
+
+    const handleDragStart = () => {
+        setZIndex(1000)
+    }
+    
+    const handleDragEnd = (card: Card, cardRef: RefObject<HTMLDivElement>) => {
+        if (timeoutRef.current) clearTimeout(timeoutRef.current)
+
+        timeoutRef.current = setTimeout(() => {
+            setZIndex(0)
+        }, 1000)
+
+        onDragEnd?.({ card, cardRef, originator: 'waste' })
+    }
 
     const calculateOffset = (index: number) => {
         const refIndex = maxWasteShowing.current - 1
@@ -21,15 +42,6 @@ export function Waste({
             return index * 40
         }
         return index === refIndex ? 80 : (index + 1 === refIndex ? 40 : 0)
-    }
-
-    const handleDragStart = () => {
-        setZIndex(1000)
-    }
-    
-    const handleDragEnd = (card: Card, cardRef: RefObject<HTMLDivElement>) => {
-        setZIndex(0)
-        onDragEnd?.({ card, cardRef, originator: 'waste' })
     }
 
     return (
