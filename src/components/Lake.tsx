@@ -22,7 +22,6 @@ export function Lake({
                                 return (
                                     <PlayingCard
                                         className={shadow}
-                                        assignedZIndex={cardIndex}
                                         key={cardIndex}
                                         suit={card.suit}
                                         rank={card.rank}

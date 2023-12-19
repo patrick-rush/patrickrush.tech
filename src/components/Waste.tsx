@@ -41,7 +41,6 @@ export function Waste({
                         <div id={`waste-${index}`} key={index} className="absolute" style={{ left: `${offset}px` }}>
                             <PlayingCard
                                 className={shadow}
-                                assignedZIndex={index}
                                 suit={card.suit}
                                 rank={card.rank}
                                 isShowing={true}

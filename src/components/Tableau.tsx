@@ -20,11 +20,11 @@ export function Tableau({
     }
 
     return (
-        <div id="tableau" className="grid grid-cols-4 justify-items-center md:flex justify-between pb-16">
+        <div id="tableau" className="grid grid-cols-4 justify-items-center md:flex justify-between pb-52 md:pb-32">
             {/* river */}
             <River river={river} playCard={playCard} onDragEnd={handleDragEnd} />
             {/* nert stack */}
-            <NertStack nertStack={nertStack} playCard={playCard} onDragEnd={({card, cardRef}) => handleDragEnd({ card, cardRef, originator: "nert"})} />
+            <NertStack className="hidden md:flex" nertStack={nertStack} playCard={playCard} onDragEnd={({card, cardRef}) => handleDragEnd({ card, cardRef, originator: "nert"})} />
         </div>
     )
 }

@@ -21,7 +21,6 @@ export function Stream({
                     return (
                         <PlayingCard
                             className={shadow}
-                            assignedZIndex={index}
                             key={index}
                             suit={card.suit}
                             rank={card.rank}
