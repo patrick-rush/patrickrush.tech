@@ -1,6 +1,6 @@
 import type { Card, PlayCardProps, DragProps } from '@/types/nerts.d'
 import { PlayingCard } from './PlayingCard';
-import type { MutableRefObject, RefObject } from 'react';
+import { useState, type MutableRefObject, type RefObject } from 'react';
 
 export function Waste({
     waste,
@@ -13,6 +13,7 @@ export function Waste({
     playCard: (props: PlayCardProps) => void;
     onDragEnd: (props: DragProps) => void;
 }) {
+    const [zIndex, setZIndex] = useState(0)
 
     const calculateOffset = (index: number) => {
         const refIndex = maxWasteShowing.current - 1
@@ -22,35 +23,40 @@ export function Waste({
         return index === refIndex ? 80 : (index + 1 === refIndex ? 40 : 0)
     }
 
+    const handleDragStart = () => {
+        setZIndex(1000)
+    }
+    
     const handleDragEnd = (card: Card, cardRef: RefObject<HTMLDivElement>) => {
-        onDragEnd?.({card, cardRef, originator: 'waste'})
+        setZIndex(0)
+        onDragEnd?.({ card, cardRef, originator: 'waste' })
     }
 
     return (
-        <div className="md:mx-8">
-            <div
-                className="relative w-36 h-24 md:w-44 md:h-36 outline outline-zinc-100 outline-offset-4 rounded-md dark:outline-zinc-700/40"
-                id="waste" 
-            >
-                {waste.map((card, index) => {
-                    let offset = 0
-                    offset = calculateOffset(index)
-                    let shadow = ''
-                    if (index > maxWasteShowing.current - 4 || index === waste.length - 1) shadow = 'shadow-md shadow-zinc-800 rounded-md'
-                    return (
-                        <div id={`waste-${index}`} key={index} className="absolute" style={{ left: `${offset}px` }}>
-                            <PlayingCard
-                                className={shadow}
-                                suit={card.suit}
-                                rank={card.rank}
-                                isShowing={true}
-                                draggable={index === waste.length - 1}
-                                onDragEnd={(cardRef) => handleDragEnd(card, cardRef)}
-                                onClick={() => playCard({ card: waste[waste.length - 1], source: 'waste' })}
-                            />
-                        </div>
-                    )
-                })}
+        <div id="waste" className="md:mx-8">
+            <div className="w-36 h-24 md:w-44 md:h-36 outline outline-zinc-100 outline-offset-4 rounded-md dark:outline-zinc-700/40" style={{ zIndex: zIndex }}>
+                <div className="absolute">
+                    {waste.map((card, index) => {
+                        let offset = 0
+                        offset = calculateOffset(index)
+                        let shadow = ''
+                        if (index > maxWasteShowing.current - 4 || index === waste.length - 1) shadow = 'shadow-md shadow-zinc-800 rounded-md'
+                        return (
+                            <div id={`waste-${index}`} key={index} className="absolute" style={{ left: `${offset}px`, zIndex: zIndex }}>
+                                <PlayingCard
+                                    className={shadow}
+                                    suit={card.suit}
+                                    rank={card.rank}
+                                    isShowing={true}
+                                    draggable={index === waste.length - 1}
+                                    onDragStart={handleDragStart}
+                                    onDragEnd={(cardRef) => handleDragEnd(card, cardRef)}
+                                    onClick={() => playCard({ card: waste[waste.length - 1], source: 'waste' })}
+                                />
+                            </div>
+                        )
+                    })}
+                </div>
             </div>
         </div>
     )

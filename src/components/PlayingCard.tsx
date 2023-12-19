@@ -15,6 +15,7 @@ type PlayingCardProps = {
   draggable?: boolean;
   style?: any;
   onClick?: () => void;
+  onDragStart?: () => void;
   onDragEnd?: (cardRef: RefObject<HTMLDivElement>) => void;
 }
 
@@ -29,24 +30,29 @@ const PlayingCardComponent: ForwardRefRenderFunction<HTMLDivElement, PlayingCard
     draggable = false,
     style,
     onClick,
+    onDragStart,
     onDragEnd,
   } = props
   const [wasDragged, setWasDragged] = useState(false)
+  // const [zIndex, setZIndex] = useState<number | null>(0)
   const cardRef = useRef<HTMLDivElement>(null)
   
   const handleDragStart = () => {
+    // setZIndex(1000)
     console.log("drag started")
+    onDragStart?.()
     setWasDragged(true)
   }
 
   const handleDragEnd = () => {
     onDragEnd?.(cardRef)
+    // setZIndex(null)
     setWasDragged(false)
   }
 
   return (
     <motion.div
-      className={clsx(className, `absolute`)}
+      className={clsx(className, `absolute z-1000`)}
       drag={draggable}
       style={style}
       dragElastic={1}
@@ -55,7 +61,7 @@ const PlayingCardComponent: ForwardRefRenderFunction<HTMLDivElement, PlayingCard
       onDragEnd={handleDragEnd}
       transition={{
         ease: "easeInOut",
-        duration: 1
+        duration: 1,
       }}
       onClick={() => wasDragged ? null : onClick?.()}
       ref={ref || cardRef}

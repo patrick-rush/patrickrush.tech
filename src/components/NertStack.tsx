@@ -1,6 +1,6 @@
 import type { Card, PlayCardProps, DragProps } from '@/types/nerts.d'
 import { PlayingCard } from './PlayingCard';
-import { MutableRefObject, RefObject } from 'react';
+import { MutableRefObject, RefObject, useState } from 'react';
 import clsx from 'clsx';
 
 export function NertStack({
@@ -14,8 +14,14 @@ export function NertStack({
     playCard: (props: PlayCardProps) => void;
     onDragEnd?: (props: DragProps) => void;
 }) {
+    const [zIndex, setZIndex] = useState(0)
+
+    const handleDragStart = () => {
+        setZIndex(1000)
+    }
 
     const handleDragEnd = (card: Card, cardRef: RefObject<HTMLDivElement>) => {
+        setZIndex(0)
         onDragEnd?.({ card, cardRef, originator: 'nert' })
     }
 
@@ -24,7 +30,7 @@ export function NertStack({
             <div className={clsx(className, "col-span-4 md:flex")}>
                 <div className="md:ml-16">
                     <div
-                        id="nert" 
+                        id="nert"
                         className="block w-16 h-24 md:w-24 md:h-36 outline outline-teal-500 dark:outline-teal-400 outline-offset-4 rounded-md"
                     >
                         <div className="absolute w-16 h-24 md:w-24 md:h-36 text-teal-500 dark:text-teal-400 flex justify-center items-center select-none">
@@ -37,17 +43,18 @@ export function NertStack({
                             return (
                                 <PlayingCard
                                     className={shadow}
+                                    style={{ zIndex: zIndex }}
                                     key={index}
                                     suit={card.suit}
                                     rank={card.rank}
                                     isShowing={true}
                                     draggable={index === nertStack.length - 1}
+                                    onDragStart={handleDragStart}
                                     onDragEnd={(cardRef) => handleDragEnd(card, cardRef)}
                                     onClick={() => playCard({
                                         card: nertStack[nertStack.length - 1],
                                         source: "nert"
                                     })}
-                                // cardPosition={nertStackPosition}
                                 />
                             )
                         })}

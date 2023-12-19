@@ -1,6 +1,6 @@
 import type { Card, PlayCardProps, DragProps } from '@/types/nerts.d'
 import { PlayingCard } from './PlayingCard'
-import { useRef } from 'react'
+import { useRef, useState } from 'react'
 import { motion } from "framer-motion"
 interface ColumnProps {
     pile: Card[]
@@ -11,16 +11,40 @@ interface ColumnProps {
     handleDragEnd: (props: DragProps) => void
     wasDragged: boolean;
     river: Card[][];
+    parentZIndex?: number;
 }
 
-export const Column = ({ pile, riverIndex, parentIndex, playCard, handleDragStart, handleDragEnd, wasDragged, river }: ColumnProps): JSX.Element => {
+export const Column = ({ pile,
+    riverIndex,
+    parentIndex,
+    playCard,
+    handleDragStart: onDragStart,
+    handleDragEnd: onDragEnd,
+    wasDragged,
+    river,
+    parentZIndex
+}: ColumnProps): JSX.Element => {
+    const [zIndex, setZIndex] = useState(parentZIndex || 0)
     const cardRef = useRef<HTMLDivElement>(null)
     if (parentIndex >= pile.length) {
         return <></>
     }
+
+    const handleDragStart = () => {
+        setZIndex(zIndex + 1000)
+        onDragStart()
+    }
+    
+    const handleDragEnd = (props: DragProps) => {
+        setZIndex(parentZIndex || 0)
+        onDragEnd(props)
+    }
+
     const card = pile[parentIndex]
     return (
         <motion.div
+            className="relative"
+            style={{ zIndex: zIndex }}
             drag
             dragElastic={1}
             dragSnapToOrigin
@@ -56,6 +80,7 @@ export const Column = ({ pile, riverIndex, parentIndex, playCard, handleDragStar
                     handleDragEnd={handleDragEnd}
                     wasDragged={wasDragged}
                     river={river}
+                    parentZIndex={zIndex}
                 />
             </div>
         </motion.div>
