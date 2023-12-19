@@ -52,7 +52,7 @@ export function NertStack({
                             )
                         })}
                     </div>
-                    <div className="grid justify-items-center m-4 font-medium text-lg text-zinc-400 dark:text-zinc-500">
+                    <div className="grid justify-items-center m-4 font-medium text-lg text-zinc-400 dark:text-zinc-500 select-none">
                         {nertStack.length}
                     </div>
                 </div>

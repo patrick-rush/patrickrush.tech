@@ -4,7 +4,7 @@ import { suits, ranks } from '@/constants/nerts'
 import { Container } from '@/components/Container'
 import { Lake } from '@/components/Lake'
 import { Tableau } from '@/components/Tableau'
-import { WasteAndStream } from '@/components/WasteAndStream'
+import { Stream } from '@/components/Stream'
 import type { Card, PlayCardProps, DragProps } from '@/types/nerts.d'
 
 export default function Nerts() {
@@ -382,7 +382,7 @@ export default function Nerts() {
                 {/* tableau */}
                 <Tableau river={river} nertStack={nertStack} playCard={playCard} onDragEnd={dropCard}/>
                 {/* stream & waste */}
-                <WasteAndStream stream={stream} waste={waste} maxWasteShowing={maxWasteShowing} playCard={playCard} wasteCards={wasteCards} nertStack={nertStack} onDragEnd={dropCard}/>
+                <Stream stream={stream} waste={waste} maxWasteShowing={maxWasteShowing} playCard={playCard} wasteCards={wasteCards} nertStack={nertStack} onDragEnd={dropCard}/>
             </div>
         </Container>
     )
