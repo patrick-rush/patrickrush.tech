@@ -2,7 +2,7 @@
 import clsx from 'clsx'
 import Image from 'next/image'
 import cardBack from '@/images/photos/ketchikan.jpeg'
-import React, { MutableRefObject, RefObject, useRef, useState } from 'react'
+import React, { ForwardRefRenderFunction, MutableRefObject, RefObject, forwardRef, useRef, useState } from 'react'
 import type { Suit, Rank } from '@/types/nerts'
 import { motion } from "framer-motion"
 
@@ -12,7 +12,6 @@ type PlayingCardProps = {
   rank: Rank;
   isShowing: boolean;
   cardPosition?: DOMRect | undefined;
-  boardRef?: MutableRefObject<null>
   draggable?: boolean;
   assignedZIndex?: number;
   style?: any;
@@ -20,20 +19,20 @@ type PlayingCardProps = {
   onDragEnd?: (cardRef: RefObject<HTMLDivElement>) => void;
 }
 
-export function PlayingCard({
-  className,
-  suit,
-  rank,
-  isShowing,
-  cardPosition,
-  boardRef,
-  draggable = false,
-  assignedZIndex,
-  style,
-  onClick,
-  onDragEnd,
-}: PlayingCardProps) {
+const PlayingCardComponent: ForwardRefRenderFunction<HTMLDivElement, PlayingCardProps> = (props, ref) => {
   "use client"
+  const {
+    className,
+    suit,
+    rank,
+    isShowing,
+    cardPosition,
+    draggable = false,
+    assignedZIndex,
+    style,
+    onClick,
+    onDragEnd,
+  } = props
   const [wasDragged, setWasDragged] = useState(false)
   const cardRef = useRef<HTMLDivElement>(null)
   
@@ -52,13 +51,12 @@ export function PlayingCard({
       className={clsx(className, `absolute z-[${assignedZIndex}]`)}
       drag={draggable}
       style={style}
-      // dragConstraints={boardRef}
       dragElastic={1}
       dragSnapToOrigin
       onDragStart={handleDragStart}
       onDragEnd={handleDragEnd}
       onClick={() => wasDragged ? null : onClick?.()}
-      ref={cardRef}
+      ref={ref || cardRef}
     >
       <div
         className="group relative flex flex-col items-start select-none"
@@ -96,3 +94,5 @@ export function PlayingCard({
     </motion.div>
   )
 }
+
+export const PlayingCard = forwardRef<HTMLDivElement, PlayingCardProps>(PlayingCardComponent)

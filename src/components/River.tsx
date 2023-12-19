@@ -5,12 +5,10 @@ import { useState, type MutableRefObject } from 'react';
 export function River({
     river,
     playCard,
-    boardRef,
     onDragEnd,
 }: {
     river: Card[][];
     playCard: (props: PlayCardProps) => void;
-    boardRef: MutableRefObject<null>;
     onDragEnd: (props: DragProps) => void;
 }) {
     const [wasDragged, setWasDragged] = useState(false)

@@ -17,7 +17,6 @@ export default function Nerts() {
     const [lake, setLake] = useState<Card[][]>(Array.from({ length: 4 * players.length }, () => []))
     const [gameOver, setGameOver] = useState<boolean>(false)
     const maxWasteShowing = useRef(0)
-    const boardRef = useRef(null)
 
     const deck = useMemo(() => suits.flatMap(suit => {
         return ranks.map(rank => {
@@ -211,44 +210,6 @@ export default function Nerts() {
         return false
     }
 
-    interface Target {
-        pile: Card[];
-        location: string;
-        index: number;
-    }
-
-    const determineDestination = (ref: HTMLDivElement) => {
-        if (!ref) {
-            console.error("Card reference does not exist.")
-            throw new Error("cardRef has no current value or current value is incompatible")
-        }
-        
-        const { bottom, top, right, left } = ref.getBoundingClientRect()
-        let target: Target | null = null
-
-        const findTarget = (repetitions: number, piles: Card[][], location: string): Target | null => {
-            for (let i = 0; i < repetitions; i++) {
-                const values = document.getElementById(`lake-${i}`)?.getBoundingClientRect()
-                if (values && left < values.right && right > values.left && top < values.bottom && bottom > values.top) {
-                    return {
-                        pile: piles[i],
-                        location: location,
-                        index: i,
-                    }
-                }
-            }
-            return null
-        }
-        
-        target = findTarget(4 * players.length, lake, 'lake')
-        
-        if (!target) target = findTarget(4, river, 'river')
-
-        console.log(">>> target", target)
-        return target
-    }
-
-
     const dropCard = ({ card, cardRef, originator, foundationIndex }: DragProps) => {
 
         let [source, i] = originator.split('-')
@@ -261,6 +222,44 @@ export default function Nerts() {
             start?: number;
         }
 
+        interface Target {
+            pile: Card[];
+            location: string;
+            index: number;
+        }
+    
+        const determineDestination = (ref: HTMLDivElement) => {
+            if (!ref) {
+                console.error("Card reference does not exist.")
+                throw new Error("cardRef has no current value or current value is incompatible")
+            }
+            
+            const { bottom, top, right, left } = ref.getBoundingClientRect()
+            let target: Target | null = null
+    
+            console.log("Dimensions:", ref.getBoundingClientRect())
+            const findTarget = (repetitions: number, piles: Card[][], location: string): Target | null => {
+                for (let i = 0; i < repetitions; i++) {
+                    const values = document.getElementById(`${location}-${i}`)?.getBoundingClientRect()
+                    console.log("Values:", values)
+                    if (values && left < values.right && right > values.left && top < values.bottom && bottom > values.top) {
+                        return {
+                            pile: piles[i],
+                            location: location,
+                            index: i,
+                        }
+                    }
+                }
+                return null
+            }
+            
+            target = findTarget(4 * players.length, lake, 'lake')
+            
+            if (!target) target = findTarget(4, river, 'river')
+    
+            console.log(">>> target", target)
+            return target
+        }    
 
         const checkCompatibility = (card: Card, target: Target) => {
             const topCard = target.pile[target.pile.length - 1]
@@ -375,13 +374,13 @@ export default function Nerts() {
     /* board */
     return (
         <Container className="flex h-full items-center pt-8 sm:pt-16" >
-            <div className="rounded-2xl border border-zinc-100 p-8 dark:border-zinc-700/40" ref={boardRef}>
+            <div className="rounded-2xl border border-zinc-100 p-8 dark:border-zinc-700/40">
                 {/* lake */}
                 <Lake numberOfPlayers={players.length} lake={lake} />
                 {/* tableau */}
-                <Tableau river={river} nertStack={nertStack} playCard={playCard} boardRef={boardRef} onDragEnd={dropCard}/>
+                <Tableau river={river} nertStack={nertStack} playCard={playCard} onDragEnd={dropCard}/>
                 {/* stream & waste */}
-                <WasteAndStream stream={stream} waste={waste} maxWasteShowing={maxWasteShowing} playCard={playCard} wasteCards={wasteCards} boardRef={boardRef} onDragEnd={dropCard}/>
+                <WasteAndStream stream={stream} waste={waste} maxWasteShowing={maxWasteShowing} playCard={playCard} wasteCards={wasteCards} onDragEnd={dropCard}/>
             </div>
         </Container>
     )

@@ -37,7 +37,6 @@ export const Column = ({ pile, riverIndex, parentIndex, playCard, handleDragStar
                 pileIndex: riverIndex,
                 foundationIndex: (parentIndex < pile.length - 1) ? parentIndex : undefined
             })}
-            ref={cardRef}
         >     
             <div id={`river-${riverIndex}-${parentIndex}`} key={parentIndex} className="absolute" >
                 <PlayingCard
@@ -47,6 +46,7 @@ export const Column = ({ pile, riverIndex, parentIndex, playCard, handleDragStar
                     suit={card.suit}
                     rank={card.rank}
                     isShowing={true}
+                    ref={cardRef}
                 />
                 <Column
                     pile={pile}
