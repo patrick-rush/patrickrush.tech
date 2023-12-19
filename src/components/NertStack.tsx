@@ -1,13 +1,16 @@
 import type { Card, PlayCardProps, DragProps } from '@/types/nerts.d'
 import { PlayingCard } from './PlayingCard';
 import { MutableRefObject, RefObject } from 'react';
+import clsx from 'clsx';
 
 export function NertStack({
     nertStack,
+    className,
     playCard,
     onDragEnd,
 }: {
     nertStack: Card[];
+    className?: string;
     playCard: (props: PlayCardProps) => void;
     onDragEnd?: (props: DragProps) => void;
 }) {
@@ -18,7 +21,7 @@ export function NertStack({
 
     return (
         <>
-            <div className="col-span-4 md:flex">
+            <div className={clsx(className, "col-span-4 md:flex")}>
                 <div className="md:ml-16">
                     <div
                         id="nert" 
@@ -34,7 +37,6 @@ export function NertStack({
                             return (
                                 <PlayingCard
                                     className={shadow}
-                                    assignedZIndex={index}
                                     key={index}
                                     suit={card.suit}
                                     rank={card.rank}

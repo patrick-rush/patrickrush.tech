@@ -42,7 +42,6 @@ export const Column = ({ pile, riverIndex, parentIndex, playCard, handleDragStar
                 <PlayingCard
                     className="shadow-md shadow-zinc-800 rounded-md"
                     style={{ top: `${Math.min(200 / river[riverIndex].length, 40) * parentIndex}px` }}
-                    assignedZIndex={parentIndex}
                     suit={card.suit}
                     rank={card.rank}
                     isShowing={true}

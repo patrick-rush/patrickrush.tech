@@ -234,15 +234,17 @@ export default function Nerts() {
                 throw new Error("cardRef has no current value or current value is incompatible")
             }
             
-            const { bottom, top, right, left } = ref.getBoundingClientRect()
+            const { bottom, top, right, left, height } = ref.getBoundingClientRect()
             let target: Target | null = null
     
             console.log("Dimensions:", ref.getBoundingClientRect())
             const findTarget = (repetitions: number, piles: Card[][], location: string): Target | null => {
                 for (let i = 0; i < repetitions; i++) {
                     const values = document.getElementById(`${location}-${i}`)?.getBoundingClientRect()
+                    let offset = 10
+                    if (location === 'river') offset = (river[i].length * (height / 5)) + 10
                     console.log("Values:", values)
-                    if (values && left < values.right && right > values.left && top < values.bottom && bottom > values.top) {
+                    if (values && left < values.right + 10 && right > values.left - 10 && top < values.bottom + offset && bottom > values.top - 10) {
                         return {
                             pile: piles[i],
                             location: location,
@@ -374,13 +376,13 @@ export default function Nerts() {
     /* board */
     return (
         <Container className="flex h-full items-center pt-8 sm:pt-16" >
-            <div className="rounded-2xl border border-zinc-100 p-8 dark:border-zinc-700/40">
+            <div className="rounded-2xl sm:border sm:border-zinc-100 sm:p-8 sm:dark:border-zinc-700/40">
                 {/* lake */}
                 <Lake numberOfPlayers={players.length} lake={lake} />
                 {/* tableau */}
                 <Tableau river={river} nertStack={nertStack} playCard={playCard} onDragEnd={dropCard}/>
                 {/* stream & waste */}
-                <WasteAndStream stream={stream} waste={waste} maxWasteShowing={maxWasteShowing} playCard={playCard} wasteCards={wasteCards} onDragEnd={dropCard}/>
+                <WasteAndStream stream={stream} waste={waste} maxWasteShowing={maxWasteShowing} playCard={playCard} wasteCards={wasteCards} nertStack={nertStack} onDragEnd={dropCard}/>
             </div>
         </Container>
     )
