@@ -277,11 +277,11 @@ export default function Nerts() {
 
             const bottomBoundOfLake = lakePositions?.get(1)?.bottom
 
-            if (lakePositions && bottomBoundOfLake && bottomBoundOfLake > bottom) {
+            if (lakePositions) {
                 target = findTarget(lakePositions, lake, 'lake')
             } 
 
-            if (!target && riverPositions && bottomBoundOfLake && bottomBoundOfLake < bottom) {
+            if (!target && riverPositions) {
                 target = findTarget(riverPositions, river, 'river')
             }
             console.log(">>> target", target)

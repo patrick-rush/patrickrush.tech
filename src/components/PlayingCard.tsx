@@ -15,6 +15,7 @@ type PlayingCardProps = {
   boardRef?: MutableRefObject<null>
   draggable?: boolean;
   assignedZIndex?: number;
+  style?: any;
   onClick?: () => void;
   onDragEnd?: (cardRef: RefObject<HTMLDivElement>) => void;
 }
@@ -28,6 +29,7 @@ export function PlayingCard({
   boardRef,
   draggable = false,
   assignedZIndex,
+  style,
   onClick,
   onDragEnd,
 }: PlayingCardProps) {
@@ -49,6 +51,7 @@ export function PlayingCard({
     <motion.div
       className={clsx(className, `absolute z-[${assignedZIndex}]`)}
       drag={draggable}
+      style={style}
       // dragConstraints={boardRef}
       dragElastic={1}
       dragSnapToOrigin
