@@ -6,13 +6,11 @@ export function Waste({
     waste,
     maxWasteShowing,
     playCard,
-    boardRef,
     onDragEnd,
 }: {
     waste: Card[];
     maxWasteShowing: { current: number }
     playCard: (props: PlayCardProps) => void;
-    boardRef: MutableRefObject<null>;
     onDragEnd: (props: DragProps) => void;
 }) {
 
@@ -47,7 +45,6 @@ export function Waste({
                                 suit={card.suit}
                                 rank={card.rank}
                                 isShowing={true}
-                                boardRef={boardRef}
                                 draggable={index === waste.length - 1}
                                 onDragEnd={(cardRef) => handleDragEnd(card, cardRef)}
                                 onClick={() => playCard({ card: waste[waste.length - 1], source: 'waste' })}

@@ -7,7 +7,6 @@ export function WasteAndStream({
     stream,
     waste,
     maxWasteShowing,
-    boardRef,
     playCard,
     wasteCards,
     onDragEnd,
@@ -15,7 +14,6 @@ export function WasteAndStream({
     stream: Card[];
     waste: Card[];
     maxWasteShowing: { current: number }
-    boardRef: MutableRefObject<null>;
     playCard: (props: PlayCardProps) => void;
     wasteCards: () => void;
     onDragEnd: (props: DragProps) => void;
@@ -25,7 +23,7 @@ export function WasteAndStream({
             {/* stream */}
             <Stream stream={stream} wasteCards={wasteCards} />
             {/* waste */}
-            <Waste waste={waste} playCard={playCard} maxWasteShowing={maxWasteShowing} boardRef={boardRef} onDragEnd={onDragEnd} />
+            <Waste waste={waste} playCard={playCard} maxWasteShowing={maxWasteShowing} onDragEnd={onDragEnd} />
         </div>
 
     )

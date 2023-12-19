@@ -6,14 +6,12 @@ import type { MutableRefObject, RefObject } from 'react';
 export function Tableau({
     river,
     nertStack,
-    boardRef,
     playCard,
     onDragEnd,
 }: {
     river: Card[][];
     playCard: (props: PlayCardProps) => void;
     nertStack: Card[];
-    boardRef: MutableRefObject<null>;
     onDragEnd: (props: DragProps) => void;
 }) {
 
@@ -24,9 +22,9 @@ export function Tableau({
     return (
         <div id="tableau" className="grid grid-cols-4 justify-items-center md:flex justify-between pb-16">
             {/* river */}
-            <River river={river} playCard={playCard} boardRef={boardRef} onDragEnd={handleDragEnd} />
+            <River river={river} playCard={playCard} onDragEnd={handleDragEnd} />
             {/* nert stack */}
-            <NertStack nertStack={nertStack} playCard={playCard} boardRef={boardRef} onDragEnd={({card, cardRef}) => handleDragEnd({ card, cardRef, originator: "nert"})} />
+            <NertStack nertStack={nertStack} playCard={playCard} onDragEnd={({card, cardRef}) => handleDragEnd({ card, cardRef, originator: "nert"})} />
         </div>
     )
 }

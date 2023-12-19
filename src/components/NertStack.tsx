@@ -4,12 +4,10 @@ import { MutableRefObject, RefObject } from 'react';
 
 export function NertStack({
     nertStack,
-    boardRef,
     playCard,
     onDragEnd,
 }: {
     nertStack: Card[];
-    boardRef: MutableRefObject<null>
     playCard: (props: PlayCardProps) => void;
     onDragEnd?: (props: DragProps) => void;
 }) {
@@ -41,7 +39,6 @@ export function NertStack({
                                     suit={card.suit}
                                     rank={card.rank}
                                     isShowing={true}
-                                    boardRef={boardRef}
                                     draggable={index === nertStack.length - 1}
                                     onDragEnd={(cardRef) => handleDragEnd(card, cardRef)}
                                     onClick={() => playCard({
