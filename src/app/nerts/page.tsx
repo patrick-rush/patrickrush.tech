@@ -1,11 +1,11 @@
 "use client"
-import { RefObject, useEffect, useMemo, useRef, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { suits, ranks } from '@/constants/nerts'
 import { Container } from '@/components/Container'
 import { Lake } from '@/components/Lake'
 import { Tableau } from '@/components/Tableau'
 import { WasteAndStream } from '@/components/WasteAndStream'
-import type { Card, PlayCardProps } from '@/types/nerts.d'
+import type { Card, PlayCardProps, DragProps } from '@/types/nerts.d'
 
 export default function Nerts() {
     "use client"
@@ -16,11 +16,6 @@ export default function Nerts() {
     const [players, setPlayers] = useState([{}, {},])
     const [lake, setLake] = useState<Card[][]>(Array.from({ length: 4 * players.length }, () => []))
     const [gameOver, setGameOver] = useState<boolean>(false)
-    const [nertStackPosition, setNertStackPosition] = useState<DOMRect | undefined>()
-    const [riverPositions, setRiverPositions] = useState<Map<number, DOMRect> | undefined>()
-    const [streamPosition, setStreamPosition] = useState<DOMRect | undefined>()
-    const [wastePosition, setWastePosition] = useState<DOMRect | undefined>()
-    const [lakePositions, setLakePositions] = useState<Map<number, DOMRect> | undefined>()
     const maxWasteShowing = useRef(0)
     const boardRef = useRef(null)
 
@@ -47,23 +42,10 @@ export default function Nerts() {
             shuffledDeck.splice(0, 1),
             shuffledDeck.splice(0, 1),
         ])
-        setNertStackPosition(document.getElementById('nert')?.getBoundingClientRect())
-        setStreamPosition(document.getElementById('stream')?.getBoundingClientRect())
-        setWastePosition(document.getElementById('waste')?.getBoundingClientRect())
-        const riverPositions = new Map()
-        for (let i = 0; i < 4; i++) {
-            riverPositions.set(i, document.getElementById(`river-${i}`)?.getBoundingClientRect())
-        }
-        setRiverPositions(riverPositions)
-        const lakePositions = new Map()
-        for (let i = 0; i < 4 * players.length; i++) {
-            lakePositions.set(i, document.getElementById(`lake-${i}`)?.getBoundingClientRect())
-        }
-        setLakePositions(lakePositions)
         maxWasteShowing.current = 0
-    }, [deck, players.length])
+    }, [deck, players])
 
-    const wasteCards = () => {
+    const wasteCards = useCallback(() => {
         if (gameOver) return
 
         const streamLength = stream.length
@@ -81,7 +63,7 @@ export default function Nerts() {
             setStream(waste.reverse())
             setWaste([])
         }
-    }
+    }, [gameOver, stream, waste, maxWasteShowing, setWaste, setStream])
 
     const playCard = (props: PlayCardProps) => {
         if (gameOver) return
@@ -229,23 +211,49 @@ export default function Nerts() {
         return false
     }
 
-    /**
-     * handleDragAndDrop
-     * @param card          the card that is being dragged
-     * @param cardRef       the DOM node representing the card that is being dragged
-     * @param originator    the location the card emanates from; may include a dash followed by
-     *                      a numeric representation of the pile index
-     * @returns             void
-     */
-    const handleDragAndDrop = (card: Card, cardRef: RefObject<HTMLDivElement>, originator: string, foundationIndex?: number) => {
+    interface Target {
+        pile: Card[];
+        location: string;
+        index: number;
+    }
+
+    const determineDestination = (ref: HTMLDivElement) => {
+        if (!ref) {
+            console.error("Card reference does not exist.")
+            throw new Error("cardRef has no current value or current value is incompatible")
+        }
+        
+        const { bottom, top, right, left } = ref.getBoundingClientRect()
+        let target: Target | null = null
+
+        const findTarget = (repetitions: number, piles: Card[][], location: string): Target | null => {
+            for (let i = 0; i < repetitions; i++) {
+                const values = document.getElementById(`lake-${i}`)?.getBoundingClientRect()
+                if (values && left < values.right && right > values.left && top < values.bottom && bottom > values.top) {
+                    return {
+                        pile: piles[i],
+                        location: location,
+                        index: i,
+                    }
+                }
+            }
+            return null
+        }
+        
+        target = findTarget(4 * players.length, lake, 'lake')
+        
+        if (!target) target = findTarget(4, river, 'river')
+
+        console.log(">>> target", target)
+        return target
+    }
+
+
+    const dropCard = ({ card, cardRef, originator, foundationIndex }: DragProps) => {
 
         let [source, i] = originator.split('-')
         const sourceIndex = +i
-        interface Target {
-            pile: Card[];
-            location: string;
-            index: number;
-        }
+
         type HandleUpdateRiverProps = {
             destination: number;
             source: string;
@@ -253,40 +261,6 @@ export default function Nerts() {
             start?: number;
         }
 
-        const determineDestination = (ref: HTMLDivElement) => {
-            if (!ref) {
-                console.error("Card reference does not exist.")
-                throw new Error("cardRef has no current value or current value is incompatible")
-            }
-
-            const { bottom, top, right, left } = ref.getBoundingClientRect()
-            let target: Target | null = null
-
-            const findTarget = (mapObject: Map<number, DOMRect>, piles: Card[][], location: string): Target | null => {
-                for (let [key, value] of mapObject) {
-                    if (left < value.right && right > value.left && top < value.bottom && bottom > value.top) {
-                        return {
-                            pile: piles[key],
-                            location: location,
-                            index: key,
-                        }
-                    }
-                }
-                return null
-            }
-
-            const bottomBoundOfLake = lakePositions?.get(1)?.bottom
-
-            if (lakePositions) {
-                target = findTarget(lakePositions, lake, 'lake')
-            } 
-
-            if (!target && riverPositions) {
-                target = findTarget(riverPositions, river, 'river')
-            }
-            console.log(">>> target", target)
-            return target
-        }
 
         const checkCompatibility = (card: Card, target: Target) => {
             const topCard = target.pile[target.pile.length - 1]
@@ -337,7 +311,7 @@ export default function Nerts() {
             start
         }: HandleUpdateRiverProps) => {
             const copyOfRiver = [...river]
-            if (start) {
+            if (start != null) {
                 copyOfRiver[destination].push(...copyOfRiver[sourceIndex].splice(start, copyOfRiver[sourceIndex].length))
             } else {
                 let sourceArray = determineSourceArray(source)
@@ -405,9 +379,9 @@ export default function Nerts() {
                 {/* lake */}
                 <Lake numberOfPlayers={players.length} lake={lake} />
                 {/* tableau */}
-                <Tableau river={river} nertStack={nertStack} playCard={playCard} boardRef={boardRef} onDragEnd={handleDragAndDrop}/>
+                <Tableau river={river} nertStack={nertStack} playCard={playCard} boardRef={boardRef} onDragEnd={dropCard}/>
                 {/* stream & waste */}
-                <WasteAndStream stream={stream} waste={waste} maxWasteShowing={maxWasteShowing} playCard={playCard} wasteCards={wasteCards} boardRef={boardRef} onDragEnd={handleDragAndDrop}/>
+                <WasteAndStream stream={stream} waste={waste} maxWasteShowing={maxWasteShowing} playCard={playCard} wasteCards={wasteCards} boardRef={boardRef} onDragEnd={dropCard}/>
             </div>
         </Container>
     )

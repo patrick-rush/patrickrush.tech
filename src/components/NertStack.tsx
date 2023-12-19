@@ -1,4 +1,4 @@
-import type { Card, PlayCardProps } from '@/types/nerts.d'
+import type { Card, PlayCardProps, DragProps } from '@/types/nerts.d'
 import { PlayingCard } from './PlayingCard';
 import { MutableRefObject, RefObject } from 'react';
 
@@ -11,11 +11,11 @@ export function NertStack({
     nertStack: Card[];
     boardRef: MutableRefObject<null>
     playCard: (props: PlayCardProps) => void;
-    onDragEnd?: (card: Card, cardRef: RefObject<HTMLDivElement>, originator: string) => void;
+    onDragEnd?: (props: DragProps) => void;
 }) {
 
     const handleDragEnd = (card: Card, cardRef: RefObject<HTMLDivElement>) => {
-        onDragEnd?.(card, cardRef, 'nert')
+        onDragEnd?.({ card, cardRef, originator: 'nert' })
     }
 
     return (

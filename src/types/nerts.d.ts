@@ -30,3 +30,10 @@ export type ConditionalPlayCardProps = | {
 }
 
 export type PlayCardProps = CommonPlayCardProps & ConditionalPlayCardProps
+
+export interface DragProps {
+    card: Card;
+    cardRef: RefObject<HTMLDivElement>;
+    originator: string;
+    foundationIndex?: number;
+}
