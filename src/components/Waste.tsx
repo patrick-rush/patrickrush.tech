@@ -27,9 +27,9 @@ export function Waste({
     }
 
     return (
-        <div className="mx-8">
+        <div className="md:mx-8">
             <div
-                className="z-0 relative w-36 h-24 md:w-44 md:h-36 outline outline-zinc-100 outline-offset-4 rounded-md dark:outline-zinc-700/40"
+                className="relative w-36 h-24 md:w-44 md:h-36 outline outline-zinc-100 outline-offset-4 rounded-md dark:outline-zinc-700/40"
                 id="waste" 
             >
                 {waste.map((card, index) => {
@@ -47,7 +47,6 @@ export function Waste({
                                 draggable={index === waste.length - 1}
                                 onDragEnd={(cardRef) => handleDragEnd(card, cardRef)}
                                 onClick={() => playCard({ card: waste[waste.length - 1], source: 'waste' })}
-                            // cardPosition={wastePosition}
                             />
                         </div>
                     )

@@ -1,35 +1,39 @@
-import type { Card } from '@/types/nerts.d'
-import { PlayingCard } from './PlayingCard';
+import type { Card, PlayCardProps, DragProps } from '@/types/nerts.d'
+import { Stock } from './Stock';
+import { Waste } from './Waste';
+import type { MutableRefObject, RefObject } from 'react';
+import { NertStack } from './NertStack';
 
 export function Stream({
     stream,
+    waste,
+    maxWasteShowing,
+    nertStack,
+    playCard,
     wasteCards,
+    onDragEnd,
 }: {
     stream: Card[];
+    waste: Card[];
+    maxWasteShowing: { current: number };
+    nertStack: Card[];
+    playCard: (props: PlayCardProps) => void;
     wasteCards: () => void;
+    onDragEnd: (props: DragProps) => void;
 }) {
+
+    const handleDragEnd = (props: DragProps) => {
+        onDragEnd?.(props)
+    }
+
     return (
-        <div id="stream" className="mx-8">
-            <div className="w-16 h-24 md:w-24 md:h-36 outline outline-zinc-100 outline-offset-4 rounded-md dark:outline-zinc-700/40" onClick={wasteCards}>
-                <div className="absolute w-16 h-24 md:w-24 md:h-36 text-zinc-400 dark:text-zinc-500 flex justify-center items-center select-none">
-                    <span className="text-l md:text-2xl font-bold">FLIP</span>
-                </div>
-                {stream.map((card, index) => {
-                    const streamLength = stream.length
-                    let shadow = ''
-                    if (index > streamLength - 4) shadow = 'shadow-md shadow-zinc-800 rounded-md'
-                    return (
-                        <PlayingCard
-                            className={shadow}
-                            key={index}
-                            suit={card.suit}
-                            rank={card.rank}
-                            isShowing={false}
-                        // cardPosition={streamPosition}
-                        />
-                    )
-                })}
-            </div>
+        <div id="stream-and-waste" className="flex justify-center ">
+            {/* waste */}
+            <Waste waste={waste} playCard={playCard} maxWasteShowing={maxWasteShowing} onDragEnd={onDragEnd} />
+            {/* stream */}
+            <Stock stream={stream} wasteCards={wasteCards} />
+            {/* nertStack for small screens */}
+            <NertStack className="md:hidden" nertStack={nertStack} playCard={playCard} onDragEnd={({card, cardRef}) => handleDragEnd({ card, cardRef, originator: "nert"})} />
         </div>
 
     )
