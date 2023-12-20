@@ -1,6 +1,6 @@
-import type { Card, PlayCardProps, DragProps } from '@/types/nerts.d'
+import type { Card, PlayCardProps, DropCardProps } from '@/types/nerts.d'
 import { PlayingCard } from './PlayingCard';
-import { MutableRefObject, RefObject, useEffect, useRef, useState } from 'react';
+import { RefObject, useEffect, useRef, useState } from 'react';
 import clsx from 'clsx';
 
 export function NertStack({
@@ -12,7 +12,7 @@ export function NertStack({
     nertStack: Card[];
     className?: string;
     playCard: (props: PlayCardProps) => void;
-    onDragEnd?: (props: DragProps) => void;
+    onDragEnd?: (props: DropCardProps) => void;
 }) {
     const [zIndex, setZIndex] = useState(0)
     const timeoutRef = useRef<NodeJS.Timeout>()
@@ -34,7 +34,7 @@ export function NertStack({
             setZIndex(0)
         }, 1000)
 
-        onDragEnd?.({ card, cardRef, originator: 'nert' })
+        onDragEnd?.({ card, cardRef, source: 'nert' })
     }
 
     return (

@@ -19,6 +19,7 @@ export interface Card {
 export interface CommonPlayCardProps {
     card: Card;
 }
+
 export type ConditionalPlayCardProps = | {
     source: 'river';
     pileIndex: number;
@@ -31,9 +32,45 @@ export type ConditionalPlayCardProps = | {
 
 export type PlayCardProps = CommonPlayCardProps & ConditionalPlayCardProps
 
-export interface DragProps {
+export interface CommonDropCardProps {
     card: Card;
     cardRef: RefObject<HTMLDivElement>;
-    originator: string;
-    foundationIndex?: number;
+    source: 'nert' | 'waste' | 'river';
+}
+
+export type ConditionalDropCardProps = | {
+    source: 'river';
+    pileIndex: number;
+    foundationIndex?: number | null;
+} | {
+    source: 'waste' | 'nert';
+    pileIndex?: never;
+    foundationIndex?: never;
+}
+
+export type DropCardProps = CommonDropCardProps & ConditionalDropCardProps
+
+
+export interface CommonHandleUpdateRiverProps {
+    destination: number;
+}
+
+export type ConditionalHandleUpdateRiverProps = | {
+    source: 'nert' | 'waste';
+    sourceIndex?: never;
+    start?: never;
+} | {
+    source: 'river';
+    sourceIndex: number;
+    start?: number | null;
+}
+
+export type HandleUpdateRiverProps = CommonHandleUpdateRiverProps & ConditionalHandleUpdateRiverProps
+
+export type GetSourceArrayProps = | {
+    source: 'river';
+    pileIndex: number;
+} | {
+    source: 'nert' | 'waste';
+    pileIndex?: never;
 }
