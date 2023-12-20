@@ -1,4 +1,4 @@
-import type { Card, PlayCardProps, DragProps } from '@/types/nerts.d'
+import type { Card, PlayCardProps, DropCardProps } from '@/types/nerts.d'
 import { PlayingCard } from './PlayingCard'
 import { useEffect, useRef, useState } from 'react'
 import { motion } from "framer-motion"
@@ -8,7 +8,7 @@ interface ColumnProps {
     parentIndex: number
     playCard: (props: PlayCardProps) => void
     handleDragStart: () => void
-    handleDragEnd: (props: DragProps) => void
+    handleDragEnd: (props: DropCardProps) => void
     wasDragged: boolean;
     river: Card[][];
     parentZIndex?: number;
@@ -43,7 +43,7 @@ export const Column = ({ pile,
         onDragStart()
     }
     
-    const handleDragEnd = (props: DragProps) => {
+    const handleDragEnd = (props: DropCardProps) => {
         if (timeoutRef.current) clearTimeout(timeoutRef.current)
 
         timeoutRef.current = setTimeout(() => {
@@ -62,18 +62,27 @@ export const Column = ({ pile,
             dragElastic={1}
             dragSnapToOrigin
             onDragStart={handleDragStart}
-            onDragEnd={() => handleDragEnd({
-                card,
-                cardRef,
-                originator: `river-${riverIndex}`,
-                foundationIndex: (parentIndex < pile.length - 1) ? parentIndex : undefined,
-            })}
-            onClick={() => wasDragged ? null : playCard({
-                card,
-                source: "river",
-                pileIndex: riverIndex,
-                foundationIndex: (parentIndex < pile.length - 1) ? parentIndex : undefined
-            })}
+            onDragEnd={(event) => {
+                event.stopPropagation()
+                handleDragEnd({
+                    card,
+                    cardRef,
+                    source: 'river',
+                    pileIndex: riverIndex,
+                    foundationIndex: (parentIndex < pile.length - 1) ? parentIndex : undefined,
+                })
+            }}
+            onClick={(event) => {
+                if (!wasDragged) {
+                    event.stopPropagation()
+                    playCard({
+                        card,
+                        source: "river",
+                        pileIndex: riverIndex,
+                        foundationIndex: (parentIndex < pile.length - 1) ? parentIndex : undefined
+                    })
+                }
+            }}
         >     
             <div id={`river-${riverIndex}-${parentIndex}`} key={parentIndex} className="absolute" >
                 <PlayingCard

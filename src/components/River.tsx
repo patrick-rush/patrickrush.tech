@@ -1,4 +1,4 @@
-import type { Card, PlayCardProps, DragProps } from '@/types/nerts.d'
+import type { Card, PlayCardProps, DropCardProps } from '@/types/nerts.d'
 import { Column } from './Column';
 import { useState, type MutableRefObject } from 'react';
 
@@ -9,7 +9,7 @@ export function River({
 }: {
     river: Card[][];
     playCard: (props: PlayCardProps) => void;
-    onDragEnd: (props: DragProps) => void;
+    onDragEnd: (props: DropCardProps) => void;
 }) {
     const [wasDragged, setWasDragged] = useState(false)
     
@@ -18,7 +18,7 @@ export function River({
         setWasDragged(true)
     }
     
-    const handleDragEnd = (props: DragProps) => {
+    const handleDragEnd = (props: DropCardProps) => {
         onDragEnd?.(props)
         setWasDragged(false)
     }

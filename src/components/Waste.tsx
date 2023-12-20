@@ -1,4 +1,4 @@
-import type { Card, PlayCardProps, DragProps } from '@/types/nerts.d'
+import type { Card, PlayCardProps, DropCardProps } from '@/types/nerts.d'
 import { PlayingCard } from './PlayingCard';
 import { useState, type RefObject, useRef, useEffect } from 'react';
 
@@ -11,7 +11,7 @@ export function Waste({
     waste: Card[];
     maxWasteShowing: { current: number }
     playCard: (props: PlayCardProps) => void;
-    onDragEnd: (props: DragProps) => void;
+    onDragEnd: (props: DropCardProps) => void;
 }) {
     const [zIndex, setZIndex] = useState(0)
     const timeoutRef = useRef<NodeJS.Timeout>()
@@ -33,7 +33,7 @@ export function Waste({
             setZIndex(0)
         }, 1000)
 
-        onDragEnd?.({ card, cardRef, originator: 'waste' })
+        onDragEnd?.({ card, cardRef, source: 'waste' })
     }
 
     const calculateOffset = (index: number) => {

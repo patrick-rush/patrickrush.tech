@@ -1,4 +1,4 @@
-import type { Card, PlayCardProps, DragProps } from '@/types/nerts.d'
+import type { Card, PlayCardProps, DropCardProps } from '@/types/nerts.d'
 import { Stock } from './Stock';
 import { Waste } from './Waste';
 import type { MutableRefObject, RefObject } from 'react';
@@ -19,10 +19,10 @@ export function Stream({
     nertStack: Card[];
     playCard: (props: PlayCardProps) => void;
     wasteCards: () => void;
-    onDragEnd: (props: DragProps) => void;
+    onDragEnd: (props: DropCardProps) => void;
 }) {
 
-    const handleDragEnd = (props: DragProps) => {
+    const handleDragEnd = (props: DropCardProps) => {
         onDragEnd?.(props)
     }
 
@@ -33,7 +33,7 @@ export function Stream({
             {/* stream */}
             <Stock stream={stream} wasteCards={wasteCards} />
             {/* nertStack for small screens */}
-            <NertStack className="md:hidden" nertStack={nertStack} playCard={playCard} onDragEnd={({card, cardRef}) => handleDragEnd({ card, cardRef, originator: "nert"})} />
+            <NertStack className="md:hidden" nertStack={nertStack} playCard={playCard} onDragEnd={({card, cardRef}) => handleDragEnd({ card, cardRef, source: "nert" })} />
         </div>
 
     )
