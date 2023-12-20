@@ -8,16 +8,29 @@ import { Stream } from '@/components/Stream'
 import type { Card, PlayCardProps, DragProps } from '@/types/nerts.d'
 import { LayoutGroup } from 'framer-motion'
 
+interface Player {
+    displayName: string;
+    id: string;
+}
+
 export default function Nerts() {
     "use client"
+    const [players, setPlayers] = useState<Player[]>([{
+        displayName: 'Patrick',
+        id: 'ec16fc8e-7e79-49ee-bd83-98b191e0ca72',
+    }, {
+        displayName: 'Esther',
+        id: 'cb98ca55-3fde-407c-8489-cc900977a92a',
+    },])
     const [nertStack, setNertStack] = useState<Card[]>([])
     const [river, setRiver] = useState<Card[][]>([[], [], [], []])
     const [stream, setStream] = useState<Card[]>([])
     const [waste, setWaste] = useState<Card[]>([])
-    const [players, setPlayers] = useState([{}, {},])
     const [lake, setLake] = useState<Card[][]>(Array.from({ length: 4 * players.length }, () => []))
+    const [lastInLake, setLastInLake] = useState<{ player: Player, card: Card } | null>(null)
     const [gameOver, setGameOver] = useState<boolean>(false)
     const maxWasteShowing = useRef(0)
+    const currentPlayer = players[0]
 
     const deck = useMemo(() => suits.flatMap(suit => {
         return ranks.map(rank => {
@@ -116,7 +129,10 @@ export default function Nerts() {
             if (!sourceArray) return false
             const copyOfLake = [...lake]
             const cardToMove = sourceArray.pop()
-            if (cardToMove) copyOfLake[destination].push(cardToMove)
+            if (cardToMove) {
+                copyOfLake[destination].push(cardToMove)
+                setLastInLake({ player: currentPlayer, card: cardToMove})
+            }
             setLake(copyOfLake)
             return true
         }
@@ -334,7 +350,10 @@ export default function Nerts() {
             if (!sourceArray) return false
             const copyOfLake = [...lake]
             const cardToMove = sourceArray.pop()
-            if (cardToMove) copyOfLake[destination].push(cardToMove)
+            if (cardToMove) {
+                setLastInLake({ player: currentPlayer, card: cardToMove})
+                copyOfLake[destination].push(cardToMove)
+            }
             setLake(copyOfLake)
             return true
         }
@@ -379,7 +398,7 @@ export default function Nerts() {
             <LayoutGroup >
                 <div className="rounded-2xl sm:border sm:border-zinc-100 sm:p-8 sm:dark:border-zinc-700/40">
                     {/* lake */}
-                    <Lake numberOfPlayers={players.length} lake={lake} />
+                    <Lake numberOfPlayers={players.length} lake={lake} lastInLake={lastInLake} />
                     {/* tableau */}
                     <Tableau river={river} nertStack={nertStack} playCard={playCard} onDragEnd={dropCard}/>
                     {/* stream & waste */}
