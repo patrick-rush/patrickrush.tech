@@ -5,14 +5,14 @@ export interface Suit {
 }
 
 export interface RankDetails {
-    display: Rank,
+    display: string,
     name: string,
     position: number
 }
 
 export interface Card {
     suit: Suit;
-    rank: Rank;
+    rank: RankDetails;
 }
 
 interface CommonPlayCardProps {
