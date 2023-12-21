@@ -1,6 +1,7 @@
 import type { Card, PlayCardProps, DropCardProps } from '@/types/nerts.d'
 import { PlayingCard } from './PlayingCard';
 import { useState, type RefObject, useRef, useEffect } from 'react';
+import { CardSource } from '@/constants/nerts';
 
 export function Waste({
     waste,
@@ -25,7 +26,7 @@ export function Waste({
     const handleDragStart = () => {
         setZIndex(1000)
     }
-    
+
     const handleDragEnd = (card: Card, cardRef: RefObject<HTMLDivElement>) => {
         if (timeoutRef.current) clearTimeout(timeoutRef.current)
 
@@ -33,7 +34,7 @@ export function Waste({
             setZIndex(0)
         }, 1000)
 
-        onDragEnd?.({ card, cardRef, source: 'waste' })
+        onDragEnd?.({ card, cardRef, source: CardSource.Waste })
     }
 
     const calculateOffset = (index: number) => {
@@ -45,7 +46,7 @@ export function Waste({
     }
 
     return (
-        <div id="waste" className="md:mx-8">
+        <div id={CardSource.Waste} className="md:mx-8">
             <div className="w-36 h-24 md:w-44 md:h-36 outline outline-zinc-100 outline-offset-4 rounded-md dark:outline-zinc-700/40" style={{ zIndex: zIndex }}>
                 <div className="absolute">
                     {waste.map((card, index) => {
@@ -54,7 +55,7 @@ export function Waste({
                         let shadow = ''
                         if (index > maxWasteShowing.current - 4 || index === waste.length - 1) shadow = 'shadow-md shadow-zinc-800 rounded-md'
                         return (
-                            <div id={`waste-${index}`} key={index} className="absolute" style={{ left: `${offset}px`, zIndex: zIndex }}>
+                            <div id={`${CardSource.Waste}-${index}`} key={index} className="absolute" style={{ left: `${offset}px`, zIndex: zIndex }}>
                                 <PlayingCard
                                     className={shadow}
                                     suit={card.suit}
@@ -63,7 +64,7 @@ export function Waste({
                                     draggable={index === waste.length - 1}
                                     onDragStart={handleDragStart}
                                     onDragEnd={(cardRef) => handleDragEnd(card, cardRef)}
-                                    onClick={() => playCard({ card: waste[waste.length - 1], source: 'waste' })}
+                                    onClick={() => playCard({ card: waste[waste.length - 1], source: CardSource.Waste })}
                                 />
                             </div>
                         )
