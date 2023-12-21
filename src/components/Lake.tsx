@@ -2,6 +2,7 @@ import { AnimatePresence, motion } from "framer-motion";
 import { PlayingCard } from "./PlayingCard";
 import type { Card } from '@/types/nerts.d'
 import { useEffect, useRef, useState } from "react";
+import clsx from "clsx";
 
 interface Player {
     displayName: string;
@@ -45,9 +46,11 @@ export function Lake({
                 {Array.from({ length: (numberOfPlayers * 4) }).map((_, index) => {
                     const pile = lake[index]
                     let showPlayerName
+                    let shadow = ''
                     if (lastInLake && lastInLake.player && lastInLake.card && pile.includes(lastInLake?.card)) showPlayerName = true
+                    if (pile.length) shadow = 'shadow-md shadow-zinc-800 rounded-md'
                     return (
-                        <div className="relative w-16 h-24 md:w-24 md:h-36 my-4" key={index} id={`lake-${index}`}>
+                        <div className={clsx(shadow, "relative w-16 h-24 md:w-24 md:h-36 my-4")} key={index} id={`lake-${index}`}>
                             <AnimatePresence>
                                 {showPlayerName && playAnimation && <motion.div
                                     initial={{ opacity: 0, scale: 0.5 }}
@@ -65,7 +68,7 @@ export function Lake({
                             {pile?.map((card, cardIndex) => {
                                 const pileLength = pile.length
                                 let shadow = ''
-                                if (index > pileLength - 4) shadow = 'shadow-md shadow-zinc-800 rounded-md'
+                                if (index > pileLength - 3) shadow = 'shadow-md shadow-zinc-800 rounded-md'
                                 return (
                                     <PlayingCard
                                         className={shadow}

@@ -64,8 +64,8 @@ export default function Nerts() {
         const streamLength = stream.length
         let topOfStream
 
-        if (stream.length >= 3) topOfStream = stream.splice(streamLength - 3)
-        else topOfStream = stream.splice(0)
+        if (stream.length >= 3) topOfStream = stream.splice(streamLength - 3).reverse()
+        else topOfStream = stream.splice(0).reverse()
 
         if (topOfStream.length > 0) {
             const newWaste = [...waste, ...topOfStream]
