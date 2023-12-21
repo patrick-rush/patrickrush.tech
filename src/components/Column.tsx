@@ -2,6 +2,7 @@ import type { Card, PlayCardProps, DropCardProps } from '@/types/nerts.d'
 import { PlayingCard } from './PlayingCard'
 import { useEffect, useRef, useState } from 'react'
 import { motion } from "framer-motion"
+import { CardSource } from '@/constants/nerts'
 interface ColumnProps {
     pile: Card[]
     riverIndex: number
@@ -42,7 +43,7 @@ export const Column = ({ pile,
         setZIndex(zIndex + 1000)
         onDragStart()
     }
-    
+
     const handleDragEnd = (props: DropCardProps) => {
         if (timeoutRef.current) clearTimeout(timeoutRef.current)
 
@@ -67,7 +68,7 @@ export const Column = ({ pile,
                 handleDragEnd({
                     card,
                     cardRef,
-                    source: 'river',
+                    source: CardSource.River,
                     pileIndex: riverIndex,
                     foundationIndex: (parentIndex < pile.length - 1) ? parentIndex : undefined,
                 })
@@ -77,14 +78,14 @@ export const Column = ({ pile,
                     event.stopPropagation()
                     playCard({
                         card,
-                        source: "river",
+                        source: CardSource.River,
                         pileIndex: riverIndex,
                         foundationIndex: (parentIndex < pile.length - 1) ? parentIndex : undefined
                     })
                 }
             }}
-        >     
-            <div id={`river-${riverIndex}-${parentIndex}`} key={parentIndex} className="absolute" >
+        >
+            <div id={`${CardSource.River}-${riverIndex}-${parentIndex}`} key={parentIndex} className="absolute" >
                 <PlayingCard
                     className="shadow-md shadow-zinc-800 rounded-md"
                     style={{ top: `${Math.min(200 / river[riverIndex].length, 40) * parentIndex}px` }}

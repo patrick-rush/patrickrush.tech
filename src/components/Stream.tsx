@@ -1,8 +1,8 @@
 import type { Card, PlayCardProps, DropCardProps } from '@/types/nerts.d'
 import { Stock } from './Stock';
 import { Waste } from './Waste';
-import type { MutableRefObject, RefObject } from 'react';
 import { NertStack } from './NertStack';
+import { CardSource } from '@/constants/nerts';
 
 export function Stream({
     stream,
@@ -10,6 +10,7 @@ export function Stream({
     maxWasteShowing,
     nertStack,
     playCard,
+    endGame,
     wasteCards,
     onDragEnd,
 }: {
@@ -18,6 +19,7 @@ export function Stream({
     maxWasteShowing: { current: number };
     nertStack: Card[];
     playCard: (props: PlayCardProps) => void;
+    endGame: () => void;
     wasteCards: () => void;
     onDragEnd: (props: DropCardProps) => void;
 }) {
@@ -33,7 +35,7 @@ export function Stream({
             {/* stream */}
             <Stock stream={stream} wasteCards={wasteCards} />
             {/* nertStack for small screens */}
-            <NertStack className="md:hidden" nertStack={nertStack} playCard={playCard} onDragEnd={({card, cardRef}) => handleDragEnd({ card, cardRef, source: "nert" })} />
+            <NertStack className="md:hidden" nertStack={nertStack} playCard={playCard} endGame={endGame} onDragEnd={({ card, cardRef }) => handleDragEnd({ card, cardRef, source: CardSource.Nert })} />
         </div>
 
     )

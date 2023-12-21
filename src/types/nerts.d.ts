@@ -1,14 +1,13 @@
 export interface Suit {
-    name: 'Hearts' | 'Clubs' | 'Diamonds' | 'Spades';
-    symbol: '♥' | '♣' | '♦' | '♠';
-    type: 0 | 1,
-    color: 'red-800' | 'zinc-950';
+    name: SuitName;
+    symbol: SuitSymbol;
+    type: SuitType;
 }
 
-export interface Rank {
-    display: string,
+export interface RankDetails {
+    display: Rank,
     name: string,
-    position: 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12 | 13
+    position: number
 }
 
 export interface Card {
@@ -16,51 +15,50 @@ export interface Card {
     rank: Rank;
 }
 
-export interface CommonPlayCardProps {
+interface CommonPlayCardProps {
     card: Card;
 }
 
-export type ConditionalPlayCardProps = | {
-    source: 'river';
+type ConditionalPlayCardProps = | {
+    source: CardSource.River;
     pileIndex: number;
     foundationIndex?: number | null;
 } | {
-    source: 'waste' | 'nert';
+    source: CardSource.Waste | CardSource.Nert;
     pileIndex?: never;
     foundationIndex?: never;
 }
 
 export type PlayCardProps = CommonPlayCardProps & ConditionalPlayCardProps
 
-export interface CommonDropCardProps {
+interface CommonDropCardProps {
     card: Card;
     cardRef: RefObject<HTMLDivElement>;
-    source: 'nert' | 'waste' | 'river';
+    source: CardSource;
 }
 
-export type ConditionalDropCardProps = | {
-    source: 'river';
+type ConditionalDropCardProps = | {
+    source: CardSource.River;
     pileIndex: number;
     foundationIndex?: number | null;
 } | {
-    source: 'waste' | 'nert';
+    source: CardSource.Waste | CardSource.Nert;
     pileIndex?: never;
     foundationIndex?: never;
 }
 
 export type DropCardProps = CommonDropCardProps & ConditionalDropCardProps
 
-
-export interface CommonHandleUpdateRiverProps {
+interface CommonHandleUpdateRiverProps {
     destination: number;
 }
 
-export type ConditionalHandleUpdateRiverProps = | {
-    source: 'nert' | 'waste';
+type ConditionalHandleUpdateRiverProps = | {
+    source: CardSource.Nert | CardSource.Waste;
     sourceIndex?: never;
     start?: never;
 } | {
-    source: 'river';
+    source: CardSource.River;
     sourceIndex: number;
     start?: number | null;
 }
@@ -68,9 +66,9 @@ export type ConditionalHandleUpdateRiverProps = | {
 export type HandleUpdateRiverProps = CommonHandleUpdateRiverProps & ConditionalHandleUpdateRiverProps
 
 export type GetSourceArrayProps = | {
-    source: 'river';
+    source: CardSource.River;
     pileIndex: number;
 } | {
-    source: 'nert' | 'waste';
+    source: CardSource.Nert | CardSource.Waste;
     pileIndex?: never;
 }

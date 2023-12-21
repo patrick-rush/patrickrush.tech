@@ -1,96 +1,88 @@
-import type { Suit, Rank} from '@/types/nerts'
+import type { Suit, RankDetails } from '@/types/nerts'
 
-export const suits: Suit[] = [
-    {
-        name: 'Hearts',
-        symbol: '♥',
-        type: 0,
-        color: 'red-800'
-    },
-    {
-        name: 'Clubs',
-        symbol: '♣',
-        type: 1,
-        color: 'zinc-950'
-    },
-    {
-        name: 'Diamonds',
-        symbol: '♦',
-        type: 0,
-        color: 'red-800'
-    },
-    {
-        name: 'Spades',
-        symbol: '♠',
-        type: 1,
-        color: 'zinc-950'
-    },
-]
+export enum SuitName {
+    Hearts = 'Hearts',
+    Clubs = 'Clubs',
+    Diamonds = 'Diamonds',
+    Spades = 'Spades'
+}
 
-export const ranks: Rank[] = [
-    {
-        display: "A",
-        name: "Ace",
-        position: 1
-    },
-    {
-        display: "2",
-        name: "Two",
-        position: 2
-    },
-    {
-        display: "3",
-        name: "Three",
-        position: 3
-    },
-    {
-        display: "4",
-        name: "Four",
-        position: 4
-    },
-    {
-        display: "5",
-        name: "Five",
-        position: 5
-    },
-    {
-        display: "6",
-        name: "Six",
-        position: 6
-    },
-    {
-        display: "7",
-        name: "Seven",
-        position: 7
-    },
-    {
-        display: "8",
-        name: "Eight",
-        position: 8
-    },
-    {
-        display: "9",
-        name: "Nine",
-        position: 9
-    },
-    {
-        display: "10",
-        name: "Ten",
-        position: 10
-    },
-    {
-        display: "J",
-        name: "Jack",
-        position: 11
-    },
-    {
-        display: "Q",
-        name: "Queen",
-        position: 12
-    },
-    {
-        display: "K",
-        name: "King",
-        position: 13
-    },
-]
+export enum SuitSymbol {
+    Hearts = '♥',
+    Clubs = '♣',
+    Diamonds = '♦',
+    Spades = '♠'
+}
+
+export enum SuitType {
+    Red = 'red-800',
+    Black = 'zinc-950'
+}
+
+export enum CardPosition {
+    Ace = 1,
+    Two,
+    Three,
+    Four,
+    Five,
+    Six,
+    Seven,
+    Eight,
+    Nine,
+    Ten,
+    Jack,
+    Queen,
+    King,
+}
+
+export enum CardSource {
+    River = 'river',
+    Waste = 'waste',
+    Nert = 'nert',
+    Lake = 'lake'
+}
+
+export const suits: Suit[] = Object.values(SuitName).map(suitName => ({
+    name: suitName,
+    symbol: SuitSymbol[suitName as keyof typeof SuitSymbol],
+    type: (suitName === SuitName.Hearts || suitName === SuitName.Diamonds) ? SuitType.Red : SuitType.Black,
+    color: (suitName === SuitName.Hearts || suitName === SuitName.Diamonds) ? SuitType.Red : SuitType.Black,
+}));
+
+export enum Rank {
+    Ace = 'A',
+    Two = '2',
+    Three = '3',
+    Four = '4',
+    Five = '5',
+    Six = '6',
+    Seven = '7',
+    Eight = '8',
+    Nine = '9',
+    Ten = '10',
+    Jack = 'J',
+    Queen = 'Q',
+    King = 'K'
+}
+
+export const rankNames = {
+    [Rank.Ace]: 'Ace',
+    [Rank.Two]: 'Two',
+    [Rank.Three]: 'Three',
+    [Rank.Four]: 'Four',
+    [Rank.Five]: 'Five',
+    [Rank.Six]: 'Six',
+    [Rank.Seven]: 'Seven',
+    [Rank.Eight]: 'Eight',
+    [Rank.Nine]: 'Nine',
+    [Rank.Ten]: 'Ten',
+    [Rank.Jack]: 'Jack',
+    [Rank.Queen]: 'Queen',
+    [Rank.King]: 'King',
+};
+
+export const ranks: RankDetails[] = Object.entries(Rank).map(([name, display], index) => ({
+    display,
+    name: rankNames[display],
+    position: index + 1
+}));

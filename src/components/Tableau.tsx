@@ -1,16 +1,19 @@
 import type { Card, PlayCardProps, DropCardProps } from '@/types/nerts.d'
 import { River } from './River';
 import { NertStack } from './NertStack';
+import { CardSource } from '@/constants/nerts';
 
 export function Tableau({
     river,
     nertStack,
     playCard,
+    endGame,
     onDragEnd,
 }: {
     river: Card[][];
-    playCard: (props: PlayCardProps) => void;
     nertStack: Card[];
+    playCard: (props: PlayCardProps) => void;
+    endGame: () => void;
     onDragEnd: (props: DropCardProps) => void;
 }) {
 
@@ -23,7 +26,7 @@ export function Tableau({
             {/* river */}
             <River river={river} playCard={playCard} onDragEnd={handleDragEnd} />
             {/* nert stack */}
-            <NertStack className="hidden md:flex" nertStack={nertStack} playCard={playCard} onDragEnd={({card, cardRef}) => handleDragEnd({ card, cardRef, source: "nert" })} />
+            <NertStack className="hidden md:flex" nertStack={nertStack} playCard={playCard} endGame={endGame} onDragEnd={({ card, cardRef }) => handleDragEnd({ card, cardRef, source: CardSource.Nert })} />
         </div>
     )
 }
