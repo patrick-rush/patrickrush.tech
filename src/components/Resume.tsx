@@ -187,7 +187,7 @@ interface Role {
     ]
   
     return (
-      <ol className="mt-6 space-y-4 max-h-44 overflow-scroll">
+      <ol className="mt-6 space-y-4 max-h-60 xl:max-h-44 overflow-scroll">
         {workHistory.map((role, roleIndex) => (
           <Role key={roleIndex} role={role} />
         ))}
@@ -242,7 +242,7 @@ interface Role {
     ]
   
     return (
-      <ol className="mt-6 space-y-4 max-h-44 overflow-scroll">
+      <ol className="mt-6 space-y-4 max-h-60 xl:max-h-44 overflow-scroll">
         {skills.map((skill, skillIndex) => (
           <Skill key={skillIndex} skill={skill} />
         ))}

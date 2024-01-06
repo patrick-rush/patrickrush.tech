@@ -16,6 +16,7 @@ export const Photos = async () => {
 };
 
 const Gallery = ({ images }: { images: Array<string>; }) => {
+    "use client"
     let rotations = ['rotate-2', '-rotate-2', 'rotate-2', 'rotate-2', '-rotate-2']
 
     const shuffled = images.sort(() => 0.5 - Math.random());
