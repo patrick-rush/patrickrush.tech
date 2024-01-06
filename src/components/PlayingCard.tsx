@@ -3,7 +3,7 @@ import clsx from 'clsx'
 import Image from 'next/image'
 import cardBack from '@/images/photos/ketchikan.jpeg'
 import React, { ForwardRefRenderFunction, RefObject, forwardRef, useRef, useState } from 'react'
-import type { RankDetails, Suit } from '@/types/nerts'
+import type { RankDetails, Suit } from '@/types/solitaire'
 import { motion } from "framer-motion"
 
 type PlayingCardProps = {

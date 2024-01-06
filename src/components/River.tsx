@@ -1,6 +1,6 @@
-import type { Card, PlayCardProps, DropCardProps } from '@/types/nerts.d'
+import type { Card, PlayCardProps, DropCardProps } from '@/types/solitaire'
 import { Column } from './Column';
-import { useState, type MutableRefObject } from 'react';
+import { useState } from 'react';
 
 export function River({
     river,

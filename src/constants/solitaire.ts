@@ -1,4 +1,4 @@
-import type { Suit, RankDetails } from '@/types/nerts'
+import type { Suit, RankDetails } from '@/types/solitaire'
 
 export enum SuitName {
     Hearts = 'Hearts',

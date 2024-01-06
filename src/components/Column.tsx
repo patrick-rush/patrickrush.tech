@@ -1,8 +1,8 @@
-import type { Card, PlayCardProps, DropCardProps } from '@/types/nerts.d'
+import type { Card, PlayCardProps, DropCardProps } from '@/types/solitaire'
 import { PlayingCard } from './PlayingCard'
 import { useEffect, useRef, useState } from 'react'
 import { motion } from "framer-motion"
-import { CardSource } from '@/constants/nerts'
+import { CardSource } from '@/constants/solitaire'
 interface ColumnProps {
     pile: Card[]
     riverIndex: number
@@ -88,10 +88,10 @@ export const Column = ({ pile,
             <div id={`${CardSource.River}-${riverIndex}-${parentIndex}`} key={parentIndex} className="absolute" >
                 <PlayingCard
                     className="shadow-md shadow-zinc-800 rounded-md"
-                    style={{ top: `${Math.min(200 / river[riverIndex].length, 40) * parentIndex}px` }}
+                    style={{ top: `${Math.min(200 / river[riverIndex].length, 30) * parentIndex}px` }}
                     suit={card.suit}
                     rank={card.rank}
-                    isShowing={true}
+                    isShowing={!!card.flipped}
                     ref={cardRef}
                 />
                 <Column

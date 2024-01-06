@@ -13,6 +13,7 @@ export interface RankDetails {
 export interface Card {
     suit: Suit;
     rank: RankDetails;
+    flipped?: boolean;
 }
 
 interface CommonPlayCardProps {

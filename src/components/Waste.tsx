@@ -1,7 +1,7 @@
-import type { Card, PlayCardProps, DropCardProps } from '@/types/nerts.d'
+import type { Card, PlayCardProps, DropCardProps } from '@/types/solitaire'
 import { PlayingCard } from './PlayingCard';
 import { useState, type RefObject, useRef, useEffect } from 'react';
-import { CardSource } from '@/constants/nerts';
+import { CardSource } from '@/constants/solitaire';
 
 export function Waste({
     waste,

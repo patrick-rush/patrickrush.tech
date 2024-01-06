@@ -1,42 +1,29 @@
 "use client"
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
-import { suits, ranks, CardSource } from '@/constants/nerts'
+import { suits, ranks, CardSource, Rank } from '@/constants/solitaire'
 import { Container } from '@/components/Container'
 import { Lake } from '@/components/Lake'
 import { Tableau } from '@/components/Tableau'
 import { Stream } from '@/components/Stream'
-import type { Card, PlayCardProps, DropCardProps, HandleUpdateRiverProps, GetSourceArrayProps } from '@/types/nerts.d'
+import type { Card, PlayCardProps, DropCardProps, HandleUpdateRiverProps, GetSourceArrayProps } from '@/types/solitaire'
 import { LayoutGroup } from 'framer-motion'
 
-interface Player {
-    displayName: string;
-    id: string;
-}
-
-export default function Nerts() {
+export default function Solitaire() {
     "use client"
-    const [players, setPlayers] = useState<Player[]>([{
-        displayName: 'Patrick',
-        id: 'ec16fc8e-7e79-49ee-bd83-98b191e0ca72',
-    }, {
-        displayName: 'Esther',
-        id: 'cb98ca55-3fde-407c-8489-cc900977a92a',
-    },])
-    const [nertStack, setNertStack] = useState<Card[]>([])
-    const [river, setRiver] = useState<Card[][]>([[], [], [], []])
+    const [river, setRiver] = useState<Card[][]>(Array.from({ length: 7 }, () => []))
     const [stream, setStream] = useState<Card[]>([])
     const [waste, setWaste] = useState<Card[]>([])
-    const [lake, setLake] = useState<Card[][]>(Array.from({ length: 4 * players.length }, () => []))
-    const [lastInLake, setLastInLake] = useState<{ player: Player, card: Card } | null>(null)
+    const [lake, setLake] = useState<Card[][]>(Array.from({ length: 4 }, () => []))
+    const [lastInLake, setLastInLake] = useState<{ card: Card } | null>(null)
     const [gameOver, setGameOver] = useState<boolean>(false)
     const maxWasteShowing = useRef(0)
-    const currentPlayer = players[0]
 
     const deck = useMemo(() => suits.flatMap(suit => {
         return ranks.map(rank => {
             return {
                 suit,
                 rank,
+                flipped: true,
             };
         });
     }), [])
@@ -44,19 +31,22 @@ export default function Nerts() {
     const shuffle = (array: any[]) => array.sort((a, b) => 0.5 - Math.random())
 
     useEffect(() => {
-        const shuffledDeck: Card[] = shuffle(deck)
-        setNertStack(shuffledDeck.splice(0, 13))
-        setLake(Array.from({ length: 4 * players.length }, () => []))
-        setStream(shuffledDeck)
+        let shuffledDeck: Card[] = shuffle(deck)
         setWaste([])
-        setRiver([
-            shuffledDeck.splice(0, 1),
-            shuffledDeck.splice(0, 1),
-            shuffledDeck.splice(0, 1),
-            shuffledDeck.splice(0, 1),
-        ])
+        setStream(shuffledDeck.splice(0, 24))
+        let river: Card[][] = []
+        for (let i = 0; i < 7; i++) {
+            let pile: Card[] = []
+            pile.push(...shuffledDeck.splice(0, i).map((card: Card) => {
+                card.flipped = false
+                return card
+            }))
+            if (shuffledDeck.length) pile.push(shuffledDeck.shift()!)
+            river.push(pile)
+        }
+        setRiver(river)
         maxWasteShowing.current = 0
-    }, [deck, players])
+    }, [deck])
 
     const wasteCards = useCallback(() => {
         if (gameOver) return
@@ -86,7 +76,7 @@ export default function Nerts() {
                 const isSameSuit = movingCard.suit.name === stationaryCard.suit.name
                 return isOneMore && isSameSuit
             case CardSource.River:
-                if (!stationaryCard) return true
+                if (!stationaryCard) return movingCard.rank.position === 13
                 const isOneLess = movingCard.rank.position + 1 === stationaryCard.rank.position
                 const isOppositeSuit = movingCard.suit.type !== stationaryCard.suit.type
                 return isOneLess && isOppositeSuit
@@ -98,12 +88,11 @@ export default function Nerts() {
     const getSourceArray = useCallback((props: GetSourceArrayProps) => {
         const { source, pileIndex } = props
         switch (source) {
-            case CardSource.Nert: return nertStack
             case CardSource.Waste: return waste
             case CardSource.River: return river[pileIndex!]
             default: throw new Error(`Invalid source: ${source}`)
         }
-    }, [nertStack, river, waste])
+    }, [river, waste])
 
     const handleUpdateRiver = ({
         destination,
@@ -121,6 +110,7 @@ export default function Nerts() {
             const cardToMove = sourceArray.pop()
             if (cardToMove) copyOfRiver[destination].push(cardToMove)
         }
+        if (sourceIndex && copyOfRiver[sourceIndex].length) copyOfRiver[sourceIndex][copyOfRiver[sourceIndex].length - 1].flipped = true
         setRiver(copyOfRiver)
         return true
     }
@@ -142,7 +132,8 @@ export default function Nerts() {
         const cardToMove = sourceArray.pop()
         if (cardToMove) {
             copyOfLake[destination].push(cardToMove)
-            setLastInLake({ player: currentPlayer, card: cardToMove })
+            setLastInLake({ card: cardToMove })
+            if (source === CardSource.River && sourceArray.length) sourceArray[sourceArray.length - 1].flipped = true
         }
         setLake(copyOfLake)
         return true
@@ -177,22 +168,12 @@ export default function Nerts() {
 
             const tryToPlaceOnPile = () => {
                 return river.some((pile, i) => {
-                    if (i === pileIndex || pile.length === 0) return false
-
                     if (isCompatible(CardSource.River, card, pile[pile.length - 1])) return placeCard(i)
                     else return false
                 })
             }
 
-            const tryToPlaceOnBlank = () => {
-                return river.some((pile, i) => {
-                    if (i === pileIndex || pile.length !== 0) return
-
-                    return placeCard(i)
-                })
-            }
-
-            return tryToPlaceOnPile() || tryToPlaceOnBlank()
+            return tryToPlaceOnPile()
 
         }
 
@@ -262,9 +243,9 @@ export default function Nerts() {
                 return null
             }
 
-            target = findTarget(4 * players.length, lake, CardSource.Lake)
+            target = findTarget(4, lake, CardSource.Lake)
 
-            if (!target) target = findTarget(4, river, CardSource.River)
+            if (!target) target = findTarget(7, river, CardSource.River)
 
             console.log(">>> target", target)
             return target
@@ -307,11 +288,11 @@ export default function Nerts() {
             <LayoutGroup >
                 <div className="rounded-2xl sm:border sm:border-zinc-100 sm:p-8 sm:dark:border-zinc-700/40">
                     {/* lake */}
-                    <Lake numberOfPlayers={players.length} lake={lake} lastInLake={lastInLake} />
+                    <Lake lake={lake} />
                     {/* tableau */}
-                    <Tableau river={river} nertStack={nertStack} playCard={playCard} endGame={endGame} onDragEnd={dropCard} />
+                    <Tableau river={river} playCard={playCard} onDragEnd={dropCard} />
                     {/* stream & waste */}
-                    <Stream stream={stream} waste={waste} maxWasteShowing={maxWasteShowing} playCard={playCard} endGame={endGame} wasteCards={wasteCards} nertStack={nertStack} onDragEnd={dropCard} />
+                    <Stream stream={stream} waste={waste} maxWasteShowing={maxWasteShowing} playCard={playCard} wasteCards={wasteCards} onDragEnd={dropCard} />
                 </div>
             </LayoutGroup>
         </Container>

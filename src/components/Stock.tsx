@@ -1,4 +1,4 @@
-import type { Card } from '@/types/nerts.d'
+import type { Card } from '@/types/solitaire'
 import { PlayingCard } from './PlayingCard';
 
 export function Stock({
