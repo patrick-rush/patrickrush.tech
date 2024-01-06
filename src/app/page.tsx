@@ -93,11 +93,11 @@ export default async function Home() {
           <Resume />
         </div>
       </Container>
-      <Photos />
-      <Container className="mt-24 md:mt-28">
+      {/* <Photos /> */}
+      <Container className="mt-24 md:mt-20">
         <CommitGrid />
       </Container>
-      <Container className="mt-24 md:mt-28">
+      <Container className="mt-24 md:mt-20">
         <div className="mx-auto grid max-w-xl grid-cols-1 gap-y-20 lg:max-w-none lg:grid-cols-2">
           <div className="flex flex-col gap-16">
             {articles.map((article) => (
