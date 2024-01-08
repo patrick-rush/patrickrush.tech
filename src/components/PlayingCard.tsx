@@ -66,7 +66,7 @@ const PlayingCardComponent: ForwardRefRenderFunction<HTMLDivElement, PlayingCard
         <div hidden className="border-0 text-zinc-950 text-red-800"></div>
         {/* {children} */}
         {isShowing ?
-          <div className="w-16 h-24 md:w-24 md:h-36 bg-white rounded-md flex flex-col justify-between p-2">
+          <div className="w-12 h-[4.5rem] md:w-16 md:h-24 lg:w-24 lg:h-36 bg-white rounded-md flex flex-col justify-between p-2">
             <div className="flex justify-between">
               <div className={`text-${suit.type}`}>
                 <p className="text-lg font-bold">{rank.display}</p>
@@ -76,9 +76,9 @@ const PlayingCardComponent: ForwardRefRenderFunction<HTMLDivElement, PlayingCard
               </div>
             </div>
             <div className="flex-grow flex items-center justify-center">
-              <div className={`absolute text-${suit.type} font-thin ${suit.name === 'Spades' && rank.position === 1 ? 'text-[5rem] leading-[1rem] md:text-8xl' : 'text-5xl'}`}>{suit.symbol}</div>
+              <div className={`absolute text-${suit.type} font-thin ${suit.name === 'Spades' && rank.position === 1 ? 'text-5xl md:text-[5rem] leading-[1rem] lg:text-8xl' : 'text-5xl'}`}>{suit.symbol}</div>
             </div>
-            <div className="hidden md:flex justify-between">
+            <div className="hidden lg:flex justify-between">
               <div className={`text-${suit.type} rotate-180`}>
                 <p className="text-lg font-thin">{suit.symbol}</p>
               </div>
@@ -88,7 +88,7 @@ const PlayingCardComponent: ForwardRefRenderFunction<HTMLDivElement, PlayingCard
             </div>
           </div>
           :
-          <div className="w-16 h-24 md:w-24 md:h-36 absolute rounded-md">
+          <div className="w-12 h-[4.5rem] md:w-16 md:h-24 lg:w-24 lg:h-36 absolute rounded-md">
             <Image draggable="false" priority sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw" fill src={cardBack} className={clsx(className, "rounded-md")} alt="reverse of playing card" />
           </div>
         }

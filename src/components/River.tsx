@@ -26,7 +26,7 @@ export function River({
     return (
         <>
             {river.map((pile, riverIndex) => (
-                    <div key={riverIndex} id={`river-${riverIndex}`} className="relative w-16 h-24 md:w-24 md:h-36 outline outline-zinc-100 outline-offset-4 rounded-md dark:outline-zinc-700/40">
+                    <div key={riverIndex} id={`river-${riverIndex}`} className="relative w-12 h-[4.5rem] md:w-16 md:h-24 lg:w-24 lg:h-36 outline outline-zinc-100 outline-offset-4 rounded-md dark:outline-zinc-700/40">
                 <div >
                         <Column
                             pile={pile}

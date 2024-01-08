@@ -89,10 +89,11 @@ export default function Solitaire() {
         const { source, pileIndex } = props
         switch (source) {
             case CardSource.Waste: return waste
+            case CardSource.Lake: return lake[pileIndex!]
             case CardSource.River: return river[pileIndex!]
             default: throw new Error(`Invalid source: ${source}`)
         }
-    }, [river, waste])
+    }, [river, lake, waste])
 
     const handleUpdateRiver = ({
         destination,
@@ -104,8 +105,8 @@ export default function Solitaire() {
         if (start != null && sourceIndex != null) {
             copyOfRiver[destination].push(...copyOfRiver[sourceIndex!].splice(start, copyOfRiver[sourceIndex!].length))
         } else {
-            const props: { source: CardSource.Nert | CardSource.Waste | CardSource.River; pileIndex?: number; } = { source }
-            if (source === CardSource.River) props.pileIndex = sourceIndex
+            const props: { source: CardSource.Waste | CardSource.Lake | CardSource.River; pileIndex?: number; } = { source }
+            if (source === CardSource.River || source === CardSource.Lake) props.pileIndex = sourceIndex
             let sourceArray = getSourceArray(props as GetSourceArrayProps)
             const cardToMove = sourceArray.pop()
             if (cardToMove) copyOfRiver[destination].push(cardToMove)
@@ -121,11 +122,11 @@ export default function Solitaire() {
         sourceIndex,
     }: {
         destination: number;
-        source: CardSource.Nert | CardSource.Waste | CardSource.River;
+        source: CardSource.Waste | CardSource.River | CardSource.Lake;
         sourceIndex?: number;
     }) => {
         let sourceArray
-        if (source === CardSource.River) sourceArray = getSourceArray({ source, pileIndex: sourceIndex! })
+        if (source === CardSource.River || source === CardSource.Lake) sourceArray = getSourceArray({ source, pileIndex: sourceIndex! })
         else sourceArray = getSourceArray({ source })
         if (!sourceArray) return false
         const copyOfLake = [...lake]
@@ -274,6 +275,7 @@ export default function Solitaire() {
             if (destination.location === CardSource.Lake) handleUpdateLake({ destination: destination.index, source, sourceIndex: pileIndex })
             if (destination.location === CardSource.River) {
                 if (source === CardSource.River) handleUpdateRiver({ destination: destination.index, source, sourceIndex: pileIndex!, start: foundationIndex })
+                if (source === CardSource.Lake) handleUpdateRiver({ destination: destination.index, source, sourceIndex: pileIndex! })
                 else handleUpdateRiver({ destination: destination.index, source })
             }
         } catch (err) {
@@ -284,17 +286,31 @@ export default function Solitaire() {
 
     /* board */
     return (
-        <Container className="flex h-full items-center pt-8 sm:pt-16" >
-            <LayoutGroup >
-                <div className="rounded-2xl sm:border sm:border-zinc-100 sm:p-8 sm:dark:border-zinc-700/40">
-                    {/* lake */}
-                    <Lake lake={lake} />
-                    {/* tableau */}
-                    <Tableau river={river} playCard={playCard} onDragEnd={dropCard} />
-                    {/* stream & waste */}
-                    <Stream stream={stream} waste={waste} maxWasteShowing={maxWasteShowing} playCard={playCard} wasteCards={wasteCards} onDragEnd={dropCard} />
-                </div>
-            </LayoutGroup>
-        </Container>
+        <>
+            <Container className="hidden lg:flex h-full items-center pt-4 sm:pt-16" >
+                <LayoutGroup >
+                    <div className="rounded-2xl sm:border sm:border-zinc-100 sm:p-8 sm:dark:border-zinc-700/40">
+                        {/* lake */}
+                        <Lake lake={lake} playCard={playCard} onDragEnd={dropCard} />
+                        {/* tableau */}
+                        <Tableau river={river} playCard={playCard} onDragEnd={dropCard} />
+                        {/* stream & waste */}
+                        <Stream stream={stream} waste={waste} maxWasteShowing={maxWasteShowing} playCard={playCard} wasteCards={wasteCards} onDragEnd={dropCard} />
+                    </div>
+                </LayoutGroup>
+            </Container>
+            <div className="lg:hidden p-16">
+                <LayoutGroup >
+                    <div className="rounded-2xl sm:border sm:border-zinc-100 sm:p-8 sm:dark:border-zinc-700/40">
+                        {/* lake */}
+                        <Lake lake={lake} playCard={playCard} onDragEnd={dropCard} />
+                        {/* tableau */}
+                        <Tableau river={river} playCard={playCard} onDragEnd={dropCard} />
+                        {/* stream & waste */}
+                        <Stream stream={stream} waste={waste} maxWasteShowing={maxWasteShowing} playCard={playCard} wasteCards={wasteCards} onDragEnd={dropCard} />
+                    </div>
+                </LayoutGroup>
+            </div>
+        </>
     )
 }

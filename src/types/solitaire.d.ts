@@ -67,9 +67,9 @@ type ConditionalHandleUpdateRiverProps = | {
 export type HandleUpdateRiverProps = CommonHandleUpdateRiverProps & ConditionalHandleUpdateRiverProps
 
 export type GetSourceArrayProps = | {
-    source: CardSource.River;
+    source: CardSource.River | CardSource.Lake;
     pileIndex: number;
 } | {
-    source: CardSource.Nert | CardSource.Waste;
+    source: CardSource.Waste;
     pileIndex?: never;
 }

@@ -47,7 +47,7 @@ export function Waste({
 
     return (
         <div id={CardSource.Waste} className="md:mx-8">
-            <div className="w-36 h-24 md:w-44 md:h-36 outline outline-zinc-100 outline-offset-4 rounded-md dark:outline-zinc-700/40" style={{ zIndex: zIndex }}>
+            <div className="w-32 h-[4.5rem] md:w-36 md:h-24 lg:w-44 lg:h-36 outline outline-zinc-100 outline-offset-4 rounded-md dark:outline-zinc-700/40" style={{ zIndex: zIndex }}>
                 <div className="absolute">
                     {waste.map((card, index) => {
                         let offset = 0

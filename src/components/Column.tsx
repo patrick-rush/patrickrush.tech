@@ -88,7 +88,7 @@ export const Column = ({ pile,
             <div id={`${CardSource.River}-${riverIndex}-${parentIndex}`} key={parentIndex} className="absolute" >
                 <PlayingCard
                     className="shadow-md shadow-zinc-800 rounded-md"
-                    style={{ top: `${Math.min(200 / river[riverIndex].length, 30) * parentIndex}px` }}
+                    style={{ top: `${Math.min(280 / river[riverIndex].length, 30) * parentIndex}px` }}
                     suit={card.suit}
                     rank={card.rank}
                     isShowing={!!card.flipped}
