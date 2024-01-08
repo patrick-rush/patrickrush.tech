@@ -26,14 +26,17 @@ export default {
     extend: {
       gridTemplateColumns: {
         '52': 'repeat(52, minmax(0, 15.5px))',
-      }
+      },
+      keyframes: {
+        flip: {
+          '0%, 100%': { transform: 'rotateY(0deg)' },
+          '50%': { transform: 'rotateY(180deg)' },
+        },
+      },
+      animation: {
+        'flip-slow': 'flip .5s ease-in-out',
+      },
     },
-    // colors: {
-    //   teal: {
-    //     500: '#14b8a6',
-    //     600: '#0d9488'
-    //   }
-    // },
     typography: typographyStyles,
   },
 } satisfies Config

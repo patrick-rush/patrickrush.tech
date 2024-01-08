@@ -1,6 +1,9 @@
 {
     "typescript.tsdk": "node_modules/typescript/lib",
     "cSpell.words": [
-        "mailgun"
+        "clsx",
+        "ketchikan",
+        "mailgun",
+        "nert"
     ]
 }
