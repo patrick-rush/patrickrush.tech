@@ -59,7 +59,7 @@ export const Column = ({ pile,
         <motion.div
             className="relative"
             style={{ zIndex: zIndex }}
-            drag
+            drag={card.flipped}
             dragElastic={1}
             dragSnapToOrigin
             onDragStart={handleDragStart}
