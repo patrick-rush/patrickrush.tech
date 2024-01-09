@@ -37,7 +37,7 @@ export function Lake({
     }
 
     return (
-        <div id="lake" className="py-8">
+        <div id="lake" className="py-8 px-2">
             <div className="grid grid-cols-4 place-items-center sm:px-8 outline outline-zinc-100 outline-offset-4 rounded-md dark:outline-zinc-700/40">
                 {Array.from({ length: 4 }).map((_, index) => {
                     const pile = lake[index]
