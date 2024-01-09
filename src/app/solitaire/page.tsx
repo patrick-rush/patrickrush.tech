@@ -7,6 +7,7 @@ import { Tableau } from '@/components/Tableau'
 import { Stream } from '@/components/Stream'
 import type { Card, PlayCardProps, DropCardProps, HandleUpdateRiverProps, GetSourceArrayProps } from '@/types/solitaire'
 import { LayoutGroup } from 'framer-motion'
+import useScreenSize from '@/lib/useScreenSize'
 
 export default function Solitaire() {
     "use client"
@@ -17,6 +18,7 @@ export default function Solitaire() {
     const [lastInLake, setLastInLake] = useState<{ card: Card } | null>(null)
     const [gameOver, setGameOver] = useState<boolean>(false)
     const maxWasteShowing = useRef(0)
+    const screenSize = useScreenSize()
 
     const deck = useMemo(() => suits.flatMap(suit => {
         return ranks.map(rank => {
@@ -227,10 +229,9 @@ export default function Solitaire() {
 
             const { bottom, top, right, left, height } = ref.getBoundingClientRect()
             let target: Target | null = null
-
             const findTarget = (repetitions: number, piles: Card[][], location: string): Target | null => {
                 for (let i = 0; i < repetitions; i++) {
-                    const values = document.getElementById(`${location}-${i}`)?.getBoundingClientRect()
+                    const values = document.getElementById(`${location}-${i}-top`)?.getBoundingClientRect()
                     let offset = 10
                     if (location === CardSource.River) offset = (river[i].length * (height / 5)) + 10
                     if (values && left < values.right + 10 && right > values.left - 10 && top < values.bottom + offset && bottom > values.top - 10) {
@@ -248,7 +249,6 @@ export default function Solitaire() {
 
             if (!target) target = findTarget(7, river, CardSource.River)
 
-            console.log(">>> target", target)
             return target
         }
 
@@ -284,33 +284,29 @@ export default function Solitaire() {
         }
     }
 
+    const board = (
+        <LayoutGroup >
+            <div className="rounded-2xl sm:border sm:border-zinc-100 sm:p-8 sm:dark:border-zinc-700/40">
+                {/* lake */}
+                <Lake lake={lake} playCard={playCard} onDragEnd={dropCard} />
+                {/* tableau */}
+                <Tableau river={river} playCard={playCard} onDragEnd={dropCard} />
+                {/* stream & waste */}
+                <Stream stream={stream} waste={waste} maxWasteShowing={maxWasteShowing} playCard={playCard} wasteCards={wasteCards} onDragEnd={dropCard} />
+            </div>
+        </LayoutGroup>
+    )
+
     /* board */
     return (
         <>
-            <Container className="hidden lg:flex h-full items-center pt-4 sm:pt-16" >
-                <LayoutGroup >
-                    <div className="rounded-2xl sm:border sm:border-zinc-100 sm:p-8 sm:dark:border-zinc-700/40">
-                        {/* lake */}
-                        <Lake lake={lake} playCard={playCard} onDragEnd={dropCard} />
-                        {/* tableau */}
-                        <Tableau river={river} playCard={playCard} onDragEnd={dropCard} />
-                        {/* stream & waste */}
-                        <Stream stream={stream} waste={waste} maxWasteShowing={maxWasteShowing} playCard={playCard} wasteCards={wasteCards} onDragEnd={dropCard} />
-                    </div>
-                </LayoutGroup>
+            {screenSize.width >= 1024
+            ? <Container className="h-full items-center pt-4 sm:pt-16" >
+                {board}
             </Container>
-            <div className="lg:hidden p-2 sm:p-16">
-                <LayoutGroup >
-                    <div className="rounded-2xl sm:border sm:border-zinc-100 sm:p-8 sm:dark:border-zinc-700/40">
-                        {/* lake */}
-                        <Lake lake={lake} playCard={playCard} onDragEnd={dropCard} />
-                        {/* tableau */}
-                        <Tableau river={river} playCard={playCard} onDragEnd={dropCard} />
-                        {/* stream & waste */}
-                        <Stream stream={stream} waste={waste} maxWasteShowing={maxWasteShowing} playCard={playCard} wasteCards={wasteCards} onDragEnd={dropCard} />
-                    </div>
-                </LayoutGroup>
-            </div>
+            : <div className="p-2 sm:p-16">
+                {board}
+            </div>}
         </>
     )
 }

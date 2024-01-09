@@ -8,6 +8,7 @@ import { motion } from "framer-motion"
 
 type PlayingCardProps = {
   className?: string
+  id?: string;
   suit: Suit;
   rank: RankDetails;
   isShowing: boolean;
@@ -22,6 +23,7 @@ const PlayingCardComponent: ForwardRefRenderFunction<HTMLDivElement, PlayingCard
   "use client"
   const {
     className,
+    id,
     suit,
     rank,
     isShowing,
@@ -47,6 +49,7 @@ const PlayingCardComponent: ForwardRefRenderFunction<HTMLDivElement, PlayingCard
   return (
     <motion.div
       className={clsx(className, `absolute z-1000`)}
+      id={id}
       drag={draggable}
       style={style}
       dragElastic={1}

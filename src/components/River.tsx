@@ -12,12 +12,12 @@ export function River({
     onDragEnd: (props: DropCardProps) => void;
 }) {
     const [wasDragged, setWasDragged] = useState(false)
-    
+
     const handleDragStart = () => {
         console.log("drag started")
         setWasDragged(true)
     }
-    
+
     const handleDragEnd = (props: DropCardProps) => {
         onDragEnd?.(props)
         setWasDragged(false)
@@ -26,8 +26,8 @@ export function River({
     return (
         <>
             {river.map((pile, riverIndex) => (
-                    <div key={riverIndex} id={`river-${riverIndex}`} className="relative w-11 h-[4.175rem] md:w-16 md:h-24 lg:w-24 lg:h-36 sm:outline outline-zinc-100 outline-offset-4 rounded-md dark:outline-zinc-700/40">
-                <div >
+                <div key={riverIndex} className="relative w-11 h-[4.175rem] md:w-16 md:h-24 lg:w-24 lg:h-36 sm:outline outline-zinc-100 outline-offset-4 rounded-md dark:outline-zinc-700/40">
+                    <div >
                         <Column
                             pile={pile}
                             riverIndex={riverIndex}
