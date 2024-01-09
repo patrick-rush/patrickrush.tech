@@ -299,7 +299,7 @@ export default function Solitaire() {
                     </div>
                 </LayoutGroup>
             </Container>
-            <div className="lg:hidden p-16">
+            <div className="lg:hidden p-2 sm:p-16">
                 <LayoutGroup >
                     <div className="rounded-2xl sm:border sm:border-zinc-100 sm:p-8 sm:dark:border-zinc-700/40">
                         {/* lake */}

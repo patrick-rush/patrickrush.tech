@@ -66,7 +66,7 @@ const PlayingCardComponent: ForwardRefRenderFunction<HTMLDivElement, PlayingCard
         <div hidden className="border-0 text-zinc-950 text-red-800"></div>
         {/* {children} */}
         {isShowing ?
-          <div className="w-12 h-[4.5rem] md:w-16 md:h-24 lg:w-24 lg:h-36 bg-white rounded-md flex flex-col justify-between p-2">
+          <div className="w-11 h-[4.175rem] md:w-16 md:h-24 lg:w-24 lg:h-36 bg-white rounded-md flex flex-col justify-between p-2">
             <div className="flex justify-between">
               <div className={`text-${suit.type}`}>
                 <p className="text-lg font-bold">{rank.display}</p>
@@ -88,7 +88,7 @@ const PlayingCardComponent: ForwardRefRenderFunction<HTMLDivElement, PlayingCard
             </div>
           </div>
           :
-          <div className="w-12 h-[4.5rem] md:w-16 md:h-24 lg:w-24 lg:h-36 absolute rounded-md">
+          <div className="w-11 h-[4.175rem] md:w-16 md:h-24 lg:w-24 lg:h-36 absolute rounded-md">
             <Image draggable="false" priority sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw" fill src={cardBack} className={clsx(className, "rounded-md")} alt="reverse of playing card" />
           </div>
         }

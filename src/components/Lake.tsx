@@ -37,14 +37,14 @@ export function Lake({
     }
 
     return (
-        <div id="lake" className="pb-8">
-            <div className="grid grid-cols-4 place-items-center px-8 outline outline-zinc-100 outline-offset-4 rounded-md dark:outline-zinc-700/40">
+        <div id="lake" className="py-8">
+            <div className="grid grid-cols-4 place-items-center sm:px-8 outline outline-zinc-100 outline-offset-4 rounded-md dark:outline-zinc-700/40">
                 {Array.from({ length: 4 }).map((_, index) => {
                     const pile = lake[index]
                     // let shadow = ''
                     // if (pile.length) shadow = 'shadow-md shadow-zinc-800 rounded-md'
                     return (
-                        <div className={clsx("relative w-12 h-[4.5rem] md:w-16 md:h-24 lg:w-24 lg:h-36 my-4")} key={index} id={`lake-${index}`} style={{ zIndex: zIndex }}>
+                        <div className={clsx("relative w-11 h-[4.175rem] md:w-16 md:h-24 lg:w-24 lg:h-36 my-4")} key={index} id={`lake-${index}`} style={{ zIndex: zIndex }}>
                             {pile?.map((card, cardIndex) => {
                                 const pileLength = pile.length
                                 let shadow = ''
