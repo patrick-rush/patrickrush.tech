@@ -36,37 +36,30 @@ export function Lake({
         onDragEnd?.({ card, cardRef, source: CardSource.Lake, pileIndex })
     }
 
+    
     return (
         <div id="lake" className="py-8 px-2">
             <div className="grid grid-cols-4 place-items-center sm:px-8 outline outline-zinc-100 outline-offset-4 rounded-md dark:outline-zinc-700/40">
                 {Array.from({ length: 4 }).map((_, index) => {
                     const pile = lake[index]
-                    // let shadow = ''
-                    // if (pile.length) shadow = 'shadow-md shadow-zinc-800 rounded-md'
+                    const card = pile.length ? pile[pile.length - 1] : null
                     return (
-                        <div className={clsx("relative w-11 h-[4.175rem] md:w-16 md:h-24 lg:w-24 lg:h-36 my-4")} key={index} id={`lake-${index}`} style={{ zIndex: zIndex }}>
-                            {pile?.map((card, cardIndex) => {
-                                const pileLength = pile.length
-                                let shadow = ''
-                                if (index > pileLength - 3) shadow = 'shadow-md shadow-zinc-800 rounded-md'
-                                return (
-                                    <PlayingCard
-                                        className={shadow}
-                                        key={cardIndex}
-                                        suit={card.suit}
-                                        rank={card.rank}
-                                        isShowing={true}
-                                        draggable={cardIndex === pile.length - 1}
-                                        onDragStart={handleDragStart}
-                                        onDragEnd={(cardRef) => handleDragEnd(card, cardRef, index)}
-                                        onClick={() => playCard({
-                                            card: pile[pile.length - 1], 
-                                            source: CardSource.Lake,
-                                            pileIndex: index,
-                                        })}    
-                                    />
-                                )
-                            })}
+                        <div className={clsx("relative w-11 h-[4.175rem] md:w-16 md:h-24 lg:w-24 lg:h-36 my-4")} key={index} style={{ zIndex: zIndex }}>
+                                {card && <PlayingCard
+                                    className="shadow-md shadow-zinc-800 rounded-md"
+                                    id={`lake-${index}-top`} 
+                                    suit={card.suit}
+                                    rank={card.rank}
+                                    isShowing
+                                    draggable
+                                    onDragStart={handleDragStart}
+                                    onDragEnd={(cardRef) => handleDragEnd(card, cardRef, index)}
+                                    onClick={() => playCard({
+                                        card: pile[pile.length - 1], 
+                                        source: CardSource.Lake,
+                                        pileIndex: index,
+                                    })}    
+                                />}
                         </div>
                     )
                 })}
