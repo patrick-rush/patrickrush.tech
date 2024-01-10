@@ -89,7 +89,6 @@ export const Column = ({ pile,
 
                     <PlayingCard
                         className="shadow-md shadow-zinc-800 rounded-md"
-                        id={parentIndex === pile.length - 1 ? `river-${riverIndex}-top` : undefined}
                         style={{ top: `${Math.min(280 / river[riverIndex].length, 30) * parentIndex}px` }}
                         suit={card.suit}
                         rank={card.rank}

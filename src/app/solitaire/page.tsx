@@ -229,9 +229,11 @@ export default function Solitaire() {
 
             const { bottom, top, right, left, height } = ref.getBoundingClientRect()
             let target: Target | null = null
-            const findTarget = (repetitions: number, piles: Card[][], location: string): Target | null => {
+            const findTarget = (repetitions: number, piles: Card[][], location: string, source: CardSource, pileIndex?: number): Target | null => {
                 for (let i = 0; i < repetitions; i++) {
-                    const values = document.getElementById(`${location}-${i}-top`)?.getBoundingClientRect()
+                    if (location === source && pileIndex === i) continue
+                    let domId: string = `${location}-${i}`
+                    const values = document.getElementById(domId)?.getBoundingClientRect()
                     let offset = 10
                     if (location === CardSource.River) offset = (river[i].length * (height / 5)) + 10
                     if (values && left < values.right + 10 && right > values.left - 10 && top < values.bottom + offset && bottom > values.top - 10) {
@@ -244,10 +246,11 @@ export default function Solitaire() {
                 }
                 return null
             }
+            
+            target = findTarget(4, lake, CardSource.Lake, source, pileIndex)
+            console.log(">>> target", target)
 
-            target = findTarget(4, lake, CardSource.Lake)
-
-            if (!target) target = findTarget(7, river, CardSource.River)
+            if (!target) target = findTarget(7, river, CardSource.River, source, pileIndex)
 
             return target
         }
@@ -300,13 +303,13 @@ export default function Solitaire() {
     /* board */
     return (
         <>
-            {screenSize.width >= 1024
-            ? <Container className="h-full items-center pt-4 sm:pt-16" >
+            {screenSize.width && screenSize.width < 1024
+            ? <div className="p-2 sm:p-16">
                 {board}
-            </Container>
-            : <div className="p-2 sm:p-16">
+            </div>
+            : <Container className="h-full items-center pt-4 sm:pt-16" >
                 {board}
-            </div>}
+            </Container>}
         </>
     )
 }

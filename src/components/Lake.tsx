@@ -44,10 +44,9 @@ export function Lake({
                     const pile = lake[index]
                     const card = pile.length ? pile[pile.length - 1] : null
                     return (
-                        <div className={clsx("relative w-11 h-[4.175rem] md:w-16 md:h-24 lg:w-24 lg:h-36 my-4")} key={index} style={{ zIndex: zIndex }}>
+                        <div className={clsx("relative w-11 h-[4.175rem] md:w-16 md:h-24 lg:w-24 lg:h-36 my-4")} key={index} id={`lake-${index}`} style={{ zIndex: zIndex }}>
                                 {card && <PlayingCard
                                     className="shadow-md shadow-zinc-800 rounded-md"
-                                    id={`lake-${index}-top`} 
                                     suit={card.suit}
                                     rank={card.rank}
                                     isShowing
