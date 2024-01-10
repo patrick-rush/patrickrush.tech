@@ -1,0 +1,62 @@
+import { ArticleLayout } from '@/components/ArticleLayout'
+import Link from 'next/link'
+import Image from 'next/image'
+import rideOutLoudBanner from './ride-out-loud-banner.jpeg'
+import patrickWithBike from './patrick-with-bike.jpg'
+
+export const article = {
+  author: 'Patrick Rush',
+  date: '2024-01-10',
+  title: 'Riding With Purpose',
+  description:
+    'Ride With Me In the Fight Against AIDS',
+}
+
+export const metadata = {
+  title: article.title,
+  description: article.description,
+}
+
+export default (props) => <ArticleLayout article={article} {...props} />
+
+As I prepare for the <Link target="_blank" href="https://www.aidslifecycle.org/">**AIDS/LifeCycle 2024**</Link>, a 545-mile bike ride from San Francisco to Los Angeles, I can't help but feel a deep connection to the cause. As a gay man, the impact of HIV/AIDS on my community over the decades is a poignant reminder of the ongoing battle against this disease. This ride is more than just a physical challenge; it's a commitment to make a difference.
+
+<div className="flex justify-center">
+    <a target="_blank" href="https://www.aidslifecycle.org/"><Image height="325" src={rideOutLoudBanner} alt="Bright orange and yellow banner with Ride Out Loud in large bold white font." /></a>
+</div>
+
+### AIDS/LifeCycle: More than Just a Ride
+
+This remarkable event, taking place from June 2nd to 8th, 2024, is not only a test of endurance but also a powerful statement in the fight against HIV/AIDS. Organized by the San Francisco AIDS Foundation and the Los Angeles LGBT Center, the ride aims to reduce new HIV infections and improve quality of life for those living with HIV/AIDS.
+
+### The Harsh Reality of HIV/AIDS
+
+Despite advancements in medical care, HIV/AIDS continues to pose a significant threat. In San Francisco, while new diagnoses have been declining, disparities persist. In 2021, the HIV diagnosis rates were 3.3 times higher among Black/African American and 2.8 times higher among Latino men compared to white men. The proportion of new diagnoses among people experiencing homelessness also increased, highlighting the need for more focused efforts<sub><Link href="#ref-1" id="pointer-1">[1]</Link></sub>.
+
+In Los Angeles County, there were 50,466 people living with HIV in 2021, and the number of late diagnoses remains a concern<sub><Link href="#ref-2" id="pointer-2">[2]</Link></sub>. Nationally, there were an estimated 32,100 new HIV infections in 2021, with a 12% decline from 2017. However, the rates of new infections are not uniformly distributed across states and regions, with the highest rates continuing to occur in the South<sub><Link href="#ref-3" id="pointer-3">[3]</Link></sub>.
+
+### Why I Ride
+
+I ride because I've seen the impact of HIV/AIDS on our community. I ride because I believe in the power of collective action and community support. And I ride because I want to contribute to a healthier future for us all. This cause is not just a distant concern; it's part of my history, my present, and my hope for a future free of AIDS.
+
+<div className="flex justify-center">
+    <a target="_blank" href="https://giving.aidslifecycle.org/index.cfm?fuseaction=donorDrive.participant&participantID=40745&language=en&referrer=mf%3A40745%3Ayou-copy"><Image src={patrickWithBike} alt="Patrick standing with his black bike." /></a>
+</div>
+
+### The Route and the Challenge
+
+The ride starts at the iconic Cow Palace in San Francisco and winds through various scenic stops before concluding in the vibrant city of Los Angeles. It's a test of endurance, commitment, and heart. But every mile is a testament to our resilience and dedication.
+
+### My Goal
+
+I am committed to raising $3,500 for this cause. By supporting my ride, you're not just backing a cyclist; you're investing in life-saving services and education. <Link target="_blank" href="https://giving.aidslifecycle.org/index.cfm?fuseaction=donorDrive.participant&participantID=40745&language=en&referrer=mf%3A40745%3Ayou-copy">Donate here</Link>.
+
+But your support doesn't have to stop at donations. Share this post, spread awareness, and find ways to contribute to similar missions in your community. Together, we can work towards a world free of AIDS.
+
+Join me in this journey, <Link target="_blank" href="https://giving.aidslifecycle.org/index.cfm?fuseaction=donorDrive.participant&participantID=40745&language=en&referrer=mf%3A40745%3Ayou-copy">support this cause</Link>, and let's pedal towards a brighter future together!
+
+---
+
+1. <span id="ref-1">"2021 HIV Epidemiology Annual Report | San Francisco" - <Link target="_blank" href="https://www.sf.gov/news/2021-hiv-epidemiology-annual-report/">SF.gov</Link></span> [<Link href="#pointer-1">1</Link>]
+2. <span id="ref-2">"Los Angeles County HIV Statistics" - <Link target="_blank" href="https://aidsvu.org/local-data/united-states/west/california/los-angeles-count/">AIDSVu.org</Link></span> [<Link href="#pointer-2">2</Link>]
+3. <span id="ref-3">"HIV in the U.S. by the Numbers - 2021 | CDC" - <Link target="_blank" href="https://www.hiv.gov/hiv-basics/overview/data-and-trends/statistics/">CDC.gov</Link></span> [<Link href="#pointer-3">3</Link>]
