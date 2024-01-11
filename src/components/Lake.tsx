@@ -13,6 +13,47 @@ export function Lake({
     playCard: (props: PlayCardProps) => void;
     onDragEnd: (props: DropCardProps) => void;
 }) {
+    return (
+        <div id="lake" className="py-8 px-2">
+            <div className="grid grid-cols-4 place-items-center sm:px-8 outline outline-zinc-100 outline-offset-4 rounded-md dark:outline-zinc-700/40">
+                {Array.from({ length: 4 }).map((_, index) => {
+                    const pile = lake[index]
+                    return (
+                        <div className={clsx("relative w-12 h-[4.5rem] md:w-16 md:h-24 lg:w-24 lg:h-36 my-4")} key={index} id={`lake-${index}`}>
+                            {pile?.map((card, cardIndex) => (
+                                <Pile 
+                                    key={cardIndex}
+                                    pile={pile}
+                                    pileIndex={index}
+                                    card={card}
+                                    cardIndex={cardIndex}
+                                    playCard={playCard}
+                                    onDragEnd={(cardRef) => onDragEnd?.({ card, cardRef, source: CardSource.Lake, pileIndex: index })}
+                                />
+                            ))}
+                        </div>
+                    )
+                })}
+            </div>
+        </div>
+    )
+}
+
+function Pile({
+    pile,
+    pileIndex,
+    card,
+    cardIndex,
+    playCard,
+    onDragEnd,
+}: {
+    pile: Card[];
+    pileIndex: number;
+    card: Card;
+    cardIndex: number;
+    playCard: (props: PlayCardProps) => void;
+    onDragEnd: (cardRef: RefObject<HTMLDivElement>) => void;
+}) {
     const [zIndex, setZIndex] = useState(0)
     const timeoutRef = useRef<NodeJS.Timeout>()
 
@@ -23,46 +64,40 @@ export function Lake({
     }, [])
 
     const handleDragStart = () => {
-        setZIndex(1000)
+        setZIndex(zIndex + 1000)
     }
 
-    const handleDragEnd = (card: Card, cardRef: RefObject<HTMLDivElement>, pileIndex: number) => {
+    const handleDragEnd = (cardRef: RefObject<HTMLDivElement>) => {
         if (timeoutRef.current) clearTimeout(timeoutRef.current)
 
         timeoutRef.current = setTimeout(() => {
             setZIndex(0)
         }, 1000)
 
-        onDragEnd?.({ card, cardRef, source: CardSource.Lake, pileIndex })
+        onDragEnd?.(cardRef)
     }
 
-    
+    const pileLength = pile.length
+    let shadow = ''
+    if (pileIndex > pileLength - 3) shadow = 'shadow-md shadow-zinc-800 rounded-md'
+
     return (
-        <div id="lake" className="py-8 px-2">
-            <div className="grid grid-cols-4 place-items-center sm:px-8 outline outline-zinc-100 outline-offset-4 rounded-md dark:outline-zinc-700/40">
-                {Array.from({ length: 4 }).map((_, index) => {
-                    const pile = lake[index]
-                    const card = pile.length ? pile[pile.length - 1] : null
-                    return (
-                        <div className={clsx("relative w-11 h-[4.175rem] md:w-16 md:h-24 lg:w-24 lg:h-36 my-4")} key={index} id={`lake-${index}`} style={{ zIndex: zIndex }}>
-                                {card && <PlayingCard
-                                    className="shadow-md shadow-zinc-800 rounded-md"
-                                    suit={card.suit}
-                                    rank={card.rank}
-                                    isShowing
-                                    draggable
-                                    onDragStart={handleDragStart}
-                                    onDragEnd={(cardRef) => handleDragEnd(card, cardRef, index)}
-                                    onClick={() => playCard({
-                                        card: pile[pile.length - 1], 
-                                        source: CardSource.Lake,
-                                        pileIndex: index,
-                                    })}    
-                                />}
-                        </div>
-                    )
+        <div style={{ position: "absolute", zIndex: zIndex }}>
+
+            <PlayingCard
+                className={shadow}
+                suit={card.suit}
+                rank={card.rank}
+                isShowing={true}
+                draggable={cardIndex === pile.length - 1}
+                onDragStart={handleDragStart}
+                onDragEnd={(cardRef) => handleDragEnd(cardRef)}
+                onClick={() => playCard({
+                    card: pile[pile.length - 1],
+                    source: CardSource.Lake,
+                    pileIndex: pileIndex,
                 })}
-            </div>
+            />
         </div>
     )
 }
