@@ -1,13 +1,12 @@
 "use client"
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
-import { suits, ranks, CardSource, Rank } from '@/constants/solitaire'
+import { suits, ranks, CardSource } from '@/constants/solitaire'
 import { Container } from '@/components/Container'
 import { Lake } from '@/components/Lake'
 import { Tableau } from '@/components/Tableau'
 import { Stream } from '@/components/Stream'
-import type { Card, PlayCardProps, DropCardProps, HandleUpdateRiverProps, GetSourceArrayProps } from '@/types/solitaire'
 import { LayoutGroup } from 'framer-motion'
-import useScreenSize from '@/lib/useScreenSize'
+import type { Card, PlayCardProps, DropCardProps, HandleUpdateRiverProps, GetSourceArrayProps } from '@/types/solitaire'
 
 export default function Solitaire() {
     "use client"
@@ -15,10 +14,11 @@ export default function Solitaire() {
     const [stream, setStream] = useState<Card[]>([])
     const [waste, setWaste] = useState<Card[]>([])
     const [lake, setLake] = useState<Card[][]>(Array.from({ length: 4 }, () => []))
-    const [lastInLake, setLastInLake] = useState<{ card: Card } | null>(null)
     const [gameOver, setGameOver] = useState<boolean>(false)
     const maxWasteShowing = useRef(0)
-    const screenSize = useScreenSize()
+
+    // for testing
+    // const [rect, setRect] = useState<DOMRect | null>(null)
 
     const deck = useMemo(() => suits.flatMap(suit => {
         return ranks.map(rank => {
@@ -31,6 +31,34 @@ export default function Solitaire() {
     }), [])
 
     const shuffle = (array: any[]) => array.sort((a, b) => 0.5 - Math.random())
+
+    // useEffect(() => {
+    //     // for testing
+    //     let existingElement = document.querySelector("#test-element")
+    //     if (existingElement) document.body.removeChild(existingElement)
+    //     let element = document.createElement("div")
+
+    //     element.style.position = "absolute"
+    //     element.style.zIndex = "10000"
+    //     element.style.height = rect?.height + "px" || "0px"
+    //     element.style.width = rect?.width + "px" || "0px"
+    //     element.style.left = rect?.left + "px"|| "0px"
+    //     element.style.right = rect?.right + "px"|| "0px"
+    //     element.style.top = rect?.top + "px"|| "0px"
+    //     element.style.bottom = rect?.bottom + "px"|| "0px"
+    //     element.style.borderWidth = "4px"
+    //     element.style.borderColor = "red"
+        
+    //     element.id = "test-element"
+
+    //     document.body.appendChild(element)
+
+    //     return () => {
+    //         if (document.body.contains(element)) {
+    //             document.body.removeChild(element)
+    //         }
+    //     }
+    // }, [rect])
 
     useEffect(() => {
         let shuffledDeck: Card[] = shuffle(deck)
@@ -135,7 +163,6 @@ export default function Solitaire() {
         const cardToMove = sourceArray.pop()
         if (cardToMove) {
             copyOfLake[destination].push(cardToMove)
-            setLastInLake({ card: cardToMove })
             if (source === CardSource.River && sourceArray.length) sourceArray[sourceArray.length - 1].flipped = true
         }
         setLake(copyOfLake)
@@ -233,10 +260,18 @@ export default function Solitaire() {
                 for (let i = 0; i < repetitions; i++) {
                     if (location === source && pileIndex === i) continue
                     let domId: string = `${location}-${i}`
+                    console.log(">>> domId", domId)
                     const values = document.getElementById(domId)?.getBoundingClientRect()
-                    let offset = 10
-                    if (location === CardSource.River) offset = (river[i].length * (height / 5)) + 10
-                    if (values && left < values.right + 10 && right > values.left - 10 && top < values.bottom + offset && bottom > values.top - 10) {
+                    // for testing
+                    // if (values) setRect({
+                    //     ...values,
+                    //     right: right + 10,
+                    //     left: left - 10,
+                    //     bottom: bottom + 10,
+                    //     top: top - 10,
+                    // })
+                    // if (values) setRect(values)
+                    if (values && left < values.right + 10 && right > values.left - 10 && top < values.bottom + 10 && bottom > values.top - 10) {
                         return {
                             pile: piles[i],
                             location: location,
@@ -246,11 +281,11 @@ export default function Solitaire() {
                 }
                 return null
             }
-            
+
             target = findTarget(4, lake, CardSource.Lake, source, pileIndex)
-            console.log(">>> target", target)
 
             if (!target) target = findTarget(7, river, CardSource.River, source, pileIndex)
+            console.log(">>> target", target)
 
             return target
         }
@@ -287,29 +322,21 @@ export default function Solitaire() {
         }
     }
 
-    const board = (
-        <LayoutGroup >
-            <div className="rounded-2xl sm:border sm:border-zinc-100 sm:p-8 sm:dark:border-zinc-700/40">
-                {/* lake */}
-                <Lake lake={lake} playCard={playCard} onDragEnd={dropCard} />
-                {/* tableau */}
-                <Tableau river={river} playCard={playCard} onDragEnd={dropCard} />
-                {/* stream & waste */}
-                <Stream stream={stream} waste={waste} maxWasteShowing={maxWasteShowing} playCard={playCard} wasteCards={wasteCards} onDragEnd={dropCard} />
-            </div>
-        </LayoutGroup>
-    )
-
     /* board */
     return (
         <>
-            {screenSize.width && screenSize.width < 1024
-            ? <div className="p-2 sm:p-16">
-                {board}
-            </div>
-            : <Container className="h-full items-center pt-4 sm:pt-16" >
-                {board}
-            </Container>}
+            <Container className="h-full items-center pt-4 sm:pt-16" >
+                <LayoutGroup >
+                    <div className="rounded-2xl sm:border sm:border-zinc-100 sm:p-8 sm:dark:border-zinc-700/40">
+                        {/* lake */}
+                        <Lake lake={lake} playCard={playCard} onDragEnd={dropCard} />
+                        {/* tableau */}
+                        <Tableau river={river} playCard={playCard} onDragEnd={dropCard} />
+                        {/* stream & waste */}
+                        <Stream stream={stream} waste={waste} maxWasteShowing={maxWasteShowing} playCard={playCard} wasteCards={wasteCards} onDragEnd={dropCard} />
+                    </div>
+                </LayoutGroup>
+            </Container>
         </>
     )
 }

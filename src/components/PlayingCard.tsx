@@ -48,7 +48,7 @@ const PlayingCardComponent: ForwardRefRenderFunction<HTMLDivElement, PlayingCard
 
   return (
     <motion.div
-      className={clsx(className, `absolute z-1000`)}
+      className={clsx(className, `absolute`)}
       id={id}
       drag={draggable}
       style={style}
