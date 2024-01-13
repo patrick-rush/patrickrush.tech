@@ -7,6 +7,7 @@ import { Tableau } from '@/components/Tableau'
 import { Stream } from '@/components/Stream'
 import { LayoutGroup } from 'framer-motion'
 import type { Card, PlayCardProps, DropCardProps, HandleUpdateRiverProps, GetSourceArrayProps } from '@/types/solitaire'
+import JSConfetti from 'js-confetti'
 
 export default function Solitaire() {
     "use client"
@@ -77,6 +78,21 @@ export default function Solitaire() {
         setRiver(river)
         maxWasteShowing.current = 0
     }, [deck])
+
+    useEffect(() => {
+        const jsConfetti = new JSConfetti()
+        if (lake.every(pile => pile.length === 13)) {
+            jsConfetti.addConfetti({
+                emojis: ['♥️', '♣️', '♠️', '♦️'],
+                confettiRadius: 3,
+                confettiNumber: 100,
+             })
+             setGameOver(true)
+        }
+        return () => {
+            jsConfetti.clearCanvas()
+        }
+    }, [lake])
 
     const wasteCards = useCallback(() => {
         if (gameOver) return
@@ -170,10 +186,10 @@ export default function Solitaire() {
     }
 
     // GAME OVER
-    const endGame = () => {
-        setGameOver(true)
-        window.alert("GAME OVER")
-    }
+    // const endGame = () => {
+    //     setGameOver(true)
+    //     window.alert("GAME OVER")
+    // }
 
     const playCard = (props: PlayCardProps) => {
         if (gameOver) return
@@ -241,6 +257,7 @@ export default function Solitaire() {
     }
 
     const dropCard = ({ card, cardRef, source, pileIndex, foundationIndex }: DropCardProps) => {
+        if (gameOver) return
 
         interface Target {
             pile: Card[];
@@ -329,7 +346,7 @@ export default function Solitaire() {
                 <LayoutGroup >
                     <div className="rounded-2xl sm:border sm:border-zinc-100 sm:p-8 sm:dark:border-zinc-700/40">
                         {/* lake */}
-                        <Lake lake={lake} playCard={playCard} onDragEnd={dropCard} />
+                        <Lake lake={lake} playCard={playCard} onDragEnd={dropCard} gameOver={gameOver} />
                         {/* tableau */}
                         <Tableau river={river} playCard={playCard} onDragEnd={dropCard} />
                         {/* stream & waste */}
