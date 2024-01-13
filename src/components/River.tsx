@@ -15,7 +15,6 @@ export function River({
     const [wasDragged, setWasDragged] = useState(false)
 
     const handleDragStart = () => {
-        console.log("drag started")
         setWasDragged(true)
     }
 
