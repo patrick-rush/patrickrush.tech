@@ -277,7 +277,6 @@ export default function Solitaire() {
                 for (let i = 0; i < repetitions; i++) {
                     if (location === source && pileIndex === i) continue
                     let domId: string = `${location}-${i}`
-                    console.log(">>> domId", domId)
                     const values = document.getElementById(domId)?.getBoundingClientRect()
                     // for testing
                     // if (values) setRect({
@@ -302,7 +301,6 @@ export default function Solitaire() {
             target = findTarget(4, lake, CardSource.Lake, source, pileIndex)
 
             if (!target) target = findTarget(7, river, CardSource.River, source, pileIndex)
-            console.log(">>> target", target)
 
             return target
         }
@@ -330,7 +328,7 @@ export default function Solitaire() {
             if (destination.location === CardSource.Lake) handleUpdateLake({ destination: destination.index, source, sourceIndex: pileIndex })
             if (destination.location === CardSource.River) {
                 if (source === CardSource.River) handleUpdateRiver({ destination: destination.index, source, sourceIndex: pileIndex!, start: foundationIndex })
-                if (source === CardSource.Lake) handleUpdateRiver({ destination: destination.index, source, sourceIndex: pileIndex! })
+                else if (source === CardSource.Lake) handleUpdateRiver({ destination: destination.index, source, sourceIndex: pileIndex! })
                 else handleUpdateRiver({ destination: destination.index, source })
             }
         } catch (err) {
