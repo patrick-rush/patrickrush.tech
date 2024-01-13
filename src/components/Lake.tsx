@@ -79,7 +79,7 @@ function Pile({
 
     const pileLength = pile.length
     let shadow = ''
-    if (pileIndex > pileLength - 3) shadow = 'shadow-md shadow-zinc-800 rounded-md'
+    if (cardIndex > pileLength - 4) shadow = 'shadow-md shadow-zinc-800 rounded-md'
 
     return (
         <div style={{ position: "absolute", zIndex: zIndex }}>

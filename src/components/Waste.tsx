@@ -53,7 +53,7 @@ export function Waste({
                         let offset = 0
                         offset = calculateOffset(index)
                         let shadow = ''
-                        if (index > maxWasteShowing.current - 4 || index === waste.length - 1) shadow = 'shadow-md shadow-zinc-800 rounded-md'
+                        if (index > maxWasteShowing.current - 4 || index === waste.length - 1 || waste.length <= 3) shadow = 'shadow-md shadow-zinc-800 rounded-md'
                         return (
                             <div id={`${CardSource.Waste}-${index}`} key={index} className="absolute" style={{ left: `${offset}px`, zIndex: zIndex }}>
                                 <PlayingCard
