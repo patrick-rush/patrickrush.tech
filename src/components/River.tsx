@@ -1,6 +1,7 @@
 import type { Card, PlayCardProps, DropCardProps } from '@/types/solitaire'
 import { Column } from './Column';
 import { useState } from 'react';
+import { CardSource } from '@/constants/solitaire';
 
 export function River({
     river,
@@ -26,7 +27,7 @@ export function River({
     return (
         <>
             {river.map((pile, riverIndex) => (
-                <div key={riverIndex} className="relative w-11 h-[4.175rem] md:w-16 md:h-24 lg:w-24 lg:h-36 sm:outline outline-zinc-100 outline-offset-4 rounded-md dark:outline-zinc-700/40">
+                <div key={riverIndex} id={pile.length === 0 ? `${CardSource.River}-${riverIndex}` : undefined} className="relative w-11 h-[4.175rem] md:w-16 md:h-24 lg:w-24 lg:h-36 sm:outline outline-zinc-100 outline-offset-4 rounded-md dark:outline-zinc-700/40">
                     <Column
                         pile={pile}
                         riverIndex={riverIndex}

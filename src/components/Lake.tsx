@@ -6,10 +6,12 @@ import { RefObject, useEffect, useRef, useState } from "react";
 
 export function Lake({
     lake,
+    gameOver,
     playCard,
     onDragEnd,
 }: {
     lake: Card[][];
+    gameOver: boolean;
     playCard: (props: PlayCardProps) => void;
     onDragEnd: (props: DropCardProps) => void;
 }) {
@@ -22,6 +24,7 @@ export function Lake({
                         <div className={clsx("relative w-12 h-[4.5rem] md:w-16 md:h-24 lg:w-24 lg:h-36 my-4")} key={index} id={`lake-${index}`}>
                             {pile?.map((card, cardIndex) => (
                                 <Pile 
+                                    gameOver={gameOver}
                                     key={cardIndex}
                                     pile={pile}
                                     pileIndex={index}
@@ -40,6 +43,7 @@ export function Lake({
 }
 
 function Pile({
+    gameOver,
     pile,
     pileIndex,
     card,
@@ -47,6 +51,7 @@ function Pile({
     playCard,
     onDragEnd,
 }: {
+    gameOver: boolean;
     pile: Card[];
     pileIndex: number;
     card: Card;
@@ -89,7 +94,7 @@ function Pile({
                 suit={card.suit}
                 rank={card.rank}
                 isShowing={true}
-                draggable={cardIndex === pile.length - 1}
+                draggable={!gameOver && cardIndex === pile.length - 1}
                 onDragStart={handleDragStart}
                 onDragEnd={(cardRef) => handleDragEnd(cardRef)}
                 onClick={() => playCard({
