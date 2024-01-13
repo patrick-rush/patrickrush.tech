@@ -76,7 +76,7 @@ export const Column = ({ pile,
                 })
             }}
             onClick={(event) => {
-                if (!wasDragged) {
+                if (!wasDragged && card.flipped) {
                     event.stopPropagation()
                     playCard({
                         card,
