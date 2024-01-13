@@ -1,3 +1,4 @@
+"use client"
 import { type Metadata } from 'next'
 import Image from 'next/image'
 
@@ -8,6 +9,7 @@ import logoCosmos from '@/images/logos/cosmos.svg'
 import logoHelioStream from '@/images/logos/helio-stream.svg'
 import logoOpenShuttle from '@/images/logos/open-shuttle.svg'
 import logoPlanetaria from '@/images/logos/planetaria.svg'
+import { useRouter } from 'next/navigation'
 
 const projects = [
   {
@@ -58,12 +60,16 @@ function LinkIcon(props: React.ComponentPropsWithoutRef<'svg'>) {
   )
 }
 
-export const metadata: Metadata = {
-  title: 'Projects',
-  description: 'Things I’ve made trying to put my dent in the universe.',
-}
+// export const metadata: Metadata = {
+//   title: 'Projects',
+//   description: 'Things I’ve made trying to put my dent in the universe.',
+// }
 
 export default function Projects() {
+  "use client"
+  const router = useRouter()
+  return router.push("../not-found")
+
   return (
     <SimpleLayout
       title="Things I’ve made trying to put my dent in the universe."
