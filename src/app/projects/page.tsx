@@ -35,7 +35,7 @@ const projects: Project[] = [
     name: 'NƎRTS',
     description:
       'Can you tell I like card games? This fast paced strategy game is a work in progress. Play with friends anywhere in the world and see who has the speed and skill to win.',
-    link: { href: '#', label: 'github.com' },
+    link: { href: 'https://github.com/patrick-rush/nerts', label: 'github.com' },
     logo: spadeLogo,
   },
 ]
