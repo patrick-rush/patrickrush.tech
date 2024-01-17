@@ -5,10 +5,12 @@ import { CardSource } from '@/constants/solitaire';
 
 export function River({
     river,
+    disabled,
     playCard,
     onDragEnd,
 }: {
     river: Card[][];
+    disabled: boolean;
     playCard: (props: PlayCardProps) => void;
     onDragEnd: (props: DropCardProps) => void;
 }) {
@@ -36,6 +38,7 @@ export function River({
                         handleDragEnd={handleDragEnd}
                         wasDragged={wasDragged}
                         river={river}
+                        disabled={disabled}
                     />
                 </div>
             ))}

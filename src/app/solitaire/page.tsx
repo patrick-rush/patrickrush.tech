@@ -5,9 +5,36 @@ import { Container } from '@/components/Container'
 import { Lake } from '@/components/Lake'
 import { Tableau } from '@/components/Tableau'
 import { Stream } from '@/components/Stream'
-import { LayoutGroup } from 'framer-motion'
-import type { Card, PlayCardProps, DropCardProps, HandleUpdateRiverProps, GetSourceArrayProps } from '@/types/solitaire'
+import { AnimatePresence, LayoutGroup } from 'framer-motion'
+import { motion } from "framer-motion"
 import JSConfetti from 'js-confetti'
+import type { Card, PlayCardProps, DropCardProps, HandleUpdateRiverProps, GetSourceArrayProps } from '@/types/solitaire'
+
+function InfoIcon(props: React.ComponentPropsWithoutRef<'svg'>) {
+    return (
+        <svg viewBox="0 0 24 24" aria-hidden="true" {...props}>
+            <path
+                strokeWidth="1.5"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                d="m11.25 11.25.041-.02a.75.75 0 0 1 1.063.852l-.708 2.836a.75.75 0 0 0 1.063.853l.041-.021M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9-3.75h.008v.008H12V8.25Z"
+            />
+        </svg>
+    )
+}
+
+function XIcon(props: React.ComponentPropsWithoutRef<'svg'>) {
+    return (
+        <svg viewBox="0 0 24 24" aria-hidden="true" {...props}>
+            <path
+                strokeWidth="1.5"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                d="m9.75 9.75 4.5 4.5m0-4.5-4.5 4.5M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"
+            />
+        </svg>
+    )
+}
 
 export default function Solitaire() {
     "use client"
@@ -16,6 +43,7 @@ export default function Solitaire() {
     const [waste, setWaste] = useState<Card[]>([])
     const [lake, setLake] = useState<Card[][]>(Array.from({ length: 4 }, () => []))
     const [gameOver, setGameOver] = useState<boolean>(false)
+    const [showInfo, setShowInfo] = useState(false)
     const maxWasteShowing = useRef(0)
 
     // for testing
@@ -49,7 +77,7 @@ export default function Solitaire() {
     //     element.style.bottom = rect?.bottom + "px"|| "0px"
     //     element.style.borderWidth = "4px"
     //     element.style.borderColor = "red"
-        
+
     //     element.id = "test-element"
 
     //     document.body.appendChild(element)
@@ -86,8 +114,8 @@ export default function Solitaire() {
                 emojis: ['♥️', '♣️', '♠️', '♦️'],
                 confettiRadius: 3,
                 confettiNumber: 100,
-             })
-             setGameOver(true)
+            })
+            setGameOver(true)
         }
         return () => {
             jsConfetti.clearCanvas()
@@ -340,17 +368,71 @@ export default function Solitaire() {
     /* board */
     return (
         <>
-            <Container className="h-full items-center pt-4 sm:pt-16" >
+            <Container 
+                className="h-full items-center pt-4 sm:pt-16"
+                onClick={() => {
+                    showInfo ? setShowInfo(false) : null
+                }}
+            >
                 <LayoutGroup >
                     <div className="rounded-2xl sm:border sm:border-zinc-100 sm:p-8 sm:dark:border-zinc-700/40">
                         {/* lake */}
-                        <Lake lake={lake} playCard={playCard} onDragEnd={dropCard} gameOver={gameOver} />
+                        <Lake lake={lake} playCard={playCard} onDragEnd={dropCard} disabled={gameOver || showInfo} />
                         {/* tableau */}
-                        <Tableau river={river} playCard={playCard} onDragEnd={dropCard} />
+                        <Tableau river={river} playCard={playCard} onDragEnd={dropCard} disabled={gameOver || showInfo} />
                         {/* stream & waste */}
-                        <Stream stream={stream} waste={waste} maxWasteShowing={maxWasteShowing} playCard={playCard} wasteCards={wasteCards} onDragEnd={dropCard} />
+                        <div className="flex justify-between">
+                            <div></div>
+                            <Stream stream={stream} waste={waste} maxWasteShowing={maxWasteShowing} playCard={playCard} wasteCards={wasteCards} onDragEnd={dropCard} disabled={gameOver || showInfo} />
+                            <div className="flex place-self-end">
+                                <button
+                                    type="button"
+                                    aria-label={showInfo ? 'Hide game info' : 'Show game info'}
+                                    className="group rounded-full bg-white/90 px-2 py-2 shadow-lg shadow-zinc-800/5 ring-1 ring-zinc-900/5 backdrop-blur transition dark:bg-zinc-800/90 dark:ring-white/10 dark:hover:ring-white/20"
+                                    onClick={() => setShowInfo(!showInfo)}
+                                >
+                                    <InfoIcon className={`${showInfo ? 'hidden' : ''} h-6 w-6 fill-teal-400/10 stroke-teal-500 group-hover:stroke-teal-600 dark:fill-zinc-700 dark:stroke-zinc-500 transition dark:group-hover:stroke-zinc-400`} />
+                                    <XIcon className={`${showInfo ? '' : 'hidden'} h-6 w-6 fill-teal-400/10 stroke-teal-500 group-hover:stroke-teal-600 dark:fill-zinc-700 dark:stroke-zinc-500 transition dark:group-hover:stroke-zinc-400`} />
+                                </button>
+                            </div>
+                        </div>
                     </div>
                 </LayoutGroup>
+                <AnimatePresence>
+                    {showInfo && <motion.div
+                        initial={{ opacity: 0, scale: 0.5 }}
+                        animate={{ opacity: 1, scale: 1 }}
+                        transition={{
+                            duration: 0.2,
+                            delay: 0.1,
+                            ease: "easeInOut"
+                        }}
+                        exit={{ opacity: 0, scale: 0.5 }}
+                        onClick={(e) => e.stopPropagation()}
+                        className="absolute inset-16 sm:inset-36 mx-auto my-auto sm:pt-18 rounded-2xl backdrop-blur-lg bg-zinc-300/40 dark:bg-zinc-800/40 border-zinc-100 p-6 flex flex-col z-10000 shadow-2xl shadow-zinc-700 dark:shadow-zinc-950"
+                    >
+                        <div className="overflow-auto">
+                            <h2 className="flex justify-between text-sm font-semibold text-zinc-900 dark:text-zinc-100">
+                                <div className="flex items-center">
+                                    <InfoIcon className="h-6 w-6 fill-teal-400/10 stroke-teal-500 group-hover:stroke-teal-600 dark:fill-zinc-700 dark:stroke-zinc-500 transition dark:group-hover:stroke-zinc-400" />
+                                    <span className="ml-3">How to play</span>
+                                </div>
+                            </h2>
+                            <Container className="mt-4 sm:mt-8">
+                                <header className="max-w-2xl">
+                                    <h1 className="text-4xl font-bold tracking-tight text-zinc-800 dark:text-zinc-100 sm:text-5xl">
+                                        Solitaire
+                                    </h1>
+                                </header>
+                                <div className="mt-4 sm:mt-8">
+                                    <p>In this card game, your goal is to arrange all the cards into four piles, one for each suit, in ascending order from Ace to King.</p><br />
+                                    <p>Start by clicking or dragging cards to form a sequence of cards in descending order (from King to Ace) and alternating colors (red and black) in the tableau. You can move cards individually or in groups. If you find an Ace, move it to the foundation piles at the top, where you&apos;ll build up each suit from Ace to King.</p><br />
+                                    <p>Don&apos;t forget to use the deck at the bottom! Click on it to reveal new cards. If you get stuck, remember you can place a King or a sequence starting with a King into an empty slot. Keep arranging the cards until all cards are in four piles!</p><br />
+                                </div>
+                            </Container>
+                        </div>
+                    </motion.div>}
+                </AnimatePresence>
             </Container>
         </>
     )

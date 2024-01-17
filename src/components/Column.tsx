@@ -13,6 +13,7 @@ interface ColumnProps {
     wasDragged: boolean;
     river: Card[][];
     parentZIndex?: number;
+    disabled: boolean;
 }
 
 export const Column = ({ pile,
@@ -23,7 +24,8 @@ export const Column = ({ pile,
     handleDragEnd: onDragEnd,
     wasDragged,
     river,
-    parentZIndex
+    parentZIndex,
+    disabled
 }: ColumnProps): JSX.Element => {
     const [zIndex, setZIndex] = useState(parentZIndex || 0)
     const cardRef = useRef<HTMLDivElement>(null)
@@ -61,7 +63,7 @@ export const Column = ({ pile,
         <motion.div
             className="relative"
             style={{ zIndex: zIndex }}
-            drag={card.flipped}
+            drag={card.flipped && !disabled}
             dragElastic={1}
             dragSnapToOrigin
             onDragStart={handleDragStart}
@@ -107,6 +109,7 @@ export const Column = ({ pile,
                     wasDragged={wasDragged}
                     river={river}
                     parentZIndex={zIndex}
+                    disabled={disabled}
                 />
             </div>
         </motion.div>
