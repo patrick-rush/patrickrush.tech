@@ -1,4 +1,5 @@
 import { ArticleLayout } from '@/components/ArticleLayout'
+import Link from 'next/link'
 import Image from 'next/image'
 import cardGameLogo from './card-game-logo.png'
 import gameBoardDark from './game-board-dark.png'
@@ -26,7 +27,7 @@ export default (props) => <ArticleLayout article={article} {...props} />
     <Image src={cardGameLogo} alt="Five playing cards fanned out, with the Ace of Spades on top." />
 </div>
 
-As a developer, I've always believed in the power of creating things that I personally use. There's something uniquely motivating about working on a project that isn't just a display of skill, but a product of personal passion and utility. This approach makes you opinionated about design, pushing you to build not just to the edge of your capability, but to the boundary of your satisfaction. It stretches you in new and unexpected ways, encouraging innovation and attention to detail. Moreover, living with your own creations allows you to experience the long-term impacts of your coding decisions, offering invaluable insights into the user experience and the evolving needs of a project. This perspective was central in developing my latest project: a digital version of the classic Solitaire game. It reflects a blend of professional skills and personal interest, making it a meaningful addition to my portfolio.
+As a developer, I've always believed in the power of creating things that I personally use. There's something uniquely motivating about working on a project that isn't just a display of skill, but a product of personal passion and utility. This approach makes you opinionated about design, pushing you to build not just to the edge of your capability, but to the boundary of your satisfaction. It stretches you in new and unexpected ways, encouraging innovation and attention to detail. Moreover, living with your own creations allows you to experience the long-term impacts of your coding decisions, offering invaluable insights into the user experience and the evolving needs of a project. This perspective was central in developing my latest project: <Link target="_blank" href="../solitaire">a digital version of the classic Solitaire game</Link>. It reflects a blend of professional skills and personal interest, making it a meaningful addition to my portfolio.
 
 ## The Gameplay Experience
 
@@ -64,7 +65,7 @@ Ensuring that the game worked seamlessly across different devices was a crucial 
 
 ## Sharing the Game
 
-In many ways, I built this game for myself. I often play Solitaire on my phone in short spurts of downtime as a way to switch off for a moment, but many of the apps available leave something to be desired; not to mention the annoying ever-present ads that one must put up with to play online games. I know that I will return to this game often, and will likely learn from it as I use it over time. My hope is that others will also enjoy it, and hopefully provide feedback about their experience with it so that I can improve it, and in turn, improve my skills as a developer.
+In many ways, I built this game for myself. I often play Solitaire on my phone in short spurts of downtime as a way to switch off for a moment, but many of the apps available leave something to be desired; not to mention the annoying ever-present ads that one must put up with to play online games. I know that I will return to this game often, and will likely learn from it as I use it over time. My hope is that others will also <Link target="_blank" href="../solitaire">enjoy it</Link>, and hopefully provide feedback about their experience with it so that I can improve it, and in turn, improve my skills as a developer.
 
 I believe that personal interest should shape professional growth, and the result of practice can be both informative and fun. Let me know, what game or application would you actually use if you built it yourself, and what's stopping you?
 
