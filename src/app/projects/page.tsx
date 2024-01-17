@@ -3,7 +3,9 @@ import Image from 'next/image'
 
 import { Card } from '@/components/Card'
 import { SimpleLayout } from '@/components/SimpleLayout'
-
+import heartLogo from '@/images/logos/heart-logo.png'
+import spadeLogo from '@/images/logos/spade-logo.png'
+import prLogo from '@/images/logos/pr-logo.png'
 interface Project {
     name: string;
     description: string;
@@ -15,41 +17,27 @@ interface Project {
 }
 
 const projects: Project[] = [
-  // {
-  //   name: 'Planetaria',
-  //   description:
-  //     'Creating technology to empower civilians to explore space on their own terms.',
-  //   link: { href: 'http://planetaria.tech', label: 'planetaria.tech' },
-  //   logo: logoPlanetaria,
-  // },
-  // {
-  //   name: 'Animaginary',
-  //   description:
-  //     'High performance web animation library, hand-written in optimized WASM.',
-  //   link: { href: '#', label: 'github.com' },
-  //   logo: logoAnimaginary,
-  // },
-  // {
-  //   name: 'HelioStream',
-  //   description:
-  //     'Real-time video streaming library, optimized for interstellar transmission.',
-  //   link: { href: '#', label: 'github.com' },
-  //   logo: logoHelioStream,
-  // },
-  // {
-  //   name: 'cosmOS',
-  //   description:
-  //     'The operating system that powers our Planetaria space shuttles.',
-  //   link: { href: '#', label: 'github.com' },
-  //   logo: logoCosmos,
-  // },
-  // {
-  //   name: 'OpenShuttle',
-  //   description:
-  //     'The schematics for the first rocket I designed that successfully made it to orbit.',
-  //   link: { href: '#', label: 'github.com' },
-  //   logo: logoOpenShuttle,
-  // },
+  {
+    name: 'Solitaire',
+    description:
+      'A classic card game for killing time. Click here to play, and check out the next project to view the source code.',
+    link: { href: './solitaire', label: 'patrickrush.tech/solitaire' },
+    logo: heartLogo,
+  },
+  {
+    name: 'patrickrush.tech',
+    description:
+      'My portfolio page. Built on top of a beautiful Tailwind UI template, this Next.js website is always evolving with personal touches, articles, and projects.',
+    link: { href: 'https://github.com/patrick-rush/patrickrush.tech', label: 'github.com' },
+    logo: prLogo,
+  },
+  {
+    name: 'NƎRTS',
+    description:
+      'Can you tell I like card games? This fast paced strategy game is a work in progress. Play with friends anywhere in the world and see who has the speed and skill to win.',
+    link: { href: '#', label: 'github.com' },
+    logo: spadeLogo,
+  },
 ]
 
 function LinkIcon(props: React.ComponentPropsWithoutRef<'svg'>) {
@@ -65,7 +53,7 @@ function LinkIcon(props: React.ComponentPropsWithoutRef<'svg'>) {
 
 export const metadata: Metadata = {
   title: 'Projects',
-  description: "Things I've made trying to put my dent in the universe.",
+  description: "A collection of projects I have worked on over the years.",
 }
 
 export default function Projects() {
