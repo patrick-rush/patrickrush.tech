@@ -6,6 +6,7 @@ export function Stream({
     stream,
     waste,
     maxWasteShowing,
+    disabled,
     playCard,
     wasteCards,
     onDragEnd,
@@ -13,6 +14,7 @@ export function Stream({
     stream: Card[];
     waste: Card[];
     maxWasteShowing: { current: number };
+    disabled: boolean;
     playCard: (props: PlayCardProps) => void;
     wasteCards: () => void;
     onDragEnd: (props: DropCardProps) => void;
@@ -21,9 +23,9 @@ export function Stream({
     return (
         <div id="stream" className="flex justify-center ">
             {/* waste */}
-            <Waste waste={waste} playCard={playCard} maxWasteShowing={maxWasteShowing} onDragEnd={onDragEnd} />
+            <Waste waste={waste} playCard={playCard} maxWasteShowing={maxWasteShowing} onDragEnd={onDragEnd} disabled={disabled} />
             {/* stream */}
-            <Stock stream={stream} wasteCards={wasteCards} />
+            <Stock stream={stream} wasteCards={wasteCards} disabled={disabled} />
         </div>
 
     )

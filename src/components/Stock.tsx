@@ -3,14 +3,16 @@ import { PlayingCard } from './PlayingCard';
 
 export function Stock({
     stream,
+    disabled,
     wasteCards,
 }: {
     stream: Card[];
+    disabled: boolean;
     wasteCards: () => void;
 }) {
     return (
         <div id="stream" className="mx-8">
-            <div className="w-11 h-[4.175rem] md:w-16 md:h-24 lg:w-24 lg:h-36 outline outline-zinc-100 outline-offset-4 rounded-md dark:outline-zinc-700/40 z-0" onClick={wasteCards}>
+            <div className="w-11 h-[4.175rem] md:w-16 md:h-24 lg:w-24 lg:h-36 outline outline-zinc-100 outline-offset-4 rounded-md dark:outline-zinc-700/40 z-0" onClick={() => disabled ? null : wasteCards()}>
                 <div className="absolute w-11 h-[4.175rem] md:w-16 md:h-24 lg:w-24 lg:h-36 text-zinc-400 dark:text-zinc-500 flex justify-center items-center select-none">
                     <span className="text-l md:text-2xl font-bold">FLIP</span>
                 </div>
@@ -30,6 +32,5 @@ export function Stock({
                 })}
             </div>
         </div>
-
     )
 }

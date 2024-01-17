@@ -6,11 +6,13 @@ import { CardSource } from '@/constants/solitaire';
 export function Waste({
     waste,
     maxWasteShowing,
+    disabled,
     playCard,
     onDragEnd,
 }: {
     waste: Card[];
-    maxWasteShowing: { current: number }
+    maxWasteShowing: { current: number };
+    disabled: boolean;
     playCard: (props: PlayCardProps) => void;
     onDragEnd: (props: DropCardProps) => void;
 }) {
@@ -61,7 +63,7 @@ export function Waste({
                                     suit={card.suit}
                                     rank={card.rank}
                                     isShowing={true}
-                                    draggable={index === waste.length - 1}
+                                    draggable={index === waste.length - 1 && !disabled}
                                     onDragStart={handleDragStart}
                                     onDragEnd={(cardRef) => handleDragEnd(card, cardRef)}
                                     onClick={() => playCard({ card: waste[waste.length - 1], source: CardSource.Waste })}
