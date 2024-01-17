@@ -1,0 +1,73 @@
+import { ArticleLayout } from '@/components/ArticleLayout'
+import Image from 'next/image'
+import cardGameLogo from './card-game-logo.png'
+import gameBoardDark from './game-board-dark.png'
+import gameBoardLight from './game-board-light.png'
+import gameSmallDark from './game-small-screen-dark.png'
+import gameSmallLight from './game-small-screen-light.png'
+import { PlayingCard } from '@/components/PlayingCard'
+
+export const article = {
+  author: 'Patrick Rush',
+  date: '2024-01-17',
+  title: 'All By Myself',
+  description:
+    'Building a Solitaire Card Game from the Card Up',
+}
+
+export const metadata = {
+  title: article.title,
+  description: article.description,
+}
+
+export default (props) => <ArticleLayout article={article} {...props} />
+
+<div className="flex justify-center">
+    <Image src={cardGameLogo} alt="Five playing cards fanned out, with the Ace of Spades on top." />
+</div>
+
+As a developer, I've always believed in the power of creating things that I personally use. There's something uniquely motivating about working on a project that isn't just a display of skill, but a product of personal passion and utility. This approach makes you opinionated about design, pushing you to build not just to the edge of your capability, but to the boundary of your satisfaction. It stretches you in new and unexpected ways, encouraging innovation and attention to detail. Moreover, living with your own creations allows you to experience the long-term impacts of your coding decisions, offering invaluable insights into the user experience and the evolving needs of a project. This perspective was central in developing my latest project: a digital version of the classic Solitaire game. It reflects a blend of professional skills and personal interest, making it a meaningful addition to my portfolio.
+
+## The Gameplay Experience
+
+The gameplay experience was a primary focus while developing this Solitaire game. It includes both traditional click-to-play and drag-and-drop options, offering players different ways to interact with the game. This choice was made to accommodate varying preferences and to provide a flexible gaming experience. The drag-and-drop behavior was made possible by Framer Motion and provided interesting challenges in the realm of animation and z-index management.
+
+## Visual and Board Design
+
+The visual design of the game, including the cards and the game board, was approached with a keen eye for aesthetics. The goal was to create a visually appealing and intuitive interface. The design choices, from card artwork to the layout of the game board, were made to enhance the overall user experience. The card itself was the very first element I created when I began working on the game, and was largely the inspiration for the whole thing. I set out to create a natural looking playing card with only JSX and Tailwind, and the rest of the project flowed from that initial endeavor.
+
+<div className="block dark:hidden">
+    <div className="flex justify-center">
+        <Image src={gameBoardLight} alt="Image of Solitaire game board mid-game in a light theme." />
+    </div>
+</div>
+<div className="hidden dark:block">
+    <div className="flex justify-center">
+        <Image src={gameBoardDark} alt="Image of Solitaire game board mid-game in a dark theme." />
+    </div>
+</div>
+
+## Responsiveness and Usability
+
+Ensuring that the game worked seamlessly across different devices was a crucial aspect of the development process. The game&apos;s responsiveness and adaptability to various screen sizes were key factors in its design, aimed at providing a consistent and accessible experience for all users. Various cards were designed for each screen size, and the placement of the interactive elements of the game took one handed, phone style game play into account. Dark and light theming were also a concern, as the game was built with my personal portfolio website as its home. 
+
+<div className="block dark:hidden">
+    <div className="flex max-h-48 justify-center">
+        <Image src={gameSmallLight} width={300} alt="Image of Solitaire game board optimized for small screens mid-game in a light theme." />
+    </div>
+</div>
+<div className="hidden dark:block">
+    <div className="flex max-h-48 justify-center">
+        <Image src={gameSmallDark} width={300} alt="Image of Solitaire game board optimized for small screens mid-game in a dark theme." />
+    </div>
+</div>
+
+## Sharing the Game
+
+In many ways, I built this game for myself. I often play Solitaire on my phone in short spurts of downtime as a way to switch off for a moment, but many of the apps available leave something to be desired; not to mention the annoying ever-present ads that one must put up with to play online games. I know that I will return to this game often, and will likely learn from it as I use it over time. My hope is that others will also enjoy it, and hopefully provide feedback about their experience with it so that I can improve it, and in turn, improve my skills as a developer.
+
+I believe that personal interest should shape professional growth, and the result of practice can be both informative and fun. Let me know, what game or application would you actually use if you built it yourself, and what's stopping you?
+
+---
+
+P.S. - If you aren't familiar with this style of Solitaire (sometimes known as Klondike or Canfield), click the information circle in the bottom righthand corner to learn more about how to play!
