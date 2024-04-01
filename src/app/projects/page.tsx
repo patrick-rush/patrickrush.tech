@@ -3,20 +3,31 @@ import Image from 'next/image'
 
 import { Card } from '@/components/Card'
 import { SimpleLayout } from '@/components/SimpleLayout'
+import gameOfLifeLogo from '@/images/logos/game-of-life-logo.png'
 import heartLogo from '@/images/logos/heart-logo.png'
 import spadeLogo from '@/images/logos/spade-logo.png'
 import prLogo from '@/images/logos/pr-logo.png'
+import clsx from 'clsx'
 interface Project {
-    name: string;
-    description: string;
-    link: {
-      href: string;
-      label: string;
-    },
-    logo: any;
+  name: string
+  description: string
+  link: {
+    href: string
+    label: string
+  }
+  logo: any
+  logoShape?: 'circle' | 'square'
 }
 
 const projects: Project[] = [
+  {
+    name: 'Game Of Life',
+    description:
+      "A classic code challenge: Conway's Game of Life. Explore the beauty and intrigue of cellular automata with this interactive simulation. Built using Angular and vanilla CSS.",
+    link: { href: './game-of-life', label: 'patrickrush.tech/game-of-life' },
+    logo: gameOfLifeLogo,
+    logoShape: 'square',
+  },
   {
     name: 'Solitaire',
     description:
@@ -28,15 +39,22 @@ const projects: Project[] = [
     name: 'patrickrush.tech',
     description:
       'My portfolio page. Built on top of a beautiful Tailwind UI template, this Next.js website is always evolving with personal touches, articles, and projects.',
-    link: { href: 'https://github.com/patrick-rush/patrickrush.tech', label: 'github.com' },
+    link: {
+      href: 'https://github.com/patrick-rush/patrickrush.tech',
+      label: 'github.com',
+    },
     logo: prLogo,
   },
   {
     name: 'NƎRTS',
     description:
       'Can you tell I like card games? This fast paced strategy game is a work in progress. Play with friends anywhere in the world and see who has the speed and skill to win.',
-    link: { href: 'https://github.com/patrick-rush/nerts', label: 'github.com' },
+    link: {
+      href: 'https://github.com/patrick-rush/nerts',
+      label: 'github.com',
+    },
     logo: spadeLogo,
+    logoShape: 'square',
   },
 ]
 
@@ -53,7 +71,7 @@ function LinkIcon(props: React.ComponentPropsWithoutRef<'svg'>) {
 
 export const metadata: Metadata = {
   title: 'Projects',
-  description: "A collection of projects I have worked on over the years.",
+  description: 'A collection of projects I have worked on over the years.',
 }
 
 export default function Projects() {
@@ -68,7 +86,16 @@ export default function Projects() {
       >
         {projects.map((project) => (
           <Card as="li" key={project.name}>
-            <div className="relative z-10 flex h-12 w-12 items-center justify-center rounded-full bg-white shadow-md shadow-zinc-800/5 ring-1 ring-zinc-900/5 dark:border dark:border-zinc-700/50 dark:bg-zinc-800 dark:ring-0">
+            <div
+              className={clsx(
+                'relative z-10 flex h-12 w-12 items-center justify-center rounded-full bg-white shadow-md shadow-zinc-800/5 ring-1 ring-zinc-900/5 dark:border dark:border-zinc-700/50 dark:bg-zinc-800 dark:ring-0',
+                project.logoShape === 'square'
+                  ? 'rounded-md'
+                  : 'circle'
+                  ? 'rounded-full'
+                  : 'rounded-full', // to allow for future shapes
+              )}
+            >
               <Image
                 src={project.logo}
                 alt=""
