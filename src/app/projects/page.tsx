@@ -24,7 +24,7 @@ const projects: Project[] = [
     name: 'Game Of Life',
     description:
       "A classic code challenge: Conway's Game of Life. Explore the beauty and intrigue of cellular automata with this interactive simulation. Built using Angular and vanilla CSS.",
-    link: { href: './game-of-life', label: 'patrickrush.tech/game-of-life' },
+    link: { href: './automata', label: 'patrickrush.tech/automata' },
     logo: gameOfLifeLogo,
     logoShape: 'square',
   },
