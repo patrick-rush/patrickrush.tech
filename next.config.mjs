@@ -18,6 +18,20 @@ const nextConfig = {
         // destination: 'http://localhost:4200/:path*',
       },
       {
+        source: '/automata',
+        destination: 'https://game-of-life-rho-sandy.vercel.app',
+        // destination: 'http://localhost:4200',
+      },
+      {
+        source: '/automata/:path*',
+        destination: 'https://game-of-life-rho-sandy.vercel.app/:path*',
+        // destination: 'http://localhost:4200/:path*',
+      },
+      {
+        source: '/not-found',
+        destination: '/not-found',
+      },
+      {
         source: '/:path*',
         destination: 'https://game-of-life-rho-sandy.vercel.app/:path*',
         // destination: 'http://localhost:4200/:path*',
