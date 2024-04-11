@@ -28,11 +28,6 @@ const nextConfig = {
         // destination: 'http://localhost:4200/:path*',
       },
       {
-        source: '/not-found',
-        destination: 'https://patrickrush.tech/not-found',
-        // destination: 'http://localhost:3000/not-found',
-      },
-      {
         source: '/:path*',
         destination: 'https://game-of-life-rho-sandy.vercel.app/:path*',
         // destination: 'http://localhost:4200/:path*',
