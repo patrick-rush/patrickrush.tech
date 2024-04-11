@@ -29,7 +29,8 @@ const nextConfig = {
       },
       {
         source: '/not-found',
-        destination: '/not-found',
+        destination: 'https://patrickrush.tech/not-found',
+        // destination: 'http://localhost:3000/not-found',
       },
       {
         source: '/:path*',
