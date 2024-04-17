@@ -1,0 +1,123 @@
+import { ArticleLayout } from '@/components/ArticleLayout'
+import Link from 'next/link'
+
+export const article = {
+  author: 'Patrick Rush',
+  date: '2024-04-17',
+  title: 'Errors and Insights',
+  description:
+    'Reflecting On Lessons Learned In An Interview',
+}
+
+export const metadata = {
+  title: article.title,
+  description: article.description,
+}
+
+export default (props) => <ArticleLayout article={article} {...props} />
+
+In my experience, a good interviewer will be able to ask you questions that expose the limits of your ability as a programmer. Not in a mean or malicious way, but in a way that helps them learn about you, your strengths, and your weaknesses. For that reason, I often leave interviews with a few things that I know I could stand to learn more about or brush up on. Although it never feels good to *not* be able to answer a question in an interview, I see it as an enormous gift to be able to walk away with more knowledge of myself and my own weaknesses. 
+
+In a recent interview, one question that came up was in regards to the following code snippet (somewhat abbreviated):
+
+```ts
+private async fetchData(queryString: string): Promise<unkonwn> {
+    return fetch(API_URL..., {
+        method: 'GET',
+        ...
+    })
+    .then((response) => response.json())
+    .then((json) => {
+        this.nodeTree = this.buildNodeTree(json);
+    });
+}
+```
+
+There are a couple of issues with this bit of code, as I&apos;m sure many people will notice right off the bat, and in the interview, I was asked how I might go about refactoring it. Unfortunately, I panicked a bit, and though I correctly identified that there was a weird blend of asynchronous syntax at play, I was not able to supply an answer that I was pleased with. But whenever that happens, I like to spend some time reflecting. Doing so gives me an opportunity to identify what went wrong, what it can tell me about myself, and how I might be able to improve.
+
+Here are the main issues I see with this function:
+
+1. A mix of asynchronous styles
+	-  The function itself is defined as an `async` function, however at no point in the function do we `await` anything. Instead, we call on the asynchronous `fetch` and chain `.then()` statements to the end to handle the response. Fortunately, part of this issue wasn&apos;t present in my original technical test submission, but somehow I snuck it in while I was reviewing the code for the interview 🤦‍♂️ Note to self... don&apos;t do that! 
+2. Insufficient error handling
+	- Whether we go with the more modern `async/await` syntax or chained `.then()` statements, what happens here when there is an error? Using a `try/catch` block, or chaining on a `.catch()` would help handle errors more appropriately.
+3. The return type of the function
+	- In TypeScript, when defining an `async` function, the implicit return of that function will be a `Promise`. In this case, the return is explicitly defined as `Promise<unknown>`, a type that is compatible with the actual return of the function, `Promise<void>`. Though `Promise<unknown>` may be a good way to type a function that is returning a promise from an external API (to permit further narrowing and type-guards down the road), in this case, the function isn&apos;t actually returning anything useful at all, so the type is a little misleading.
+
+### Possible Improvements:
+
+To address the mix of code styles here, we would want to pick one or the other and stick with it, at least within the scope of this use case. Using `async/await` syntax is designed to make asynchronous code more readable and declarative in nature, however, it can be overkill in simple scenarios like this one. Additionally, using `async/await` with a `fetch` request, which is naturally asynchronous is considered by some to be an anti-pattern. Here is what this flow might look like if we did away with `async/await` entirely. We will:
+
+1. Remove `async` from the function declaration and modify the return type of the function
+2. Handle errors with a `.catch()`
+
+```ts
+private fetchData(queryString: string): void {
+    fetch(API_URL..., {
+        method: 'GET',
+        ...
+    })
+    .then((response) => response.json())
+    .then((json) => this.nodeTree = this.buildNodeTree(json))
+    .catch((err) => /* handle error*/)
+}
+```
+
+Perhaps the pattern in your codebase has firmly established the use of `async/await` as the desired approach. If we did want to go the `async/await` route, I would make some further adjustments:
+
+1. Make sure to await the responses from `fetch` and `.json()`
+2. Store the awaited fetch in a variable and return the parsed json
+3. Split out the `buildNodeTree` step in order to separate our concerns a bit (because of how this is getting consumed elsewhere)
+4. Handle errors where appropriate
+5. More narrowly define the return type now that we know exactly how this is expected to look
+
+```ts
+private async processRequest(queryString: string): Promise<void> {
+    try {
+        const treeData = await this.fetchData(queryString)
+        this.nodeTree = this.buildNodeTree(treeData)
+    } catch (err) {
+        // handle any errors that were thrown
+    }
+}
+
+private async fetchData(queryString: string): Promise<ResponseNode[]> {
+    try {
+        const response = await fetch(API_URL..., {
+            method: 'GET',
+            ...
+        })
+        
+        // handle http response errors
+        if (!response.ok) {
+            throw new Error('Network response failed');
+        }
+        
+        return await response.json()
+    } catch (err) {
+        /*
+        log error and rethrow
+        handles http response errors and other errors that may occur
+        (network errors, parsing errors, etc.)
+        */
+        throw err
+    }
+}
+```
+
+### What Else Might Help?
+
+There are a couple of things that might have helped me avoid this situation in the first place, or may have helped me when I was asked how I could improve it.
+
+1. The `es-lint` rule <Link target="_blank" href="https://eslint.org/docs/latest/rules/require-await">require-await</Link>
+    - Although I was awaiting my response in my code originally, when I made the fateful refactor that removed the `await`, I might have noticed had I had this lovely `es-lint` rule enabled. Just like the docs say, "Asynchronous functions that don&apos;t use await might not need to be asynchronous functions and could be the unintentional result of refactoring." My issue exactly. 
+2. Knowing your anti-patterns
+    - As I mentioned before, using `async/await` with `fetch` is considered by some to be an anti-pattern. Knowing that would have given me the opportunity to *a.* avoid committing such a crime, and *b.* allow me to speak intelligently about what was going on in my code. Additionally, being able to identify that a mix of the two was certainly not a good idea would have been helpful. 
+3. Keeping the implicit return type of `async` functions top of mind
+    - In JavaScript, `async` functions implicitly return a `Promise`, whether you explicitly return anything or not. This, of course, is the case in TypeScript as well. Knowing this can help you identify that the code may not be performing quite like you expect it to be, despite the lack of TypeScript errors.
+
+### Final Thoughts
+
+Thankfully, having things like this come up in an interview is an amazing opportunity to learn about yourself, your blind spots, and how you can improve as a developer. Taking the opportunity to reflect on what you might have done differently, and how you could improve your ability to respond next time will help you grow. Asynchronous code is notoriously rife with opportunities for confusion, and can be a hotspot for less than optimal code, both from a style perspective, and a performance perspective. Overall, I&apos;m thankful for this opportunity to re-up my understanding of best-practices and anti-patterns related to asynchronous code.
+
+Have other tips for thinking about asynchronous code execution in JavaScript/TypeScript? Spotted yet another issue with my code? Got resources you&apos;d like to share on the topic? Reach out to me and let me know! Thanks for reading! 
