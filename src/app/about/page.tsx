@@ -74,16 +74,34 @@ export default function About() {
           </h1>
           <div className="mt-6 space-y-7 text-base text-zinc-600 dark:text-zinc-400">
             <p>
-              As a full-stack software engineer, I draw inspiration from a diverse background that includes classical music and the coffee industry. 
+              As a full-stack software engineer, I draw inspiration from a
+              diverse background that includes classical music and the coffee
+              industry.
             </p>
             <p>
-              Transitioning to tech in 2020 allowed me to blend creativity, intelligence, and a love for learning into my professional journey. My approach to coding mirrors my musical roots - I aim for beauty in every line, crafting code that is not only effective but also a joy to behold - hopefully leaving things more beautiful than I found them wherever I go. 
+              Transitioning to tech in 2020 allowed me to blend creativity,
+              intelligence, and a love for learning into my professional
+              journey. My approach to coding mirrors my musical roots - I aim
+              for beauty in every line, crafting code that is not only effective
+              but also a joy to behold - hopefully leaving things more beautiful
+              than I found them wherever I go.
             </p>
             <p>
-              Constantly evolving, I bring the mindset of a lifelong student to each project. My ability to rapidly grasp new patterns and my dedication to continuous practice have propelled me to a mid-level engineering position within my first few years in the industry.
+              Constantly evolving, I bring the mindset of a lifelong student to
+              each project. My ability to rapidly grasp new patterns and my
+              dedication to continuous practice have propelled me to a mid-level
+              engineering position within my first few years in the industry.
             </p>
             <p>
-              In addition to my technical skill, I&apos;m a musician, a pilot, a knitter, a yogi, and a cyclist. These diverse interests shape my character, influencing my work with qualities like integrity, kindness, drive, and a meticulous attention to detail. Whether navigating the skies or weaving intricate patterns with code, I am the same person – passionate, professional, and fascinated by the world around me. Join me on this journey where software engineering meets artistry, and let&apos;s create something beautiful together.
+              In addition to my technical skill, I&apos;m a musician, a student
+              pilot, a knitter, a yogi, and a cyclist. These diverse interests
+              shape my character, influencing my work with qualities like
+              integrity, kindness, drive, and a meticulous attention to detail.
+              Whether navigating the skies or weaving intricate patterns with
+              code, I am the same person – passionate, professional, and
+              fascinated by the world around me. Join me on this journey where
+              software engineering meets artistry, and let&apos;s create
+              something beautiful together.
             </p>
           </div>
         </div>
@@ -92,13 +110,25 @@ export default function About() {
             <SocialLink href={`${process.env.TWITTER_URL}`} icon={TwitterIcon}>
               Follow on Twitter
             </SocialLink>
-            <SocialLink href={`${process.env.INSTAGRAM_URL}`} icon={InstagramIcon} className="mt-4">
+            <SocialLink
+              href={`${process.env.INSTAGRAM_URL}`}
+              icon={InstagramIcon}
+              className="mt-4"
+            >
               Follow on Instagram
             </SocialLink>
-            <SocialLink href={`${process.env.GITHUB_URL}`} icon={GitHubIcon} className="mt-4">
+            <SocialLink
+              href={`${process.env.GITHUB_URL}`}
+              icon={GitHubIcon}
+              className="mt-4"
+            >
               Follow on GitHub
             </SocialLink>
-            <SocialLink href={`${process.env.LINKEDIN_URL}`} icon={LinkedInIcon} className="mt-4">
+            <SocialLink
+              href={`${process.env.LINKEDIN_URL}`}
+              icon={LinkedInIcon}
+              className="mt-4"
+            >
               Follow on LinkedIn
             </SocialLink>
             <SocialLink
