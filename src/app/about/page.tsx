@@ -93,6 +93,13 @@ export default function About() {
               engineering position within my first few years in the industry.
             </p>
             <p>
+              My work in software engineering has largely revolved around
+              fintech, business automation, and now the space industry.
+              Currently, I am a Software Engineer at Rocket Lab in Auckland, New
+              Zealand, where I contribute to the forefront of space technology
+              and innovation.
+            </p>
+            <p>
               In addition to my technical skill, I&apos;m a musician, a student
               pilot, a knitter, a yogi, and a cyclist. These diverse interests
               shape my character, influencing my work with qualities like
