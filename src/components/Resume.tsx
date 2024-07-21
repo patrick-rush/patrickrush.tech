@@ -152,6 +152,16 @@ function Skill({ skill }: { skill: Skill }) {
 function Work() {
   let workHistory: Array<Role> = [
     {
+      company: 'Rocket Lab',
+      title: 'Software Engineer I',
+      // logo: logoPlanetaria,
+      start: '2024',
+      end: {
+        label: 'Present',
+        dateTime: new Date().getFullYear().toString(),
+      },
+    },
+    {
       company: 'Uplynx',
       title: 'Principle Engineer/Co-Founder',
       // logo: logoPlanetaria,
@@ -202,12 +212,6 @@ function Skills() {
       end: new Date().getFullYear().toString(),
     },
     {
-      name: 'C#/.NET',
-      level: 'Beginner',
-      start: '2023',
-      end: new Date().getFullYear().toString(),
-    },
-    {
       name: 'AWS/Serverless',
       level: 'Advanced',
       start: '2021',
@@ -217,6 +221,12 @@ function Skills() {
       name: 'React',
       level: 'Advanced',
       start: '2020',
+      end: new Date().getFullYear().toString(),
+    },
+    {
+      name: 'Angular',
+      level: 'Beginner',
+      start: '2024',
       end: new Date().getFullYear().toString(),
     },
     {
@@ -235,6 +245,12 @@ function Skills() {
       name: 'HTML/CSS',
       level: 'Intermediate',
       start: '2020',
+      end: new Date().getFullYear().toString(),
+    },
+    {
+      name: 'C#/.NET',
+      level: 'Beginner',
+      start: '2023',
       end: new Date().getFullYear().toString(),
     },
   ]
