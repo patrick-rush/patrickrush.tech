@@ -7,6 +7,8 @@ import gameOfLifeLogo from '@/images/logos/game-of-life-logo.png'
 import heartLogo from '@/images/logos/heart-logo.png'
 import spadeLogo from '@/images/logos/spade-logo.png'
 import prLogo from '@/images/logos/pr-logo.png'
+import nz from '@/images/logos/new-zealand.png'
+
 import clsx from 'clsx'
 interface Project {
   name: string
@@ -56,6 +58,17 @@ const projects: Project[] = [
     logo: spadeLogo,
     logoShape: 'square',
   },
+  {
+    name: 'New Zealand Ferns (Photography Project)',
+    description:
+      'A collection of photos and information about the native ferns of New Zealand. Website built using sambecker/exif-photo-blog Next.js template.',
+    link: {
+      href: 'https://newzealandferns.com',
+      label: 'newzealandferns.com',
+    },
+    logo: nz,
+    logoShape: 'square',
+  },
 ]
 
 function LinkIcon(props: React.ComponentPropsWithoutRef<'svg'>) {
@@ -91,7 +104,7 @@ export default function Projects() {
                 'relative z-10 flex h-12 w-12 items-center justify-center rounded-full bg-white shadow-md shadow-zinc-800/5 ring-1 ring-zinc-900/5 dark:border dark:border-zinc-700/50 dark:bg-zinc-800 dark:ring-0',
                 project.logoShape === 'square'
                   ? 'rounded-md'
-                  : 'circle'
+                  : project.logoShape === 'circle'
                   ? 'rounded-full'
                   : 'rounded-full', // to allow for future shapes
               )}
