@@ -104,11 +104,11 @@ export default async function Home() {
         </div>
       </Container>
       {/* <Photos /> */}
-      <Container className="mt-24 md:mt-20">
+      {/* <Container className="mt-24 md:mt-20">
         <CommitGrid />
-      </Container>
-      <Container className="mt-24 md:mt-20">
-        <div className="mx-auto grid max-w-xl grid-cols-1 gap-y-20 lg:max-w-none lg:grid-cols-2">
+      </Container> */}
+      {/* <Container className="mt-24 md:mt-20">
+        <div className="mx-auto grid max-w-xl grid-cols-2 gap-y-20 lg:max-w-none lg:grid-cols-2">
           <div className="flex flex-col gap-16">
             {articles.map((article) => (
               <Article key={article.slug} article={article} />
@@ -120,7 +120,7 @@ export default async function Home() {
             </div>
           </div>
         </div>
-      </Container>
+      </Container> */}
     </>
   )
 }
