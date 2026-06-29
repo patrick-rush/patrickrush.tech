@@ -153,7 +153,7 @@ function Work() {
   let workHistory: Array<Role> = [
     {
       company: 'Rocket Lab',
-      title: 'Software Engineer I',
+      title: 'Software Engineer II',
       // logo: logoPlanetaria,
       start: '2024',
       end: {
@@ -166,10 +166,7 @@ function Work() {
       title: 'Principle Engineer/Co-Founder',
       // logo: logoPlanetaria,
       start: '2022',
-      end: {
-        label: 'Present',
-        dateTime: new Date().getFullYear().toString(),
-      },
+      end: '2025',
     },
     {
       company: 'Jackson Symphony',
@@ -225,7 +222,7 @@ function Skills() {
     },
     {
       name: 'Angular',
-      level: 'Beginner',
+      level: 'Advanced',
       start: '2024',
       end: new Date().getFullYear().toString(),
     },
