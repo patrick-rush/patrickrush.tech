@@ -114,9 +114,9 @@ export default function About() {
         </div>
         <div className="lg:pl-20">
           <ul role="list">
-            <SocialLink href={`${process.env.TWITTER_URL}`} icon={TwitterIcon}>
-              Follow on Twitter
-            </SocialLink>
+            {/* <SocialLink href={`${process.env.TWITTER_URL}`} icon={TwitterIcon}>
+              Follow on 
+            </SocialLink> */}
             <SocialLink
               href={`${process.env.INSTAGRAM_URL}`}
               icon={InstagramIcon}

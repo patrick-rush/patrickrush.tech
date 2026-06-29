@@ -78,11 +78,11 @@ export default async function Home() {
             </div>
             {/* socials */}
             <div className="mt-6 flex gap-6">
-              <SocialLink
+              {/* <SocialLink
                 href={`${process.env.TWITTER_URL}`}
                 aria-label="Follow on Twitter"
                 icon={TwitterIcon}
-              />
+              /> */}
               <SocialLink
                 href={`${process.env.INSTAGRAM_URL}`}
                 aria-label="Follow on Instagram"
