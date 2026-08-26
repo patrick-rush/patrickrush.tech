@@ -18,6 +18,7 @@
   },
   "browserslist": "defaults, not ie <= 11",
   "dependencies": {
+    "@anthropic-ai/sdk": "^0.120.0",
     "@headlessui/react": "^1.7.13",
     "@mapbox/rehype-prism": "^0.8.0",
     "@mdx-js/loader": "^2.3.0",
@@ -36,6 +37,7 @@
     "better-auth": "1.6.25",
     "cheerio": "^1.0.0-rc.12",
     "clsx": "^1.2.1",
+    "date-fns": "^4.4.0",
     "drizzle-orm": "^0.45.2",
     "fast-glob": "^3.2.11",
     "feed": "^4.2.2",
@@ -55,7 +57,8 @@
     "react-dom": "18.2.0",
     "remark-gfm": "^3.0.1",
     "tailwindcss": "^3.3.3",
-    "typescript": "5.1.6"
+    "typescript": "5.1.6",
+    "zod": "^4.4.3"
   },
   "devDependencies": {
     "@better-auth/cli": "^1.4.22",
