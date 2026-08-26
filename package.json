@@ -9,7 +9,12 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "db:generate": "dotenv -e .env.local -- drizzle-kit generate",
+    "db:migrate": "dotenv -e .env.local -- drizzle-kit migrate",
+    "db:studio": "dotenv -e .env.local -- drizzle-kit studio",
+    "auth:schema": "dotenv -e .env.local -- npx @better-auth/cli generate --config src/lib/auth.ts --output src/db/schema/auth.ts",
+    "create-user": "dotenv -e .env.local -- tsx scripts/create-user.ts"
   },
   "browserslist": "defaults, not ie <= 11",
   "dependencies": {
@@ -17,6 +22,7 @@
     "@mapbox/rehype-prism": "^0.8.0",
     "@mdx-js/loader": "^2.3.0",
     "@mdx-js/react": "^2.3.0",
+    "@neondatabase/serverless": "^1.1.0",
     "@next/mdx": "14.2.35",
     "@tailwindcss/typography": "^0.5.4",
     "@types/node": "20.4.7",
@@ -27,8 +33,10 @@
     "@vercel/node": "^3.0.11",
     "@vercel/speed-insights": "^1.0.1",
     "autoprefixer": "^10.4.12",
+    "better-auth": "^1.7.1",
     "cheerio": "^1.0.0-rc.12",
     "clsx": "^1.2.1",
+    "drizzle-orm": "^0.45.2",
     "fast-glob": "^3.2.11",
     "feed": "^4.2.2",
     "form-data": "^4.0.0",
@@ -50,10 +58,14 @@
     "typescript": "5.1.6"
   },
   "devDependencies": {
+    "@better-auth/cli": "^1.4.22",
+    "dotenv-cli": "^11.0.0",
+    "drizzle-kit": "^0.31.10",
     "eslint": "8.45.0",
     "eslint-config-next": "14.2.35",
     "prettier": "^3.0.1",
     "prettier-plugin-tailwindcss": "^0.5.2",
-    "sharp": "^0.32.0"
+    "sharp": "^0.32.0",
+    "tsx": "^4.23.12"
   }
 }
