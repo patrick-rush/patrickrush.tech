@@ -17,7 +17,7 @@
     "@mapbox/rehype-prism": "^0.8.0",
     "@mdx-js/loader": "^2.3.0",
     "@mdx-js/react": "^2.3.0",
-    "@next/mdx": "13.4.16",
+    "@next/mdx": "14.2.35",
     "@tailwindcss/typography": "^0.5.4",
     "@types/node": "20.4.7",
     "@types/react": "18.2.18",
@@ -36,7 +36,7 @@
     "i": "^0.3.7",
     "js-confetti": "^0.12.0",
     "mailgun.js": "^9.3.0",
-    "next": "13.4.16",
+    "next": "14.2.35",
     "next-themes": "^0.2.1",
     "npm": "^10.2.5",
     "octokit": "^3.1.2",
@@ -51,7 +51,7 @@
   },
   "devDependencies": {
     "eslint": "8.45.0",
-    "eslint-config-next": "13.4.16",
+    "eslint-config-next": "14.2.35",
     "prettier": "^3.0.1",
     "prettier-plugin-tailwindcss": "^0.5.2",
     "sharp": "^0.32.0"
