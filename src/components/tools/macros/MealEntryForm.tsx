@@ -20,7 +20,7 @@ const emptyFields: MacroFieldsValue = {
   loggedAt: nowForInput(),
 }
 
-export function MealEntryForm() {
+export function MealEntryForm({ onSaved }: { onSaved?: () => void }) {
   const router = useRouter()
   const [phase, setPhase] = useState<'input' | 'review'>('input')
   const [rawInput, setRawInput] = useState('')
@@ -69,6 +69,7 @@ export function MealEntryForm() {
     setRawInput('')
     setFields(emptyFields)
     router.refresh()
+    onSaved?.()
   }
 
   function onStartOver() {

@@ -3,6 +3,7 @@
 import Anthropic from '@anthropic-ai/sdk'
 import { zodOutputFormat } from '@anthropic-ai/sdk/helpers/zod'
 import { revalidatePath } from 'next/cache'
+import { and, desc, eq, gte, lte } from 'drizzle-orm'
 import { anthropic } from '@/lib/anthropic-client'
 import { requireUserId } from '@/lib/auth-server'
 import { db } from '@/db/client'
@@ -74,4 +75,63 @@ export async function saveMeal(input: SaveMealInput): Promise<void> {
   })
 
   revalidatePath('/tools/macros')
+}
+
+export type MealRow = {
+  id: string
+  name: string
+  calories: number
+  proteinG: number
+  carbsG: number
+  fatG: number
+  loggedAt: string
+}
+
+function toMealRow(row: typeof meals.$inferSelect): MealRow {
+  return {
+    id: row.id,
+    name: row.name,
+    calories: row.calories,
+    proteinG: row.proteinG,
+    carbsG: row.carbsG,
+    fatG: row.fatG,
+    loggedAt: row.loggedAt.toISOString(),
+  }
+}
+
+// Generic range query — the caller supplies the boundaries, since "today"
+// and "the last 14 days" only mean something relative to the browser's
+// local timezone, not the server's (Vercel functions run in UTC).
+export async function getMealsInRange(
+  startISO: string,
+  endISO: string,
+): Promise<MealRow[]> {
+  const userId = await requireUserId()
+
+  const rows = await db
+    .select()
+    .from(meals)
+    .where(
+      and(
+        eq(meals.userId, userId),
+        gte(meals.loggedAt, new Date(startISO)),
+        lte(meals.loggedAt, new Date(endISO)),
+      ),
+    )
+    .orderBy(meals.loggedAt)
+
+  return rows.map(toMealRow)
+}
+
+export async function getRecentMeals(limit: number): Promise<MealRow[]> {
+  const userId = await requireUserId()
+
+  const rows = await db
+    .select()
+    .from(meals)
+    .where(eq(meals.userId, userId))
+    .orderBy(desc(meals.loggedAt))
+    .limit(limit)
+
+  return rows.map(toMealRow)
 }
