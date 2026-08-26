@@ -33,7 +33,7 @@
     "@vercel/node": "^3.0.11",
     "@vercel/speed-insights": "^1.0.1",
     "autoprefixer": "^10.4.12",
-    "better-auth": "^1.7.1",
+    "better-auth": "1.6.25",
     "cheerio": "^1.0.0-rc.12",
     "clsx": "^1.2.1",
     "drizzle-orm": "^0.45.2",
