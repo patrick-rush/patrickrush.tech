@@ -34,10 +34,15 @@ export function MealEntryForm({ onSaved }: { onSaved?: () => void }) {
     setEstimating(true)
     setError(null)
 
-    const result = await estimateMealMacros(rawInput)
+    let result: Awaited<ReturnType<typeof estimateMealMacros>> | undefined
+    try {
+      result = await estimateMealMacros(rawInput)
+    } catch {
+      result = undefined
+    }
 
     setEstimating(false)
-    if (result.ok) {
+    if (result?.ok) {
       setFields({
         name: result.estimate.name,
         calories: result.estimate.calories,
@@ -47,7 +52,10 @@ export function MealEntryForm({ onSaved }: { onSaved?: () => void }) {
         loggedAt: nowForInput(),
       })
     } else {
-      setError(result.error)
+      setError(
+        result?.error ??
+          'Something went wrong reaching the server — try refreshing the page.',
+      )
       setFields({ ...emptyFields, loggedAt: nowForInput() })
     }
     setPhase('review')
@@ -55,21 +63,26 @@ export function MealEntryForm({ onSaved }: { onSaved?: () => void }) {
 
   async function onSave() {
     setSaving(true)
-    await saveMeal({
-      rawInput,
-      name: fields.name,
-      calories: fields.calories,
-      proteinG: fields.proteinG,
-      carbsG: fields.carbsG,
-      fatG: fields.fatG,
-      loggedAt: fields.loggedAt,
-    })
-    setSaving(false)
-    setPhase('input')
-    setRawInput('')
-    setFields(emptyFields)
-    router.refresh()
-    onSaved?.()
+    try {
+      await saveMeal({
+        rawInput,
+        name: fields.name,
+        calories: fields.calories,
+        proteinG: fields.proteinG,
+        carbsG: fields.carbsG,
+        fatG: fields.fatG,
+        loggedAt: fields.loggedAt,
+      })
+      setPhase('input')
+      setRawInput('')
+      setFields(emptyFields)
+      router.refresh()
+      onSaved?.()
+    } catch {
+      setError('Could not save — try refreshing the page and re-entering the meal.')
+    } finally {
+      setSaving(false)
+    }
   }
 
   function onStartOver() {

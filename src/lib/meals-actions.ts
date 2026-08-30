@@ -17,9 +17,9 @@ type EstimateResult =
 export async function estimateMealMacros(
   rawInput: string,
 ): Promise<EstimateResult> {
-  await requireUserId()
-
   try {
+    await requireUserId()
+
     const response = await anthropic.messages.parse({
       model: 'claude-sonnet-5',
       max_tokens: 1024,
@@ -45,6 +45,9 @@ export async function estimateMealMacros(
     }
     if (err instanceof Anthropic.APIError) {
       return { ok: false, error: 'Estimation failed — enter values manually.' }
+    }
+    if (err instanceof Error && err.message === 'Not authenticated') {
+      return { ok: false, error: 'Your session expired — refresh the page and sign in again.' }
     }
     return { ok: false, error: 'Unexpected error — enter values manually.' }
   }
