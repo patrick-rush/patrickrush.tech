@@ -35,7 +35,11 @@ export async function estimateMealMacros(
     await requireUserId()
 
     const response = await anthropic.messages.parse({
-      model: 'claude-sonnet-5',
+      // Vercel Hobby caps serverless functions at 10s with no way to raise
+      // it. claude-sonnet-5 measured 2.5-8.8s for this call alone (before
+      // cold-start/network overhead) and was occasionally tipping over into
+      // a 504. haiku-4-5 measured consistently under 2.5s.
+      model: 'claude-haiku-4-5',
       max_tokens: 1024,
       system: SYSTEM_PROMPT,
       messages: [{ role: 'user', content: rawInput }],
