@@ -4,6 +4,11 @@ import Link from 'next/link'
 import { auth } from '@/lib/auth'
 import { Container } from '@/components/Container'
 
+// Vercel Hobby's hard ceiling for serverless function duration (applies to
+// this whole route segment, including Server Actions invoked from it, like
+// the AI macro estimate call) — raise this if the project ever moves to Pro.
+export const maxDuration = 10
+
 // Real session check (defense-in-depth behind middleware's cheap cookie
 // check, which only gates whether this layout renders at all).
 export default async function ToolsLayout({
