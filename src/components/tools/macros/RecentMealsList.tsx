@@ -27,7 +27,7 @@ export function RecentMealsList({ meals }: { meals: MealRow[] }) {
               {meal.calories.toLocaleString()} cal
             </p>
             <p className="text-xs text-zinc-500 dark:text-zinc-400">
-              {Math.round(meal.proteinG)}p · {Math.round(meal.carbsG)}c ·{' '}
+              {Math.round(meal.proteinG)}p · {meal.netCarbsG.toFixed(1)}c ·{' '}
               {Math.round(meal.fatG)}f
             </p>
           </div>

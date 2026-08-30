@@ -12,7 +12,11 @@ export const meals = pgTable(
     name: text('name').notNull(),
     calories: integer('calories').notNull(),
     proteinG: real('protein_g').notNull(),
-    carbsG: real('carbs_g').notNull(),
+    // JS-side name reflects what's actually stored: net carbs (total minus
+    // fiber), computed at estimation time — see resolveMacros() in
+    // src/lib/meals-schema.ts. Same underlying `carbs_g` column, so no
+    // migration is needed for this rename.
+    netCarbsG: real('carbs_g').notNull(),
     fatG: real('fat_g').notNull(),
     loggedAt: timestamp('logged_at', { withTimezone: true })
       .defaultNow()

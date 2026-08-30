@@ -6,7 +6,7 @@ import { getMealsInRange, type MealRow } from '@/lib/meals-actions'
 import { TodayTotals, type TodayTotalsValue } from './TodayTotals'
 
 function emptyTotals(): TodayTotalsValue {
-  return { calories: 0, proteinG: 0, carbsG: 0, fatG: 0 }
+  return { calories: 0, proteinG: 0, netCarbsG: 0, fatG: 0 }
 }
 
 // "Today" only means something relative to the browser's local clock
@@ -28,7 +28,7 @@ export function MacrosOverview({ refreshKey }: { refreshKey: number }) {
           (acc, r) => ({
             calories: acc.calories + r.calories,
             proteinG: acc.proteinG + r.proteinG,
-            carbsG: acc.carbsG + r.carbsG,
+            netCarbsG: acc.netCarbsG + r.netCarbsG,
             fatG: acc.fatG + r.fatG,
           }),
           emptyTotals(),

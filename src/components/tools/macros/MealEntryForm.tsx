@@ -15,7 +15,7 @@ const emptyFields: MacroFieldsValue = {
   name: '',
   calories: 0,
   proteinG: 0,
-  carbsG: 0,
+  netCarbsG: 0,
   fatG: 0,
   loggedAt: nowForInput(),
 }
@@ -46,9 +46,9 @@ export function MealEntryForm({ onSaved }: { onSaved?: () => void }) {
       setFields({
         name: result.estimate.name,
         calories: result.estimate.calories,
-        proteinG: result.estimate.protein_g,
-        carbsG: result.estimate.carbs_g,
-        fatG: result.estimate.fat_g,
+        proteinG: result.estimate.proteinG,
+        netCarbsG: result.estimate.netCarbsG,
+        fatG: result.estimate.fatG,
         loggedAt: nowForInput(),
       })
     } else {
@@ -69,7 +69,7 @@ export function MealEntryForm({ onSaved }: { onSaved?: () => void }) {
         name: fields.name,
         calories: fields.calories,
         proteinG: fields.proteinG,
-        carbsG: fields.carbsG,
+        netCarbsG: fields.netCarbsG,
         fatG: fields.fatG,
         // fields.loggedAt is a timezone-naive "datetime-local" string —
         // resolve it to an absolute instant here, in the browser, where the
