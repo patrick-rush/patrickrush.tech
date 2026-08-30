@@ -6,33 +6,36 @@ import remarkGfm from 'remark-gfm'
 const nextConfig = {
   pageExtensions: ['js', 'jsx', 'ts', 'tsx', 'mdx'],
   async rewrites() {
-    return [
-      {
-        source: '/game-of-life',
-        destination: 'https://game-of-life-rho-sandy.vercel.app',
-        // destination: 'http://localhost:4200',
-      },
-      {
-        source: '/game-of-life/:path*',
-        destination: 'https://game-of-life-rho-sandy.vercel.app/:path*',
-        // destination: 'http://localhost:4200/:path*',
-      },
-      {
-        source: '/automata',
-        destination: 'https://game-of-life-rho-sandy.vercel.app',
-        // destination: 'http://localhost:4200',
-      },
-      {
-        source: '/automata/:path*',
-        destination: 'https://game-of-life-rho-sandy.vercel.app/:path*',
-        // destination: 'http://localhost:4200/:path*',
-      },
-      {
-        source: '/:path*',
-        destination: 'https://game-of-life-rho-sandy.vercel.app/:path*',
-        // destination: 'http://localhost:4200/:path*',
-      },
-    ]
+    return {
+      beforeFiles: [
+        {
+          source: '/game-of-life',
+          destination: 'https://game-of-life-rho-sandy.vercel.app',
+        },
+        {
+          source: '/game-of-life/:path*',
+          destination: 'https://game-of-life-rho-sandy.vercel.app/:path*',
+        },
+        {
+          source: '/automata',
+          destination: 'https://game-of-life-rho-sandy.vercel.app',
+        },
+        {
+          source: '/automata/:path*',
+          destination: 'https://game-of-life-rho-sandy.vercel.app/:path*',
+        },
+      ],
+      // Catch-all only applies when nothing else — no page, no API/App
+      // Router route handler — matches. A plain array here previously
+      // intercepted requests to app/api/auth/[...all], silently breaking
+      // sign-in.
+      fallback: [
+        {
+          source: '/:path*',
+          destination: 'https://game-of-life-rho-sandy.vercel.app/:path*',
+        },
+      ],
+    }
   },
 }
 
