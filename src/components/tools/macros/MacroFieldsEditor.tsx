@@ -4,7 +4,7 @@ export type MacroFieldsValue = {
   name: string
   calories: number
   proteinG: number
-  carbsG: number
+  netCarbsG: number
   fatG: number
   loggedAt: string
 }
@@ -65,12 +65,13 @@ export function MacroFieldsEditor({
         />
       </div>
       <div>
-        <label className={labelClassName}>Carbs (g)</label>
+        <label className={labelClassName}>Net carbs (g)</label>
         <input
           type="number"
+          step="0.5"
           className={`${inputClassName} mt-1 w-full`}
-          value={value.carbsG}
-          onChange={(e) => set('carbsG', Number(e.target.value))}
+          value={value.netCarbsG}
+          onChange={(e) => set('netCarbsG', Number(e.target.value))}
         />
       </div>
       <div>

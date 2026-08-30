@@ -1,14 +1,14 @@
 const tiles = [
-  { key: 'calories', label: 'Calories', suffix: '' },
-  { key: 'proteinG', label: 'Protein', suffix: 'g' },
-  { key: 'carbsG', label: 'Carbs', suffix: 'g' },
-  { key: 'fatG', label: 'Fat', suffix: 'g' },
+  { key: 'calories', label: 'Calories', suffix: '', decimals: 0 },
+  { key: 'proteinG', label: 'Protein', suffix: 'g', decimals: 0 },
+  { key: 'netCarbsG', label: 'Net carbs', suffix: 'g', decimals: 1 },
+  { key: 'fatG', label: 'Fat', suffix: 'g', decimals: 0 },
 ] as const
 
 export type TodayTotalsValue = {
   calories: number
   proteinG: number
-  carbsG: number
+  netCarbsG: number
   fatG: number
 }
 
@@ -24,7 +24,10 @@ export function TodayTotals({ totals }: { totals: TodayTotalsValue }) {
             {tile.label}
           </p>
           <p className="mt-1 text-2xl font-semibold text-zinc-900 dark:text-zinc-100">
-            {Math.round(totals[tile.key]).toLocaleString()}
+            {totals[tile.key].toLocaleString(undefined, {
+              minimumFractionDigits: tile.decimals,
+              maximumFractionDigits: tile.decimals,
+            })}
             {tile.suffix}
           </p>
         </div>

@@ -8,11 +8,25 @@ import { anthropic } from '@/lib/anthropic-client'
 import { requireUserId } from '@/lib/auth-server'
 import { db } from '@/db/client'
 import { meals } from '@/db/schema'
-import { MacroEstimateSchema, type MacroEstimate } from '@/lib/meals-schema'
+import { MacroEstimateSchema, resolveMacros, type ResolvedMacros } from '@/lib/meals-schema'
 
 type EstimateResult =
-  | { ok: true; estimate: MacroEstimate }
+  | { ok: true; estimate: ResolvedMacros }
   | { ok: false; error: string }
+
+const SYSTEM_PROMPT =
+  'You are a precise nutrition estimation assistant helping someone track macros ' +
+  'while following a strict ketogenic diet, where staying under a small daily ' +
+  'net-carb budget (typically 15-30g) is essential. Accuracy on carbohydrates ' +
+  'matters far more than on any other macro: do not pad your carb estimate with ' +
+  "a safety margin, and do not round up \"just in case\" — but also do not omit " +
+  'carbs that are genuinely present in an ingredient (vegetables, dairy, sauces, ' +
+  'coatings). Base your estimate strictly on the ingredients actually described, ' +
+  'using standard nutrition data for those specific foods and typical ' +
+  'preparation/portion sizes only when a detail is left unspecified. Reason ' +
+  'ingredient-by-ingredient internally before totaling. Report total ' +
+  'carbohydrates and dietary fiber as separate fields so net carbs can be ' +
+  'computed precisely elsewhere — do not subtract fiber yourself.'
 
 export async function estimateMealMacros(
   rawInput: string,
@@ -23,11 +37,7 @@ export async function estimateMealMacros(
     const response = await anthropic.messages.parse({
       model: 'claude-sonnet-5',
       max_tokens: 1024,
-      system:
-        'You are a nutrition estimation assistant. Given a free-text meal ' +
-        'description, estimate calories and macronutrients using standard ' +
-        'nutrition data and typical portion sizes when unspecified. Round ' +
-        'calories to the nearest 10, macros to the nearest 1g.',
+      system: SYSTEM_PROMPT,
       messages: [{ role: 'user', content: rawInput }],
       output_config: { format: zodOutputFormat(MacroEstimateSchema) },
     })
@@ -38,7 +48,7 @@ export async function estimateMealMacros(
         error: 'Could not parse a macro estimate — try rephrasing or enter values manually.',
       }
     }
-    return { ok: true, estimate: response.parsed_output }
+    return { ok: true, estimate: resolveMacros(response.parsed_output) }
   } catch (err) {
     if (err instanceof Anthropic.RateLimitError) {
       return { ok: false, error: 'Rate limited — try again shortly.' }
@@ -58,7 +68,7 @@ export type SaveMealInput = {
   name: string
   calories: number
   proteinG: number
-  carbsG: number
+  netCarbsG: number
   fatG: number
   loggedAt: string
 }
@@ -72,7 +82,7 @@ export async function saveMeal(input: SaveMealInput): Promise<void> {
     name: input.name,
     calories: input.calories,
     proteinG: input.proteinG,
-    carbsG: input.carbsG,
+    netCarbsG: input.netCarbsG,
     fatG: input.fatG,
     loggedAt: new Date(input.loggedAt),
   })
@@ -85,7 +95,7 @@ export type MealRow = {
   name: string
   calories: number
   proteinG: number
-  carbsG: number
+  netCarbsG: number
   fatG: number
   loggedAt: string
 }
@@ -96,7 +106,7 @@ function toMealRow(row: typeof meals.$inferSelect): MealRow {
     name: row.name,
     calories: row.calories,
     proteinG: row.proteinG,
-    carbsG: row.carbsG,
+    netCarbsG: row.netCarbsG,
     fatG: row.fatG,
     loggedAt: row.loggedAt.toISOString(),
   }

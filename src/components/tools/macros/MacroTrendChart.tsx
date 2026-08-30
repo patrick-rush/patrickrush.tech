@@ -15,7 +15,7 @@ import type { LabelProps } from 'recharts'
 import { eachDayOfInterval, format, parseISO, startOfDay, subDays } from 'date-fns'
 import { getMealsInRange, type MealRow } from '@/lib/meals-actions'
 
-type SeriesKey = 'calories' | 'proteinG' | 'carbsG' | 'fatG'
+type SeriesKey = 'calories' | 'proteinG' | 'netCarbsG' | 'fatG'
 type Range = 'today' | 'week' | 'month'
 
 // t: epoch ms — always plotted on a real numeric time axis, so gaps between
@@ -25,7 +25,7 @@ type Point = {
   t: number
   calories: number
   proteinG: number
-  carbsG: number
+  netCarbsG: number
   fatG: number
 }
 
@@ -35,7 +35,7 @@ type Point = {
 const SERIES: { key: SeriesKey; label: string; color: { light: string; dark: string } }[] = [
   { key: 'calories', label: 'Calories', color: { light: '#2a78d6', dark: '#3987e5' } },
   { key: 'proteinG', label: 'Protein', color: { light: '#eb6834', dark: '#d95926' } },
-  { key: 'carbsG', label: 'Carbs', color: { light: '#1baf7a', dark: '#199e70' } },
+  { key: 'netCarbsG', label: 'Net carbs', color: { light: '#1baf7a', dark: '#199e70' } },
   { key: 'fatG', label: 'Fat', color: { light: '#eda100', dark: '#c98500' } },
 ]
 
@@ -47,6 +47,14 @@ const RANGES: { key: Range; label: string }[] = [
 
 const GRID_COLOR = { light: '#e1e0d9', dark: '#2c2c2a' }
 const AXIS_COLOR = '#898781'
+
+// Net carbs are tracked to 0.5g precision (matters at keto's low daily
+// budget); everything else displays as a whole number.
+function formatValue(key: SeriesKey, value: number): string {
+  return key === 'netCarbsG'
+    ? value.toLocaleString(undefined, { minimumFractionDigits: 1, maximumFractionDigits: 1 })
+    : Math.round(value).toLocaleString()
+}
 
 function fetchWindow(range: Range) {
   const now = new Date()
@@ -73,13 +81,13 @@ function cumulativeToday(rows: MealRow[]): Point[] {
     (a, b) => parseISO(a.loggedAt).getTime() - parseISO(b.loggedAt).getTime(),
   )
 
-  const points: Point[] = [{ t: start.getTime(), calories: 0, proteinG: 0, carbsG: 0, fatG: 0 }]
-  let running = { calories: 0, proteinG: 0, carbsG: 0, fatG: 0 }
+  const points: Point[] = [{ t: start.getTime(), calories: 0, proteinG: 0, netCarbsG: 0, fatG: 0 }]
+  let running = { calories: 0, proteinG: 0, netCarbsG: 0, fatG: 0 }
   for (const r of sorted) {
     running = {
       calories: running.calories + r.calories,
       proteinG: running.proteinG + r.proteinG,
-      carbsG: running.carbsG + r.carbsG,
+      netCarbsG: running.netCarbsG + r.netCarbsG,
       fatG: running.fatG + r.fatG,
     }
     points.push({ t: parseISO(r.loggedAt).getTime(), ...running })
@@ -108,10 +116,10 @@ function dailyTotals(rows: MealRow[], range: Range): Point[] {
         t: acc.t,
         calories: acc.calories + r.calories,
         proteinG: acc.proteinG + r.proteinG,
-        carbsG: acc.carbsG + r.carbsG,
+        netCarbsG: acc.netCarbsG + r.netCarbsG,
         fatG: acc.fatG + r.fatG,
       }),
-      { t: day.getTime(), calories: 0, proteinG: 0, carbsG: 0, fatG: 0 },
+      { t: day.getTime(), calories: 0, proteinG: 0, netCarbsG: 0, fatG: 0 },
     )
   })
 }
@@ -143,7 +151,7 @@ function TrendTooltip({
               style={{ backgroundColor: colorFor(s.key) }}
             />
             <span className="font-semibold">
-              {Math.round(d[s.key]).toLocaleString()}
+              {formatValue(s.key, d[s.key])}
               {s.key === 'calories' ? ' cal' : 'g'}
             </span>
             <span className="text-xs text-zinc-500 dark:text-zinc-400">{s.label}</span>
@@ -157,7 +165,7 @@ function TrendTooltip({
 // Direct end-of-line value label — required relief for the two
 // default-visible series (carbs/fat) whose light-mode hues sit below 3:1
 // contrast against the chart surface (see dataviz skill's contrast check).
-function endLabel(color: string, data: Point[], suffix: string) {
+function endLabel(color: string, data: Point[], key: SeriesKey, suffix: string) {
   function EndLabel(props: LabelProps) {
     const { x, y, index, value } = props
     if (index !== data.length - 1 || typeof x !== 'number' || typeof y !== 'number') {
@@ -165,7 +173,7 @@ function endLabel(color: string, data: Point[], suffix: string) {
     }
     return (
       <text x={x + 6} y={y} dy={4} fill={color} fontSize={11} fontWeight={600}>
-        {Math.round(Number(value)).toLocaleString()}
+        {formatValue(key, Number(value))}
         {suffix}
       </text>
     )
@@ -181,7 +189,7 @@ export function MacroTrendChart({ refreshKey }: { refreshKey: number }) {
   const [visible, setVisible] = useState<Record<SeriesKey, boolean>>({
     calories: false,
     proteinG: false,
-    carbsG: true,
+    netCarbsG: true,
     fatG: true,
   })
   const [rows, setRows] = useState<MealRow[] | null>(null)
@@ -286,7 +294,7 @@ export function MacroTrendChart({ refreshKey }: { refreshKey: number }) {
                 strokeLinejoin="round"
                 dot={{ r: 3, fill: colorFor(s.key), strokeWidth: 0 }}
                 activeDot={{ r: 5, fill: colorFor(s.key), stroke: isDark ? '#1a1a19' : '#fcfcfb', strokeWidth: 2 }}
-                label={endLabel(colorFor(s.key), data, s.key === 'calories' ? '' : 'g')}
+                label={endLabel(colorFor(s.key), data, s.key, s.key === 'calories' ? '' : 'g')}
               />
             ))}
           </LineChart>
