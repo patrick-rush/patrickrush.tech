@@ -12,23 +12,17 @@ import {
   Tooltip,
 } from 'recharts'
 import type { LabelProps } from 'recharts'
-import {
-  eachDayOfInterval,
-  eachHourOfInterval,
-  format,
-  parseISO,
-  startOfDay,
-  startOfHour,
-  subDays,
-  subHours,
-} from 'date-fns'
+import { eachDayOfInterval, format, parseISO, startOfDay, subDays } from 'date-fns'
 import { getMealsInRange, type MealRow } from '@/lib/meals-actions'
 
 type SeriesKey = 'calories' | 'proteinG' | 'carbsG' | 'fatG'
-type Range = '24h' | 'week' | 'month'
+type Range = 'today' | 'week' | 'month'
 
-type Bucket = {
-  bucket: string // ISO timestamp of bucket start
+// t: epoch ms — always plotted on a real numeric time axis, so gaps between
+// meals (Today) or between days (Week/Month) are spatially proportional
+// rather than evenly spaced by category.
+type Point = {
+  t: number
   calories: number
   proteinG: number
   carbsG: number
@@ -46,7 +40,7 @@ const SERIES: { key: SeriesKey; label: string; color: { light: string; dark: str
 ]
 
 const RANGES: { key: Range; label: string }[] = [
-  { key: '24h', label: '24 hours' },
+  { key: 'today', label: 'Today' },
   { key: 'week', label: 'Week' },
   { key: 'month', label: 'Month' },
 ]
@@ -54,49 +48,70 @@ const RANGES: { key: Range; label: string }[] = [
 const GRID_COLOR = { light: '#e1e0d9', dark: '#2c2c2a' }
 const AXIS_COLOR = '#898781'
 
-function rangeConfig(range: Range) {
+function fetchWindow(range: Range) {
   const now = new Date()
-  if (range === '24h') {
-    return {
-      start: startOfHour(subHours(now, 23)),
-      end: now,
-      buckets: eachHourOfInterval({ start: startOfHour(subHours(now, 23)), end: now }),
-      keyFn: (d: Date) => format(d, "yyyy-MM-dd'T'HH"),
-      tickFormat: (d: Date) => format(d, 'ha'),
-      tooltipFormat: (d: Date) => format(d, 'EEE, MMM d · h a'),
-    }
-  }
+  if (range === 'today') return { start: startOfDay(now), end: now }
   const days = range === 'week' ? 6 : 29
-  const start = startOfDay(subDays(now, days))
-  return {
-    start,
-    end: now,
-    buckets: eachDayOfInterval({ start, end: now }),
-    keyFn: (d: Date) => format(d, 'yyyy-MM-dd'),
-    tickFormat: (d: Date) => format(d, 'MMM d'),
-    tooltipFormat: (d: Date) => format(d, 'EEE, MMM d'),
-  }
+  return { start: startOfDay(subDays(now, days)), end: now }
 }
 
-function bucketMeals(rows: MealRow[], range: Range): Bucket[] {
-  const config = rangeConfig(range)
-  const byKey = new Map<string, MealRow[]>()
+function tickFormat(range: Range, t: number) {
+  return range === 'today' ? format(t, 'ha') : format(t, 'MMM d')
+}
+
+function tooltipFormat(range: Range, t: number) {
+  return range === 'today' ? format(t, 'h:mm a') : format(t, 'EEE, MMM d')
+}
+
+// "Today": a running cumulative total that rises as meals are logged, so the
+// line shows progress through the day toward a target rather than discrete
+// per-hour amounts — that's the actual question ("how am I tracking today"),
+// not "how much did I eat in each hour."
+function cumulativeToday(rows: MealRow[]): Point[] {
+  const { start, end } = fetchWindow('today')
+  const sorted = [...rows].sort(
+    (a, b) => parseISO(a.loggedAt).getTime() - parseISO(b.loggedAt).getTime(),
+  )
+
+  const points: Point[] = [{ t: start.getTime(), calories: 0, proteinG: 0, carbsG: 0, fatG: 0 }]
+  let running = { calories: 0, proteinG: 0, carbsG: 0, fatG: 0 }
+  for (const r of sorted) {
+    running = {
+      calories: running.calories + r.calories,
+      proteinG: running.proteinG + r.proteinG,
+      carbsG: running.carbsG + r.carbsG,
+      fatG: running.fatG + r.fatG,
+    }
+    points.push({ t: parseISO(r.loggedAt).getTime(), ...running })
+  }
+  // Extend the line flat to "now" so it doesn't stop at the last meal.
+  points.push({ t: end.getTime(), ...running })
+  return points
+}
+
+// Week/Month: one point per day, that day's total — not cumulative.
+function dailyTotals(rows: MealRow[], range: Range): Point[] {
+  const { start, end } = fetchWindow(range)
+  const days = eachDayOfInterval({ start, end })
+
+  const byDay = new Map<string, MealRow[]>()
   for (const row of rows) {
-    const key = config.keyFn(parseISO(row.loggedAt))
-    byKey.set(key, [...(byKey.get(key) ?? []), row])
+    const key = format(parseISO(row.loggedAt), 'yyyy-MM-dd')
+    byDay.set(key, [...(byDay.get(key) ?? []), row])
   }
 
-  return config.buckets.map((b) => {
-    const rowsInBucket = byKey.get(config.keyFn(b)) ?? []
-    return rowsInBucket.reduce(
+  return days.map((day) => {
+    const key = format(day, 'yyyy-MM-dd')
+    const dayRows = byDay.get(key) ?? []
+    return dayRows.reduce(
       (acc, r) => ({
-        bucket: acc.bucket,
+        t: acc.t,
         calories: acc.calories + r.calories,
         proteinG: acc.proteinG + r.proteinG,
         carbsG: acc.carbsG + r.carbsG,
         fatG: acc.fatG + r.fatG,
       }),
-      { bucket: b.toISOString(), calories: 0, proteinG: 0, carbsG: 0, fatG: 0 },
+      { t: day.getTime(), calories: 0, proteinG: 0, carbsG: 0, fatG: 0 },
     )
   })
 }
@@ -109,20 +124,17 @@ function TrendTooltip({
   colorFor,
 }: {
   active?: boolean
-  payload?: { payload: Bucket }[]
+  payload?: { payload: Point }[]
   visible: Record<SeriesKey, boolean>
   range: Range
   colorFor: (key: SeriesKey) => string
 }) {
   if (!active || !payload?.length) return null
   const d = payload[0].payload
-  const config = rangeConfig(range)
 
   return (
     <div className="rounded-md border border-zinc-900/10 bg-white px-3 py-2 text-sm shadow-md dark:border-zinc-700 dark:bg-zinc-800">
-      <p className="text-xs text-zinc-500 dark:text-zinc-400">
-        {config.tooltipFormat(parseISO(d.bucket))}
-      </p>
+      <p className="text-xs text-zinc-500 dark:text-zinc-400">{tooltipFormat(range, d.t)}</p>
       <div className="mt-1 space-y-0.5">
         {SERIES.filter((s) => visible[s.key]).map((s) => (
           <p key={s.key} className="flex items-center gap-1.5 text-zinc-900 dark:text-zinc-100">
@@ -145,21 +157,14 @@ function TrendTooltip({
 // Direct end-of-line value label — required relief for the two
 // default-visible series (carbs/fat) whose light-mode hues sit below 3:1
 // contrast against the chart surface (see dataviz skill's contrast check).
-function endLabel(color: string, data: Bucket[], suffix: string) {
+function endLabel(color: string, data: Point[], suffix: string) {
   function EndLabel(props: LabelProps) {
     const { x, y, index, value } = props
     if (index !== data.length - 1 || typeof x !== 'number' || typeof y !== 'number') {
       return null
     }
     return (
-      <text
-        x={x + 6}
-        y={y}
-        dy={4}
-        fill={color}
-        fontSize={11}
-        fontWeight={600}
-      >
+      <text x={x + 6} y={y} dy={4} fill={color} fontSize={11} fontWeight={600}>
         {Math.round(Number(value)).toLocaleString()}
         {suffix}
       </text>
@@ -172,7 +177,7 @@ export function MacroTrendChart({ refreshKey }: { refreshKey: number }) {
   const { resolvedTheme } = useTheme()
   const isDark = resolvedTheme === 'dark'
 
-  const [range, setRange] = useState<Range>('24h')
+  const [range, setRange] = useState<Range>('today')
   const [visible, setVisible] = useState<Record<SeriesKey, boolean>>({
     calories: false,
     proteinG: false,
@@ -183,7 +188,7 @@ export function MacroTrendChart({ refreshKey }: { refreshKey: number }) {
 
   useEffect(() => {
     let cancelled = false
-    const { start, end } = rangeConfig(range)
+    const { start, end } = fetchWindow(range)
     getMealsInRange(start.toISOString(), end.toISOString()).then((result) => {
       if (!cancelled) setRows(result)
     })
@@ -192,14 +197,17 @@ export function MacroTrendChart({ refreshKey }: { refreshKey: number }) {
     }
   }, [range, refreshKey])
 
-  const data = useMemo(() => bucketMeals(rows ?? [], range), [rows, range])
+  const data = useMemo(
+    () => (range === 'today' ? cumulativeToday(rows ?? []) : dailyTotals(rows ?? [], range)),
+    [rows, range],
+  )
+  const { start, end } = fetchWindow(range)
 
   const colorFor = (key: SeriesKey) => {
     const s = SERIES.find((s) => s.key === key)!
     return isDark ? s.color.dark : s.color.light
   }
   const gridColor = isDark ? GRID_COLOR.dark : GRID_COLOR.light
-  const config = rangeConfig(range)
 
   return (
     <div className="rounded-2xl border border-zinc-100 p-6 dark:border-zinc-700/40">
@@ -252,8 +260,10 @@ export function MacroTrendChart({ refreshKey }: { refreshKey: number }) {
           <LineChart data={data} margin={{ top: 8, right: 40, left: -16, bottom: 0 }}>
             <CartesianGrid vertical={false} stroke={gridColor} />
             <XAxis
-              dataKey="bucket"
-              tickFormatter={(d) => config.tickFormat(parseISO(d))}
+              dataKey="t"
+              type="number"
+              domain={[start.getTime(), end.getTime()]}
+              tickFormatter={(t) => tickFormat(range, t)}
               stroke={AXIS_COLOR}
               fontSize={12}
               tickLine={false}
@@ -268,7 +278,7 @@ export function MacroTrendChart({ refreshKey }: { refreshKey: number }) {
             {SERIES.filter((s) => visible[s.key]).map((s) => (
               <Line
                 key={s.key}
-                type="monotone"
+                type={range === 'today' ? 'stepAfter' : 'monotone'}
                 dataKey={s.key}
                 stroke={colorFor(s.key)}
                 strokeWidth={2}
