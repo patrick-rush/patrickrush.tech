@@ -71,7 +71,11 @@ export function MealEntryForm({ onSaved }: { onSaved?: () => void }) {
         proteinG: fields.proteinG,
         carbsG: fields.carbsG,
         fatG: fields.fatG,
-        loggedAt: fields.loggedAt,
+        // fields.loggedAt is a timezone-naive "datetime-local" string —
+        // resolve it to an absolute instant here, in the browser, where the
+        // timezone is actually known. Sending the naive string as-is would
+        // have the server (UTC on Vercel) reinterpret it in the wrong zone.
+        loggedAt: new Date(fields.loggedAt).toISOString(),
       })
       setPhase('input')
       setRawInput('')
