@@ -10,10 +10,13 @@ import {
   YAxis,
   CartesianGrid,
   Tooltip,
+  ReferenceLine,
 } from 'recharts'
 import type { LabelProps } from 'recharts'
 import { eachDayOfInterval, format, parseISO, startOfDay, subDays } from 'date-fns'
 import { getMealsInRange, type MealRow } from '@/lib/meals-actions'
+import { getMacroTargets } from '@/lib/macro-targets-actions'
+import { DEFAULT_TARGETS, type MacroTargets } from '@/lib/macro-targets'
 
 type SeriesKey = 'calories' | 'proteinG' | 'netCarbsG' | 'fatG'
 type Range = 'today' | 'week' | 'month'
@@ -193,6 +196,7 @@ export function MacroTrendChart({ refreshKey }: { refreshKey: number }) {
     fatG: true,
   })
   const [rows, setRows] = useState<MealRow[] | null>(null)
+  const [targets, setTargets] = useState<MacroTargets>(DEFAULT_TARGETS)
 
   useEffect(() => {
     let cancelled = false
@@ -204,6 +208,16 @@ export function MacroTrendChart({ refreshKey }: { refreshKey: number }) {
       cancelled = true
     }
   }, [range, refreshKey])
+
+  useEffect(() => {
+    let cancelled = false
+    getMacroTargets().then((result) => {
+      if (!cancelled) setTargets(result)
+    })
+    return () => {
+      cancelled = true
+    }
+  }, [])
 
   const data = useMemo(
     () => (range === 'today' ? cumulativeToday(rows ?? []) : dailyTotals(rows ?? [], range)),
@@ -265,7 +279,7 @@ export function MacroTrendChart({ refreshKey }: { refreshKey: number }) {
 
       <div className="mt-4 h-64">
         <ResponsiveContainer width="100%" height="100%">
-          <LineChart data={data} margin={{ top: 8, right: 40, left: -16, bottom: 0 }}>
+          <LineChart data={data} margin={{ top: 8, right: 40, left: 0, bottom: 0 }}>
             <CartesianGrid vertical={false} stroke={gridColor} />
             <XAxis
               dataKey="t"
@@ -278,11 +292,29 @@ export function MacroTrendChart({ refreshKey }: { refreshKey: number }) {
               axisLine={false}
               minTickGap={24}
             />
-            <YAxis stroke={AXIS_COLOR} fontSize={12} tickLine={false} axisLine={false} width={40} />
+            <YAxis stroke={AXIS_COLOR} fontSize={12} tickLine={false} axisLine={false} width={52} />
             <Tooltip
               content={<TrendTooltip visible={visible} range={range} colorFor={colorFor} />}
               cursor={{ stroke: gridColor, strokeWidth: 1 }}
             />
+            {SERIES.filter((s) => visible[s.key]).map((s) => (
+              <ReferenceLine
+                key={`target-${s.key}`}
+                y={targets[s.key]}
+                stroke={colorFor(s.key)}
+                strokeDasharray="4 4"
+                strokeOpacity={0.6}
+                strokeWidth={1.5}
+                ifOverflow="extendDomain"
+                label={{
+                  value: `${formatValue(s.key, targets[s.key])} target`,
+                  position: 'insideBottomLeft',
+                  fill: colorFor(s.key),
+                  fontSize: 10,
+                  fontWeight: 600,
+                }}
+              />
+            ))}
             {SERIES.filter((s) => visible[s.key]).map((s) => (
               <Line
                 key={s.key}
