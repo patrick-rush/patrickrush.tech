@@ -19,7 +19,11 @@ export function MacrosDashboard() {
           Recent meals
         </h2>
         <div className="mt-4">
-          <RecentMealsPanel limit={8} refreshKey={refreshKey} />
+          <RecentMealsPanel
+            limit={8}
+            refreshKey={refreshKey}
+            onChanged={() => setRefreshKey((k) => k + 1)}
+          />
         </div>
       </div>
     </div>

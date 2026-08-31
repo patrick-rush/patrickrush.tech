@@ -94,6 +94,46 @@ export async function saveMeal(input: SaveMealInput): Promise<void> {
   revalidatePath('/tools/macros')
 }
 
+export type UpdateMealInput = {
+  id: string
+  name: string
+  calories: number
+  proteinG: number
+  netCarbsG: number
+  fatG: number
+  loggedAt: string
+}
+
+export async function updateMeal(input: UpdateMealInput): Promise<void> {
+  const userId = await requireUserId()
+
+  await db
+    .update(meals)
+    .set({
+      name: input.name,
+      calories: input.calories,
+      proteinG: input.proteinG,
+      netCarbsG: input.netCarbsG,
+      fatG: input.fatG,
+      loggedAt: new Date(input.loggedAt),
+    })
+    // Scoped to userId too, not just id — a user can only ever edit their
+    // own meals, even though there's one user today.
+    .where(and(eq(meals.id, input.id), eq(meals.userId, userId)))
+
+  revalidatePath('/tools/macros')
+  revalidatePath('/tools/macros/history')
+}
+
+export async function deleteMeal(id: string): Promise<void> {
+  const userId = await requireUserId()
+
+  await db.delete(meals).where(and(eq(meals.id, id), eq(meals.userId, userId)))
+
+  revalidatePath('/tools/macros')
+  revalidatePath('/tools/macros/history')
+}
+
 export type MealRow = {
   id: string
   name: string
