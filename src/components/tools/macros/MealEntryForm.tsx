@@ -65,7 +65,8 @@ export function MealEntryForm({ onSaved }: { onSaved?: () => void }) {
     setSaving(true)
     try {
       await saveMeal({
-        rawInput,
+        // Manual entries (no AI estimate) may never have a description typed.
+        rawInput: rawInput.trim() || '(entered manually)',
         name: fields.name,
         calories: fields.calories,
         proteinG: fields.proteinG,
@@ -94,6 +95,12 @@ export function MealEntryForm({ onSaved }: { onSaved?: () => void }) {
     setError(null)
   }
 
+  function onEnterManually() {
+    setError(null)
+    setFields({ ...emptyFields, loggedAt: nowForInput() })
+    setPhase('review')
+  }
+
   return (
     <div className="rounded-2xl border border-zinc-100 p-6 dark:border-zinc-700/40">
       <h2 className="text-sm font-semibold text-zinc-900 dark:text-zinc-100">
@@ -111,9 +118,12 @@ export function MealEntryForm({ onSaved }: { onSaved?: () => void }) {
             rows={3}
             className="min-w-0 flex-auto appearance-none rounded-md border border-zinc-900/10 bg-white px-3 py-2 shadow-md shadow-zinc-800/5 placeholder:text-zinc-400 focus:border-teal-500 focus:outline-none focus:ring-4 focus:ring-teal-500/10 dark:border-zinc-700 dark:bg-zinc-700/[0.15] dark:text-zinc-200 dark:placeholder:text-zinc-500 dark:focus:border-teal-400 dark:focus:ring-teal-400/10 sm:text-sm w-full"
           />
-          <div className="mt-4">
+          <div className="mt-4 flex gap-3">
             <Button type="submit" disabled={estimating}>
               {estimating ? 'Estimating…' : 'Estimate'}
+            </Button>
+            <Button type="button" variant="secondary" onClick={onEnterManually} disabled={estimating}>
+              Enter manually
             </Button>
           </div>
         </form>

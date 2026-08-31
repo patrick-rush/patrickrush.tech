@@ -3,7 +3,7 @@
 import { useState } from 'react'
 import { format, parseISO } from 'date-fns'
 import { Button } from '@/components/Button'
-import { deleteMeal, updateMeal, type MealRow } from '@/lib/meals-actions'
+import { deleteMeal, duplicateMeal, updateMeal, type MealRow } from '@/lib/meals-actions'
 import { MacroFieldsEditor, type MacroFieldsValue } from './MacroFieldsEditor'
 
 function toEditValues(meal: MealRow): MacroFieldsValue {
@@ -75,6 +75,16 @@ export function RecentMealsList({
     }
   }
 
+  async function onDuplicate(id: string) {
+    setBusyId(id)
+    try {
+      await duplicateMeal(id)
+      onChanged?.()
+    } finally {
+      setBusyId(null)
+    }
+  }
+
   if (meals.length === 0) {
     return (
       <p className="text-sm text-zinc-600 dark:text-zinc-400">
@@ -120,6 +130,14 @@ export function RecentMealsList({
                   </p>
                 </div>
                 <div className="flex flex-col items-end gap-1 text-xs">
+                  <button
+                    type="button"
+                    onClick={() => onDuplicate(meal.id)}
+                    disabled={busyId === meal.id}
+                    className="font-medium text-teal-600 hover:text-teal-500 disabled:opacity-50 dark:text-teal-400"
+                  >
+                    {busyId === meal.id ? '…' : 'Duplicate'}
+                  </button>
                   <button
                     type="button"
                     onClick={() => startEdit(meal)}

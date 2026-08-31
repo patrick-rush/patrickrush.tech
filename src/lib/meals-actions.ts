@@ -134,6 +134,32 @@ export async function deleteMeal(id: string): Promise<void> {
   revalidatePath('/tools/macros/history')
 }
 
+// Copies an existing meal's macros into a new row logged as "now" — for
+// re-logging something you've eaten before. Edit is one click away
+// afterward if the copy needs adjusting (e.g. a different portion size).
+export async function duplicateMeal(id: string): Promise<void> {
+  const userId = await requireUserId()
+
+  const original = await db.query.meals.findFirst({
+    where: and(eq(meals.id, id), eq(meals.userId, userId)),
+  })
+  if (!original) throw new Error('Meal not found')
+
+  await db.insert(meals).values({
+    userId,
+    rawInput: original.rawInput,
+    name: original.name,
+    calories: original.calories,
+    proteinG: original.proteinG,
+    netCarbsG: original.netCarbsG,
+    fatG: original.fatG,
+    loggedAt: new Date(),
+  })
+
+  revalidatePath('/tools/macros')
+  revalidatePath('/tools/macros/history')
+}
+
 export type MealRow = {
   id: string
   name: string
