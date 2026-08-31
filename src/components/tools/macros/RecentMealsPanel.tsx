@@ -7,11 +7,19 @@ import { RecentMealsList } from './RecentMealsList'
 export function RecentMealsPanel({
   limit,
   refreshKey,
+  onChanged,
 }: {
   limit: number
   refreshKey?: number
+  // Called (in addition to this panel's own refetch below) when a meal is
+  // edited/deleted here, so a parent holding sibling components — e.g. the
+  // dashboard's TodayTotals/MacroTrendChart — can refresh them too.
+  onChanged?: () => void
 }) {
   const [meals, setMeals] = useState<MealRow[] | null>(null)
+  // Bumped after an edit/delete so this panel refetches even on pages (like
+  // /tools/macros/history) with no parent refreshKey to react to.
+  const [localRefresh, setLocalRefresh] = useState(0)
 
   useEffect(() => {
     let cancelled = false
@@ -21,7 +29,7 @@ export function RecentMealsPanel({
     return () => {
       cancelled = true
     }
-  }, [limit, refreshKey])
+  }, [limit, refreshKey, localRefresh])
 
   if (meals === null) {
     return (
@@ -29,5 +37,13 @@ export function RecentMealsPanel({
     )
   }
 
-  return <RecentMealsList meals={meals} />
+  return (
+    <RecentMealsList
+      meals={meals}
+      onChanged={() => {
+        setLocalRefresh((k) => k + 1)
+        onChanged?.()
+      }}
+    />
+  )
 }
